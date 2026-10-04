@@ -5,26 +5,21 @@ import { Desk } from "./Desk";
 import { Keyboard } from "./Keyboard";
 import { Lamp } from "./Lamp";
 import { Monitor } from "./Monitor";
+import { ScreenGlow } from "./ScreenGlow";
 
 export function Scene() {
   return (
     <>
       <color attach="background" args={["#090a0e"]} />
       <fog attach="fog" args={["#090a0e", 7, 18]} />
-      <ambientLight color="#8b9bb4" intensity={0.16} />
+      <ambientLight color="#303a55" intensity={0.5} />
+      <ScreenGlow />
       <pointLight
-        color="#6f94ff"
-        intensity={6}
-        distance={6}
-        decay={2}
-        position={[0, 1.55, 0.95]}
-      />
-      <pointLight
-        color="#6f94ff"
-        intensity={1.4}
-        distance={8}
-        decay={2}
-        position={[2.4, 1.8, -1.1]}
+        color="#3a4fa0"
+        intensity={2.4}
+        distance={10}
+        decay={1}
+        position={[3, 2.5, -2]}
       />
       <CameraRig />
       <Desk />

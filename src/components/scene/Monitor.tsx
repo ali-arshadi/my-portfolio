@@ -3,65 +3,44 @@
 import { useLayoutEffect, useMemo } from "react";
 import { CanvasTexture, SRGBColorSpace } from "three";
 
-const BEZEL_Z = 0.35;
-const SCREEN_Z = 0.43;
-
 function createScreenTexture() {
-  const width = 1024;
-  const height = 600;
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = 1024;
+  canvas.height = 600;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("TODO: 2d canvas context unavailable for monitor screen");
   }
 
-  ctx.fillStyle = "#0b0d12";
-  ctx.fillRect(0, 0, width, height);
-
-  ctx.fillStyle = "#141821";
-  ctx.fillRect(0, 0, width, 44);
+  ctx.fillStyle = "#0b0d13";
+  ctx.fillRect(0, 0, 1024, 600);
 
   const dots = ["#ff5f57", "#febc2e", "#28c840"];
   dots.forEach((color, index) => {
-    ctx.beginPath();
     ctx.fillStyle = color;
-    ctx.arc(28 + index * 22, 22, 6, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  const bars = [
-    { width: 280, color: "#3d4f6f" },
-    { width: 360, color: "#4a5d3a" },
-    { width: 180, color: "#6b4a2a" },
-    { width: 310, color: "#3d4f6f" },
-    { width: 220, color: "#4a3d6f" },
-    { width: 400, color: "#3d4f6f" },
-    { width: 140, color: "#4a5d3a" },
-    { width: 300, color: "#3d4f6f" },
-    { width: 250, color: "#6b4a2a" },
-    { width: 190, color: "#4a3d6f" },
-    { width: 340, color: "#3d4f6f" },
-    { width: 160, color: "#4a5d3a" },
-  ];
-
-  bars.forEach((bar, index) => {
-    ctx.fillStyle = bar.color;
     ctx.beginPath();
-    ctx.roundRect(36, 78 + index * 36, bar.width, 14, 4);
+    ctx.arc(40 + index * 28, 36, 8, 0, Math.PI * 2);
     ctx.fill();
   });
 
+  const barColors = ["#7aa2ff", "#ffb454", "#8fd3a8", "#c39bff", "#5b6275"];
+  for (let index = 0; index < 16; index += 1) {
+    ctx.fillStyle = barColors[(index * 3) % 5];
+    ctx.globalAlpha = 0.85;
+    const indent = (index % 4) * 34;
+    ctx.fillRect(60 + indent, 90 + index * 28, 80 + ((index * 97) % 300), 12);
+  }
+
+  ctx.globalAlpha = 1;
   ctx.fillStyle = "#e9e7e2";
   ctx.font =
-    "600 44px 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText("Ali Arshadi", 580, 280);
+    "700 64px 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("Ali Arshadi", 600, 300);
   ctx.fillStyle = "#8b8f9c";
   ctx.font =
-    "400 26px 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText("Front-end developer", 580, 322);
+    "400 28px 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("Front-end developer", 604, 350);
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
@@ -80,27 +59,19 @@ export function Monitor() {
 
   return (
     <group>
-      <mesh position={[0, 1.55, BEZEL_Z]}>
+      <mesh position={[0, 1.55, 0]}>
         <boxGeometry args={[3.3, 1.95, 0.12]} />
-        <meshStandardMaterial
-          color="#12141a"
-          metalness={0.35}
-          roughness={0.45}
-        />
+        <meshStandardMaterial color="#0c0d12" roughness={0.4} metalness={0.5} />
       </mesh>
-      <mesh position={[0, 0.41, BEZEL_Z]}>
+      <mesh position={[0, 0.55, -0.1]}>
         <boxGeometry args={[0.25, 0.7, 0.12]} />
-        <meshStandardMaterial color="#12141a" metalness={0.3} roughness={0.5} />
+        <meshStandardMaterial color="#1a1c24" roughness={0.4} metalness={0.6} />
       </mesh>
-      <mesh position={[0, 0.03, BEZEL_Z]}>
+      <mesh position={[0, 0.03, -0.05]}>
         <boxGeometry args={[1.2, 0.06, 0.7]} />
-        <meshStandardMaterial
-          color="#12141a"
-          metalness={0.4}
-          roughness={0.42}
-        />
+        <meshStandardMaterial color="#1a1c24" roughness={0.4} metalness={0.6} />
       </mesh>
-      <mesh position={[0, 1.55, SCREEN_Z]}>
+      <mesh position={[0, 1.55, 0.07]}>
         <planeGeometry args={[3.05, 1.78]} />
         <meshBasicMaterial map={texture} />
       </mesh>

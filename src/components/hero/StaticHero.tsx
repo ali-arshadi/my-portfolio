@@ -1,4 +1,28 @@
+"use client";
+
+import { useScrollProgress } from "@/components/scene/useScrollProgress";
+import { useEffect, useRef } from "react";
+
 export function StaticHero() {
+  const textRef = useRef<HTMLDivElement>(null);
+  const progress = useScrollProgress();
+
+  useEffect(() => {
+    let frame = 0;
+
+    const tick = () => {
+      if (textRef.current) {
+        textRef.current.style.opacity = String(
+          Math.max(0, 1 - progress.current.p * 3.2),
+        );
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [progress]);
+
   return (
     <>
       <a
@@ -7,14 +31,19 @@ export function StaticHero() {
       >
         Skip to content
       </a>
-      <div className="relative z-10 mx-auto w-full max-w-[1040px] px-6 pb-16 pt-24 md:px-10 md:pb-24">
-        <h1 className="text-5xl font-bold tracking-tight sm:text-7xl md:text-8xl">
+      <div
+        ref={textRef}
+        className="pointer-events-none relative z-10 w-full px-[clamp(1.25rem,5vw,4rem)] pb-[9vh] pt-24 will-change-[opacity]"
+      >
+        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.92] tracking-[-0.03em]">
           Ali Arshadi
         </h1>
-        <p className="mt-4 text-lg text-muted sm:text-xl">
-          Front-end developer
+        <p className="mt-4 text-[clamp(1rem,2vw,1.35rem)] text-muted">
+          Front-end developer. Vue, Nuxt, React, TypeScript.
         </p>
-        <p className="mt-8 text-lamp">Scroll to step up to the screen</p>
+        <p className="mt-8 text-[0.95rem] text-lamp">
+          Scroll to step up to the screen
+        </p>
       </div>
     </>
   );

@@ -8,7 +8,10 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <div id="content" className="relative bg-bg">
+      <div
+        id="content"
+        className="relative z-[2] bg-bg shadow-[0_-60px_80px_20px_#090a0e]"
+      >
         <SelectedWork />
         <Tools />
         <Experience />

@@ -14,13 +14,13 @@ const KEY_COUNT = ROWS * COLS;
 
 export function Keyboard() {
   const keysRef = useRef<InstancedMesh>(null);
-  const geometry = useMemo(() => new BoxGeometry(0.12, 0.04, 0.12), []);
+  const geometry = useMemo(() => new BoxGeometry(0.11, 0.04, 0.1), []);
   const material = useMemo(
     () =>
       new MeshStandardMaterial({
-        color: "#3f4654",
-        metalness: 0.16,
-        roughness: 0.55,
+        color: "#232733",
+        roughness: 0.5,
+        metalness: 0.3,
       }),
     [],
   );
@@ -32,15 +32,11 @@ export function Keyboard() {
     }
 
     const dummy = new Object3D();
-    const startX = -0.84;
-    const startZ = -0.21;
-    const gapX = 0.14;
-    const gapZ = 0.14;
     let index = 0;
 
     for (let row = 0; row < ROWS; row += 1) {
       for (let col = 0; col < COLS; col += 1) {
-        dummy.position.set(startX + col * gapX, 0.09, startZ + row * gapZ);
+        dummy.position.set(-0.85 + col * 0.142, 0.08, 0.95 + row * 0.14);
         dummy.updateMatrix();
         mesh.setMatrixAt(index, dummy.matrix);
         index += 1;
@@ -59,20 +55,16 @@ export function Keyboard() {
   }, [geometry, material]);
 
   return (
-    <group position={[0, 0, 1.35]}>
-      <mesh position={[0, 0.03, 0]}>
+    <>
+      <mesh position={[0, 0.03, 1.15]}>
         <boxGeometry args={[1.9, 0.06, 0.62]} />
-        <meshStandardMaterial
-          color="#14171f"
-          metalness={0.28}
-          roughness={0.55}
-        />
+        <meshStandardMaterial color="#14161c" roughness={0.5} metalness={0.4} />
       </mesh>
       <instancedMesh
         ref={keysRef}
         args={[geometry, material, KEY_COUNT]}
         frustumCulled={false}
       />
-    </group>
+    </>
   );
 }
