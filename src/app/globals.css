@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #090a0e;
+  --fg: #e9e7e2;
+  --muted: #8b8f9c;
+  --lamp: #ffb454;
+  --card: #0f1118;
+  --line: #1f2330;
+  --radius-card: 0.75rem;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-lamp: var(--lamp);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --radius-card: var(--radius-card);
+  --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--lamp);
+  outline-offset: 3px;
+}
