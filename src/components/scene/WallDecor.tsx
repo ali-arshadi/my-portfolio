@@ -3,6 +3,7 @@
 import { RoundedBox } from "@react-three/drei";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useThree } from "@react-three/fiber";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import {
   CanvasTexture,
   CatmullRomCurve3,
@@ -14,21 +15,58 @@ import {
   MeshStandardMaterial,
   Object3D,
   Quaternion,
+  RepeatWrapping,
   Shape,
   SRGBColorSpace,
   TubeGeometry,
   Vector3,
   type InstancedMesh,
+  type SpotLight,
 } from "three";
 
-const SHELF = {
-  x: -0.05,
-  y: 2.78,
-  z: -2.74,
-  width: 4.55,
-  height: 0.16,
-  depth: 0.42,
+RectAreaLightUniformsLib.init();
+
+export const BACK_WALL = {
+  x: -0.75,
+  y: 1.06,
+  z: -2.59,
+  width: 8.8,
+  height: 6.68,
+  depth: 0.14,
 } as const;
+
+export const LEFT_WALL = {
+  cornerX: -5.15,
+  cornerZ: -2.52,
+  yaw: Math.atan2(0.872, 0.493),
+  length: 5.8,
+  thickness: 0.12,
+} as const;
+
+const SHELF = {
+  x: -1.55,
+  y: 2.66,
+  z: -2.3,
+  width: 4.05,
+  height: 0.17,
+  depth: 0.4,
+} as const;
+
+export function roomShift(narrow: boolean) {
+  return narrow ? { x: 2.05, y: 0.68, z: 0.12 } : { x: 0, y: 0, z: 0 };
+}
+
+function leftWallPoint(along: number, y: number, gap: number) {
+  const yaw = LEFT_WALL.yaw;
+  const half = LEFT_WALL.length / 2;
+  const centerX = LEFT_WALL.cornerX - Math.cos(yaw) * half;
+  const centerZ = LEFT_WALL.cornerZ + Math.sin(yaw) * half;
+  return [
+    centerX + Math.cos(yaw) * along + Math.sin(yaw) * gap,
+    y,
+    centerZ - Math.sin(yaw) * along + Math.cos(yaw) * gap,
+  ] as const;
+}
 
 const SHELF_TOP = SHELF.y + SHELF.height / 2;
 
@@ -45,56 +83,56 @@ type BookSpec = {
 const BOOKS: readonly BookSpec[] = [
   {
     title: "Vue.js",
-    x: -1.92,
+    x: -1.52,
     height: 0.48,
     thickness: 0.078,
     depth: 0.3,
-    color: "#3a3e48",
+    color: "#4a5160",
     yaw: 0.015,
   },
   {
     title: "Nuxt.js",
-    x: -1.8,
+    x: -1.36,
     height: 0.56,
     thickness: 0.096,
     depth: 0.32,
-    color: "#343a46",
+    color: "#2a3344",
     yaw: -0.012,
   },
   {
     title: "React",
-    x: -1.66,
+    x: -1.18,
     height: 0.5,
     thickness: 0.084,
     depth: 0.3,
-    color: "#3e3c40",
+    color: "#5c564e",
     yaw: 0.01,
   },
   {
     title: "TypeScript",
-    x: -1.5,
+    x: -0.98,
     height: 0.62,
     thickness: 0.11,
     depth: 0.33,
-    color: "#2e3644",
+    color: "#35322f",
     yaw: 0.02,
   },
   {
     title: "Design",
-    x: -1.36,
+    x: -0.8,
     height: 0.44,
     thickness: 0.074,
     depth: 0.28,
-    color: "#3c3a40",
+    color: "#3e4654",
     yaw: -0.016,
   },
   {
     title: "Interfaces",
-    x: -1.22,
+    x: -0.62,
     height: 0.52,
     thickness: 0.09,
     depth: 0.31,
-    color: "#363940",
+    color: "#6a6158",
     yaw: 0.008,
   },
 ];
@@ -102,29 +140,29 @@ const BOOKS: readonly BookSpec[] = [
 const SHELF_VINES: readonly (readonly (readonly [number, number, number])[])[] =
   [
     [
-      [0.02, 0.18, 0.0],
-      [0.14, 0.36, 0.06],
-      [0.3, 0.16, 0.12],
-      [0.38, -0.16, 0.18],
-      [0.24, -0.58, 0.22],
+      [0.02, 0.16, 0.0],
+      [0.12, 0.3, 0.05],
+      [0.26, 0.1, 0.1],
+      [0.32, -0.14, 0.14],
+      [0.2, -0.38, 0.16],
     ],
     [
-      [0.04, 0.16, 0.02],
-      [0.2, 0.06, 0.1],
-      [0.34, -0.28, 0.16],
-      [0.46, -0.72, 0.2],
+      [0.04, 0.14, 0.02],
+      [0.18, 0.04, 0.08],
+      [0.3, -0.18, 0.12],
+      [0.36, -0.44, 0.15],
     ],
     [
-      [-0.02, 0.2, 0.0],
-      [-0.14, 0.32, 0.05],
-      [0.02, 0.1, 0.1],
-      [0.12, -0.38, 0.16],
+      [-0.02, 0.18, 0.0],
+      [-0.12, 0.26, 0.04],
+      [0.02, 0.06, 0.08],
+      [0.1, -0.24, 0.12],
     ],
     [
-      [0.08, 0.22, -0.02],
-      [0.24, 0.3, 0.04],
-      [0.36, 0.06, 0.1],
-      [0.3, -0.24, 0.14],
+      [0.06, 0.18, -0.02],
+      [0.2, 0.22, 0.04],
+      [0.28, 0.02, 0.08],
+      [0.22, -0.16, 0.11],
     ],
   ];
 
@@ -135,9 +173,9 @@ type LeafPlacement = {
   color: Color;
 };
 
-const LEAF_A = new Color("#304732");
-const LEAF_B = new Color("#3a5640");
-const LEAF_C = new Color("#2a4030");
+const LEAF_A = new Color("#304734");
+const LEAF_B = new Color("#38533b");
+const LEAF_C = new Color("#2c4334");
 
 function createPosterTexture() {
   const canvas = document.createElement("canvas");
@@ -148,14 +186,23 @@ function createPosterTexture() {
     throw new Error("2d canvas context unavailable for poster");
   }
 
-  ctx.fillStyle = "#121014";
+  ctx.fillStyle = "#1a181c";
   ctx.fillRect(0, 0, 1024, 1536);
 
+  for (let i = 0; i < 2200; i += 1) {
+    const x = (i * 97) % 1024;
+    const y = (i * 53) % 1536;
+    const alpha = 0.025 + (i % 5) * 0.008;
+    ctx.fillStyle =
+      i % 2 === 0 ? `rgba(255,248,236,${alpha})` : `rgba(0,0,0,${alpha})`;
+    ctx.fillRect(x, y, 2, 2);
+  }
+
   const lines = [
-    { text: "Build", color: "#e7e0d4" },
-    { text: "Ship", color: "#e7e0d4" },
-    { text: "Improve", color: "#e7e0d4" },
-    { text: "Repeat.", color: "#ffb454" },
+    { text: "Build", color: "#e8e2d6" },
+    { text: "Ship", color: "#e8e2d6" },
+    { text: "Improve", color: "#e8e2d6" },
+    { text: "Repeat.", color: "#e0a15a" },
   ];
 
   ctx.textBaseline = "top";
@@ -321,51 +368,156 @@ function Poster() {
     };
   }, [texture]);
 
-  const artW = narrow ? 1.9 : 2.4;
-  const artH = narrow ? 2.7 : 3.2;
-  const frame = 0.07;
+  const artW = narrow ? 1.22 : 1.72;
+  const artH = narrow ? 1.72 : 2.4;
+  const frame = 0.09;
+  const shift = roomShift(narrow);
+  const anchor = leftWallPoint(
+    narrow ? 2.35 : 0.72,
+    narrow ? 2.15 : 1.64,
+    0.09,
+  );
+  const position = [
+    anchor[0] + shift.x,
+    anchor[1] + shift.y,
+    anchor[2] + shift.z,
+  ] as const;
 
   return (
-    <group position={[narrow ? -4.15 : -6.5, narrow ? 2.05 : 2.12, -3.04]}>
+    <group position={position} rotation={[0, LEFT_WALL.yaw, 0]}>
       <mesh castShadow receiveShadow>
-        <boxGeometry args={[artW + frame * 2, artH + frame * 2, 0.045]} />
+        <boxGeometry args={[artW + frame * 2, artH + frame * 2, 0.07]} />
         <meshStandardMaterial
-          color="#3a342e"
-          roughness={0.62}
-          metalness={0.12}
+          color="#2a2724"
+          roughness={0.58}
+          metalness={0.28}
         />
       </mesh>
-      <mesh position={[0, 0, 0.026]} receiveShadow>
+      <mesh position={[0, 0, 0.042]} receiveShadow>
+        <planeGeometry args={[artW + 0.03, artH + 0.03]} />
+        <meshStandardMaterial color="#121114" roughness={0.94} metalness={0} />
+      </mesh>
+      <mesh position={[0, 0, 0.05]} receiveShadow>
         <planeGeometry args={[artW, artH]} />
         <meshStandardMaterial
           map={texture}
           color="#ffffff"
-          roughness={0.78}
+          roughness={0.92}
           metalness={0}
         />
       </mesh>
-      <pointLight
-        color="#ffb454"
-        intensity={3.1}
-        distance={5.5}
-        decay={2}
-        position={[0.85, -0.55, 2.2]}
-      />
     </group>
   );
 }
 
+function PosterSpill() {
+  const narrow = useThree((state) => state.size.width < 700);
+  const lightRef = useRef<SpotLight>(null);
+  const targetRef = useRef<Object3D>(null);
+  const shift = roomShift(narrow);
+  const anchor = leftWallPoint(narrow ? 2.35 : 0.72, narrow ? 2.15 : 1.64, 0.2);
+  const position = [
+    anchor[0] + shift.x,
+    anchor[1] + shift.y,
+    anchor[2] + shift.z,
+  ] as const;
+
+  useLayoutEffect(() => {
+    if (!lightRef.current || !targetRef.current) {
+      return;
+    }
+    lightRef.current.target = targetRef.current;
+    lightRef.current.target.updateMatrixWorld();
+  }, [narrow]);
+
+  return (
+    <group>
+      <spotLight
+        ref={lightRef}
+        color="#ffc48a"
+        intensity={8}
+        distance={7.5}
+        angle={1.25}
+        penumbra={1}
+        decay={2}
+        position={[position[0] + 2.1, position[1] + 0.55, position[2] + 1.6]}
+      />
+      <rectAreaLight
+        color="#ffc49a"
+        intensity={28}
+        width={3.6}
+        height={3.1}
+        position={[
+          position[0] + Math.sin(LEFT_WALL.yaw) * 1.55,
+          position[1] + 0.15,
+          position[2] + Math.cos(LEFT_WALL.yaw) * 1.55,
+        ]}
+        rotation={[0, LEFT_WALL.yaw + Math.PI, 0]}
+      />
+      <object3D ref={targetRef} position={position} />
+    </group>
+  );
+}
+
+function createWoodTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("2d canvas context unavailable for wood");
+  }
+
+  ctx.fillStyle = "#32261e";
+  ctx.fillRect(0, 0, 512, 128);
+
+  for (let i = 0; i < 46; i += 1) {
+    const y = (i * 29) % 128;
+    ctx.strokeStyle = i % 3 === 0 ? "rgba(86,58,38,0.55)" : "rgba(18,12,8,0.4)";
+    ctx.lineWidth = 1 + (i % 3);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= 512; x += 28) {
+      ctx.lineTo(x, y + Math.sin(x * 0.04 + i) * 2.2);
+    }
+    ctx.stroke();
+  }
+
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(1.4, 1);
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function Shelf() {
+  const wood = useMemo(() => createWoodTexture(), []);
+
+  useLayoutEffect(() => {
+    return () => {
+      wood.dispose();
+    };
+  }, [wood]);
+
   return (
     <RoundedBox
       args={[SHELF.width, SHELF.height, SHELF.depth]}
-      radius={0.012}
+      radius={0.014}
       smoothness={3}
       position={[SHELF.x, SHELF.y, SHELF.z]}
       castShadow
       receiveShadow
     >
-      <meshStandardMaterial color="#3a2c22" roughness={0.58} metalness={0.04} />
+      <meshPhysicalMaterial
+        map={wood}
+        color="#ffffff"
+        roughness={0.62}
+        metalness={0.02}
+        clearcoat={0.14}
+        clearcoatRoughness={0.58}
+      />
     </RoundedBox>
   );
 }
@@ -375,17 +527,17 @@ function useBookMaterials(spec: BookSpec) {
     const texture = createSpineTexture(spec.title, spec.color);
     const side = new MeshStandardMaterial({
       color: spec.color,
-      roughness: 0.8,
+      roughness: 0.76,
       metalness: 0.02,
     });
     const pages = new MeshStandardMaterial({
-      color: "#4a453c",
-      roughness: 0.9,
+      color: "#a39888",
+      roughness: 0.84,
       metalness: 0,
     });
     const spine = new MeshStandardMaterial({
       map: texture,
-      roughness: 0.74,
+      roughness: 0.72,
       metalness: 0.02,
     });
     return {
@@ -410,7 +562,7 @@ function Book({ spec }: { spec: BookSpec }) {
 
   return (
     <mesh
-      position={[spec.x, SHELF_TOP + spec.height / 2, -2.66]}
+      position={[SHELF.x + spec.x, SHELF_TOP + spec.height / 2, SHELF.z + 0.04]}
       rotation={[0, spec.yaw, 0]}
       material={materials}
       castShadow
@@ -433,54 +585,34 @@ function Books() {
 
 function DecorativeObject() {
   return (
-    <group position={[-0.42, SHELF_TOP, -2.66]} scale={2}>
+    <group position={[SHELF.x - 0.08, SHELF_TOP, SHELF.z + 0.04]} scale={2}>
       <mesh position={[0, 0.012, 0]} receiveShadow castShadow>
         <cylinderGeometry args={[0.09, 0.098, 0.022, 20]} />
         <meshStandardMaterial
-          color="#2a2826"
-          roughness={0.48}
-          metalness={0.35}
+          color="#3e3a36"
+          roughness={0.72}
+          metalness={0.12}
         />
       </mesh>
       <mesh position={[0, 0.1, 0]} castShadow>
         <capsuleGeometry args={[0.042, 0.07, 4, 8]} />
-        <meshStandardMaterial
-          color="#2c2c2c"
-          roughness={0.7}
-          metalness={0.06}
-        />
+        <meshStandardMaterial color="#5c564e" roughness={0.84} metalness={0} />
       </mesh>
       <mesh position={[0, 0.205, 0.008]} castShadow>
         <sphereGeometry args={[0.046, 16, 12]} />
-        <meshStandardMaterial
-          color="#262626"
-          roughness={0.68}
-          metalness={0.06}
-        />
+        <meshStandardMaterial color="#6a6258" roughness={0.8} metalness={0} />
       </mesh>
       <mesh position={[-0.028, 0.242, 0.006]} rotation={[0, 0, 0.4]} castShadow>
         <coneGeometry args={[0.016, 0.028, 6]} />
-        <meshStandardMaterial
-          color="#242424"
-          roughness={0.7}
-          metalness={0.05}
-        />
+        <meshStandardMaterial color="#4e4943" roughness={0.82} metalness={0} />
       </mesh>
       <mesh position={[0.028, 0.242, 0.006]} rotation={[0, 0, -0.4]} castShadow>
         <coneGeometry args={[0.016, 0.028, 6]} />
-        <meshStandardMaterial
-          color="#242424"
-          roughness={0.7}
-          metalness={0.05}
-        />
+        <meshStandardMaterial color="#4e4943" roughness={0.82} metalness={0} />
       </mesh>
       <mesh position={[-0.07, 0.09, 0.01]} rotation={[0.2, 0, 0.5]} castShadow>
         <capsuleGeometry args={[0.012, 0.04, 3, 6]} />
-        <meshStandardMaterial
-          color="#2a2a2a"
-          roughness={0.72}
-          metalness={0.05}
-        />
+        <meshStandardMaterial color="#534e48" roughness={0.84} metalness={0} />
       </mesh>
       <mesh
         position={[0.068, 0.095, 0.02]}
@@ -488,11 +620,7 @@ function DecorativeObject() {
         castShadow
       >
         <capsuleGeometry args={[0.012, 0.045, 3, 6]} />
-        <meshStandardMaterial
-          color="#2a2a2a"
-          roughness={0.72}
-          metalness={0.05}
-        />
+        <meshStandardMaterial color="#534e48" roughness={0.84} metalness={0} />
       </mesh>
     </group>
   );
@@ -550,8 +678,8 @@ function VinePlant({
       {tubes.map((tube, index) => (
         <mesh key={index} geometry={tube} castShadow>
           <meshStandardMaterial
-            color="#2c4030"
-            roughness={0.82}
+            color="#243628"
+            roughness={0.78}
             metalness={0}
           />
         </mesh>
@@ -561,9 +689,11 @@ function VinePlant({
         args={[leafGeometry, undefined, placements.length]}
         frustumCulled={false}
       >
-        <meshStandardMaterial
-          roughness={0.76}
+        <meshPhysicalMaterial
+          roughness={0.68}
           metalness={0}
+          clearcoat={0.08}
+          clearcoatRoughness={0.62}
           side={DoubleSide}
         />
       </instancedMesh>
@@ -573,22 +703,14 @@ function VinePlant({
 
 function ShelfPlant() {
   return (
-    <group position={[1.38, SHELF_TOP, -2.64]}>
+    <group position={[SHELF.x + 1.42, SHELF_TOP, SHELF.z + 0.03]}>
       <mesh position={[0, 0.08, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.11, 0.086, 0.16, 18]} />
-        <meshStandardMaterial
-          color="#34312e"
-          roughness={0.92}
-          metalness={0.02}
-        />
+        <meshStandardMaterial color="#6a6258" roughness={0.9} metalness={0} />
       </mesh>
       <mesh position={[0, 0.158, 0]} castShadow>
         <cylinderGeometry args={[0.122, 0.112, 0.022, 18]} />
-        <meshStandardMaterial
-          color="#3e3a36"
-          roughness={0.8}
-          metalness={0.04}
-        />
+        <meshStandardMaterial color="#7c746a" roughness={0.82} metalness={0} />
       </mesh>
       <mesh position={[0, 0.164, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.1, 18]} />
@@ -609,11 +731,11 @@ function createWallGlowTexture() {
   }
 
   const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-  gradient.addColorStop(0, "rgba(255, 180, 84, 0)");
-  gradient.addColorStop(0.22, "rgba(255, 180, 84, 0.03)");
-  gradient.addColorStop(0.46, "rgba(255, 180, 84, 0.16)");
-  gradient.addColorStop(0.64, "rgba(255, 180, 84, 0.05)");
-  gradient.addColorStop(1, "rgba(255, 180, 84, 0)");
+  gradient.addColorStop(0, "rgba(255, 176, 110, 0)");
+  gradient.addColorStop(0.18, "rgba(255, 176, 110, 0.015)");
+  gradient.addColorStop(0.42, "rgba(255, 176, 110, 0.07)");
+  gradient.addColorStop(0.68, "rgba(255, 176, 110, 0.02)");
+  gradient.addColorStop(1, "rgba(255, 176, 110, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 32, 256);
 
@@ -632,10 +754,12 @@ function ShelfLight() {
     };
   }, [texture]);
 
+  const wallZ = BACK_WALL.z + BACK_WALL.depth / 2 + 0.01;
+
   return (
     <group>
-      <mesh position={[SHELF.x, SHELF.y - 0.48, -3.12]}>
-        <planeGeometry args={[SHELF.width - 0.2, 0.72]} />
+      <mesh position={[SHELF.x, SHELF.y - 0.72, wallZ]}>
+        <planeGeometry args={[SHELF.width - 0.15, 1.45]} />
         <meshBasicMaterial
           map={texture}
           transparent
@@ -644,23 +768,32 @@ function ShelfLight() {
         />
       </mesh>
       <mesh
-        position={[SHELF.x, SHELF.y - SHELF.height / 2 - 0.01, SHELF.z + 0.04]}
+        position={[SHELF.x, SHELF.y - SHELF.height / 2 - 0.008, SHELF.z + 0.08]}
       >
-        <boxGeometry args={[SHELF.width - 0.35, 0.012, 0.035]} />
+        <boxGeometry args={[SHELF.width - 0.28, 0.012, 0.028]} />
         <meshStandardMaterial
           color="#4a321c"
-          emissive="#ffb454"
-          emissiveIntensity={0.28}
-          roughness={0.72}
+          emissive="#ffb06a"
+          emissiveIntensity={0.42}
+          roughness={0.74}
           metalness={0}
         />
       </mesh>
-      <pointLight
-        color="#ffb454"
-        intensity={2.6}
-        distance={1.05}
-        decay={2}
-        position={[SHELF.x - 0.35, SHELF.y + 0.02, SHELF.z + 0.48]}
+      <rectAreaLight
+        color="#ffb06a"
+        intensity={55}
+        width={SHELF.width - 0.4}
+        height={0.16}
+        position={[SHELF.x, SHELF.y - SHELF.height / 2 - 0.05, SHELF.z + 0.06]}
+        rotation={[Math.PI / 2 + 0.7, 0, 0]}
+      />
+      <rectAreaLight
+        color="#d7b48a"
+        intensity={14}
+        width={6.4}
+        height={2.8}
+        position={[SHELF.x + 0.35, SHELF.y + 0.15, -1.05]}
+        rotation={[0, Math.PI, 0]}
       />
     </group>
   );
@@ -672,7 +805,8 @@ export function WallDecor() {
   return (
     <group>
       <Poster />
-      <group position={[narrow ? -2.05 : 0, 0, 0]}>
+      <PosterSpill />
+      <group position={[narrow ? -0.55 : 0, 0, 0]}>
         <Shelf />
         <Books />
         <DecorativeObject />
