@@ -63,17 +63,42 @@ export function Monitor() {
         <boxGeometry args={[3.3, 1.95, 0.12]} />
         <meshStandardMaterial color="#0c0d12" roughness={0.4} metalness={0.5} />
       </mesh>
+
       <mesh position={[0, 0.55, -0.1]}>
         <boxGeometry args={[0.25, 0.7, 0.12]} />
         <meshStandardMaterial color="#1a1c24" roughness={0.4} metalness={0.6} />
       </mesh>
+
       <mesh position={[0, 0.03, -0.05]}>
         <boxGeometry args={[1.2, 0.06, 0.7]} />
         <meshStandardMaterial color="#1a1c24" roughness={0.4} metalness={0.6} />
       </mesh>
+
       <mesh position={[0, 1.55, 0.07]}>
         <planeGeometry args={[3.05, 1.78]} />
-        <meshBasicMaterial map={texture} />
+        <meshStandardMaterial
+          map={texture}
+          emissive="#ffffff"
+          emissiveMap={texture}
+          emissiveIntensity={0.65}
+          roughness={0.6}
+          metalness={0}
+        />
+      </mesh>
+
+      <mesh position={[0, 1.55, 0.075]}>
+        <planeGeometry args={[3.05, 1.78]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.035}
+          roughness={0.25}
+          metalness={0}
+          transmission={0}
+          clearcoat={0.35}
+          clearcoatRoughness={0.4}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );

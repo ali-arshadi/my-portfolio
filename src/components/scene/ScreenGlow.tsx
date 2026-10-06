@@ -14,15 +14,15 @@ export function ScreenGlow() {
       return;
     }
 
-    lightRef.current.intensity = 4 + progress.current.e * 5.1;
+    lightRef.current.intensity = 2.5 + progress.current.e * 2.5;
   });
 
   return (
     <pointLight
       ref={lightRef}
       color="#6f94ff"
-      intensity={4}
-      distance={6}
+      intensity={2.5}
+      distance={4.5}
       decay={1}
       position={[0, 1.5, 1.6]}
     />
