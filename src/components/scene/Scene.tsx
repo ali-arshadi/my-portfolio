@@ -7,11 +7,16 @@ import { Keyboard } from "./Keyboard";
 import { Lamp } from "./Lamp";
 import { Monitor } from "./Monitor";
 import { ScreenGlow } from "./ScreenGlow";
+import { WallDecor } from "./WallDecor";
 
 function Room() {
   return (
     <group>
-      <mesh position={[0, -2.25, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh
+        position={[0, -2.25, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
         <planeGeometry args={[24, 24]} />
         <meshStandardMaterial color="#0d0e11" roughness={0.96} metalness={0} />
       </mesh>
@@ -43,6 +48,7 @@ export function Scene() {
 
       <CameraRig />
       <Room />
+      <WallDecor />
       <Desk />
       <Monitor />
       <Keyboard />
