@@ -1,30 +1,31 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import {
-  ACESFilmicToneMapping,
-  PCFSoftShadowMap,
-  SRGBColorSpace,
-} from "three";
-import { Scene } from "./Scene";
+import { AgXToneMapping, SRGBColorSpace } from "three";
+import { HERO_CAMERA } from "@/config/scene.generated";
+import { Experience } from "./Experience";
 
 export default function DeskCanvas() {
   return (
     <Canvas
       className="h-full w-full"
-      shadows={{ type: PCFSoftShadowMap }}
       dpr={[1, 1.75]}
       gl={{
         antialias: true,
         alpha: false,
-        toneMapping: ACESFilmicToneMapping,
-        toneMappingExposure: 1.05,
+        toneMapping: AgXToneMapping,
+        toneMappingExposure: 1,
         outputColorSpace: SRGBColorSpace,
       }}
-      camera={{ position: [3.6, 2.5, 5.4], fov: 42, near: 0.1, far: 50 }}
+      camera={{
+        position: [...HERO_CAMERA.position],
+        fov: HERO_CAMERA.fov,
+        near: 0.01,
+        far: 20,
+      }}
       style={{ pointerEvents: "none" }}
     >
-      <Scene />
+      <Experience />
     </Canvas>
   );
 }

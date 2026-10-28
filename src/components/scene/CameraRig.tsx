@@ -1,21 +1,34 @@
 "use client";
 
 import { PerspectiveCamera } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import {
+  MathUtils,
   Vector3,
   type PerspectiveCamera as PerspectiveCameraType,
 } from "three";
+import {
+  CAMERA_ASPECT,
+  HERO_CAMERA,
+  SCREEN_CAMERA,
+} from "@/config/scene.generated";
 import { useScrollProgress } from "./useScrollProgress";
 
-const START = { x: 3.6, y: 2.5, z: 5.4 };
-const END = { x: 0, y: 1.55, z: 2.35 };
-const LOOK_START = { x: -0.3, y: 1.1, z: 0 };
-const LOOK_END = { x: 0, y: 1.55, z: 0 };
+const PARALLAX = { x: 0.06, y: 0.04 };
 
-function lerp(from: number, to: number, t: number) {
-  return from + (to - from) * t;
+const { lerp } = MathUtils;
+
+// The poses were framed for 16:9; narrower viewports widen the vertical fov
+// so the horizontal framing stays the same.
+function fitFov(fov: number, aspect: number) {
+  if (aspect >= CAMERA_ASPECT) {
+    return fov;
+  }
+  const half = MathUtils.degToRad(fov / 2);
+  return MathUtils.radToDeg(
+    2 * Math.atan((Math.tan(half) * CAMERA_ASPECT) / aspect),
+  );
 }
 
 export function CameraRig() {
@@ -23,11 +36,9 @@ export function CameraRig() {
   const look = useRef(new Vector3());
   const pointer = useRef({ x: 0, y: 0 });
   const progress = useScrollProgress();
-  const width = useThree((state) => state.size.width);
-  const fov = width < 700 ? 58 : 42;
 
   useEffect(() => {
-    const onPointerMove = (event: PointerEvent) => {
+    const onPointerMove = (event: MouseEvent) => {
       pointer.current.x = event.clientX / window.innerWidth - 0.5;
       pointer.current.y = event.clientY / window.innerHeight - 0.5;
     };
@@ -40,7 +51,7 @@ export function CameraRig() {
     };
   }, []);
 
-  useFrame(() => {
+  useFrame((state) => {
     const camera = cameraRef.current;
     if (!camera) {
       return;
@@ -48,28 +59,39 @@ export function CameraRig() {
 
     const { e } = progress.current;
     const fade = 1 - e;
+    const from = HERO_CAMERA;
+    const to = SCREEN_CAMERA;
 
     camera.position.set(
-      lerp(START.x, END.x, e) + pointer.current.x * 0.5 * fade,
-      lerp(START.y, END.y, e) - pointer.current.y * 0.3 * fade,
-      lerp(START.z, END.z, e),
+      lerp(from.position[0], to.position[0], e) +
+        pointer.current.x * PARALLAX.x * fade,
+      lerp(from.position[1], to.position[1], e) -
+        pointer.current.y * PARALLAX.y * fade,
+      lerp(from.position[2], to.position[2], e),
     );
     look.current.set(
-      lerp(LOOK_START.x, LOOK_END.x, e),
-      lerp(LOOK_START.y, LOOK_END.y, e),
-      0,
+      lerp(from.target[0], to.target[0], e),
+      lerp(from.target[1], to.target[1], e),
+      lerp(from.target[2], to.target[2], e),
     );
     camera.lookAt(look.current);
+
+    const { width, height } = state.size;
+    const fov = fitFov(lerp(from.fov, to.fov, e), width / Math.max(height, 1));
+    if (camera.fov !== fov) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
   });
 
   return (
     <PerspectiveCamera
       ref={cameraRef}
       makeDefault
-      fov={fov}
-      near={0.1}
-      far={50}
-      position={[START.x, START.y, START.z]}
+      fov={HERO_CAMERA.fov}
+      near={0.01}
+      far={20}
+      position={[...HERO_CAMERA.position]}
     />
   );
 }
