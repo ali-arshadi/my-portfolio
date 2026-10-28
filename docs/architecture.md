@@ -46,12 +46,13 @@ blender/
       materials.py           named PBR material library (one place for every colour/roughness)
       geometry.py            box / cylinder / rod / leaf helpers, bevel, UV unwrap
       textures.py            poster, spine and placeholder-screen images (Pillow)
+      foliage.py             leaf meshes and the plants' sway weight
       export.py              per-asset glTF export
       validation.py          name, bounds, pivot and triangle checks
     config.py                layout knobs: positions, sizes, camera, lights
     create_room.py           create_desk.py   create_monitor.py   create_keyboard.py
     create_desk_lamp.py      create_wall_poster.py   create_shelf.py   create_books.py
-    create_figurine.py       create_shelf_plant.py   create_floor_plant.py
+    create_figurine.py       create_candle.py   create_shelf_plant.py   create_floor_plant.py
     build_scene.py           runs every create_*, adds lights + camera, optional preview render
     bake.py                  bakes light layers into per-asset lightmaps
     export_all.py            writes public/models/*.glb and src/config/scene.generated.ts
@@ -60,10 +61,7 @@ blender/
 public/models/               generated GLBs (committed, so the site runs without Blender)
 ```
 
-Each `create_*.py` exposes `build(cfg) -> root object` and can also run alone for a quick look. The
-current single-file scripts (`blender/scene.py`, `blender/bake_export.py`, `blender/make_textures.py`)
-are the starting material: they are split into the modules above during Phases 1–2 and removed once the
-modular build reaches parity.
+Each `create_*.py` exposes `build() -> root object` and can also run alone for a quick look.
 
 `pnpm models` runs `blender/regenerate.sh`, which reads the Python interpreter from `BLENDER_PYTHON`
 (any Python with `bpy` 5.x, Pillow and NumPy; default `.venv-blender/bin/python`). Setup:
@@ -74,38 +72,76 @@ uv pip install --python .venv-blender/bin/python bpy pillow numpy
 ```
 
 The camera is exported from Blender into `src/config/scene.generated.ts`, so the browser camera can never
-drift from the camera the bake and the comparisons were made with. Regeneration is byte-for-byte
-reproducible (checked over repeated runs), so unchanged assets never show up in a diff.
+drift from the camera the bake and the comparisons were made with. Regeneration is stable: an export
+that matches the existing GLB's geometry, materials and images keeps the existing file, so unchanged
+assets never show up in a diff (checked over five consecutive runs). Blender computes some mesh data on
+several threads, which reorders vertices between runs; the comparison is order-independent for that
+reason (`shared/export.py`).
 
-**Status (Phase 1):** `config.py`, `shared/{materials,geometry,export,validation}.py`, `create_room.py`,
-`create_desk.py`, `build_scene.py`, `export_all.py`, `compare.py` and `regenerate.sh` exist. The other
-`create_*` scripts and `bake.py` arrive in Phases 2–4. `shared/textures.py` and `blender/fonts/` arrive in
-Phase 2.
+**Status (Phase 3):** everything above exists except `bake.py` (Phase 4). The candle has its own
+`create_candle.py`, and `shared/foliage.py` holds the leaf mesh and plant sway weight. `calibration.py`
+turns pixel anchors measured in the reference into the placements in `config.py`.
 
 ## 4. Rendering
 
-### Light layers
+### Light layers (implemented in Phase 4)
 
-The bake produces, per asset, a lightmap atlas on UV channel 2 for two layers:
+`blender/scripts/lights.py` defines the light rig and splits it into two layers:
 
-- **base**: every light except the desk lamp (shelf LED, candle, monitor, environment fill), with
-  bounce light and contact shadows.
-- **lamp**: the desk lamp alone.
+- **base**: shelf LED strip, candle, monitor glow, a warm picture light above the poster, a small warm
+  fill on the shelf, a cool rim from the right, and a faint world fill.
+- **lamp**: the desk lamp alone (a 40° spot aimed at the measured centre of the reference's light pool).
 
-In three.js each asset keeps a `MeshStandardMaterial` (albedo, roughness, metalness from Blender). A small
-`onBeforeCompile` patch replaces the indirect-diffuse term with
-`base + lampLevel * lamp`, where `lampLevel` is a shared uniform. Toggling the lamp animates `lampLevel`,
-the bulb's emissive intensity and one real-time spot light together, so the baked pool, the glowing
-diffuser and the live specular highlights stay in sync.
+Emissive materials belong to a layer as well. When one layer bakes, the other layer's lights and emitters
+are switched off.
 
-Real-time lights are kept for **specular only** (lamp spot, a weak cool monitor light). They do not cast
-shadows; shadows come from the bake. The exact split is tuned in Phase 4, where double-counting
-diffuse light is the main thing to check.
+`blender/scripts/bake.py` bakes each layer per asset with Cycles: diffuse direct plus indirect, without
+the surface colour, so each lightmap holds light, not colour. Details:
 
-### Effects (candidates, each must earn its place in Phase 4)
+- **One atlas per asset:** all of an asset's meshes share one `lightmap` UV set (`TEXCOORD_1`), packed by
+  `lightmap_pack`.
+- **Better packing:** faces no camera pose sees (desk underside, outsides of the walls) are deleted, and
+  long faces are sliced into near-square pieces, so the visible surfaces get most of the atlas.
+- **Storage:** 8-bit PNGs of `sRGB(light / LIGHTMAP_SCALE)`. The sRGB curve spends the 8 bits on the dark
+  end, which is most of this scene, and sampling them as sRGB textures gives the linear value back.
+- **Same run as the export:** baking runs inside `export_all.py`, so a lightmap always matches the UV
+  layout of the GLB written in that run.
+- **Not baked:** emissive and transparent surfaces (screen, LED, bulb, diffuser, flame, glass) light the
+  scene and are rendered as they are.
 
-- Bloom restricted to emissive surfaces (lamp diffuser, LED strip, candle flame).
-- A very light vignette, only if the comparison shows the reference has one.
+In three.js (`Workspace.tsx`), every lightmapped `MeshStandardMaterial` gets:
+
+- the base layer as its `lightMap`, at intensity `π · LIGHTMAP_SCALE`. three.js divides irradiance by π
+  when it applies the surface colour; Cycles' value multiplies it directly.
+- a small `onBeforeCompile` patch that adds the lamp layer times the shared `lampLevel` uniform
+  (`lampState.ts`).
+
+Changing `lampLevel.value` fades the baked lamp light everywhere at once, and the lamp's emissive bulb
+and diffuser follow it every frame, so the pool and the glowing shade stay in sync. `?lamp=off` (or
+`?lamp=0.4`) sets it for checking.
+
+There are **no real-time lights.** Reflections come from a small generated environment
+(`Lighting.tsx`, drei `Environment` + `Lightformer`s placed at the lamp, LED, monitor and rim
+positions). Metals use it at full strength, since they have no diffuse colour for the bake to show on.
+Everything else uses a trace of it, so it does not double the baked diffuse light.
+
+Tone mapping is AgX in both Blender and three.js, with the same exposure (`EXPOSURE`, in stops).
+
+### Live lamp highlight
+
+Cycles' diffuse bake cannot hold reflections, because they depend on where the camera is. Without them
+the lamp pool lost most of its brightness compared with the Blender preview. A single live spot light
+sits at the bulb with the same cone and power (Blender watts / 4π). On lightmapped materials the shader
+patch discards its diffuse part (`reflectedLight.directDiffuse = 0`), so it adds only the sheen on the
+desk, keyboard and metal, and never double-counts the baked light. It fades with `lampLevel`.
+
+### Effects (`Effects.tsx`)
+
+- **Bloom** on light sources only. The scene renders in linear HDR, and the threshold (1.5) sits above
+  every baked surface, so only the emissive bulb, diffuser, LED and flame glow. A small radius keeps the
+  glow close to them; the first, wider setting hazed the dark walls next to the LED by up to 9×.
+- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview.
+- No vignette: the reference's dark corners come from its lighting, which the bake already reproduces.
 - No real-time AO or soft shadows: both are already in the bake.
 
 ### Plants
@@ -119,9 +155,9 @@ uses two or three incommensurate sine frequencies so it never visibly loops, and
 src/
   app/                    Next.js routes (page.tsx keeps the hero + fallback content)
   config/
-    scene.generated.ts    cameras and temporary lights from Blender (do not edit)
+    scene.generated.ts    cameras, lights, asset + lightmap manifest from Blender (do not edit)
     camera.ts             scroll keyframes and phase ranges
-    scene.ts              asset list, light levels, effect settings
+    scene.ts              environment strengths, hit-target naming
   components/
     scene/
       DeskCanvas.tsx      <Canvas>, renderer settings, Suspense + loader
@@ -208,8 +244,8 @@ src/
    exposure offset and decode in the shader, or use 16-bit/KTX2 maps. Decided in Phase 4 after a test bake.
 4. **Performance on integrated graphics.** The only hardware available for measurement is an Intel Iris
    Xe. Figures in the performance report will be for that machine and labelled as such.
-5. **Font portability.** `make_textures.py` points at system font paths (Inter, DejaVu Sans Mono Bold)
-   that are missing on this machine. Phase 2 vendors OFL fonts into `blender/fonts/`.
+5. **Font portability.** Resolved in Phase 2: DejaVu Sans Mono Bold and Noto Sans are vendored in
+   `blender/fonts/` with their licences.
 6. **Figurine.** The reference figure resembles a well-known brand mascot; it will be modelled as a
    generic stylised cat.
 7. **Tooling location.** The `bpy` venv currently lives in a session scratch folder. `regenerate.sh` and

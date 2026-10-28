@@ -11,7 +11,9 @@ class AssetError(Exception):
 
 
 def world_bounds(root):
-    pts = [o.matrix_world @ Vector(c) for o in descendants(root) if o.type == "MESH" for c in o.bound_box]
+    # from the vertices themselves: an object's cached bound_box can lag behind bmesh edits
+    bpy.context.view_layer.update()
+    pts = [o.matrix_world @ v.co for o in descendants(root) if o.type == "MESH" for v in o.data.vertices]
     if not pts:
         raise AssetError(f"{root.name}: no meshes")
     lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
@@ -53,8 +55,9 @@ def check_scene(root, expect):
     return dict(tris=tris, bounds=(tuple(round(v, 3) for v in lo), tuple(round(v, 3) for v in hi)))
 
 
-def check_glb(path, names):
-    """The exported file parses and still contains the named nodes, meshes, materials and both UV sets."""
+def check_glb(path, names, attributes=None):
+    """The exported file parses and still contains the named nodes, meshes, materials and both UV sets,
+    plus any extra vertex `attributes` ({mesh name: [attribute, ...]})."""
     j = glb_json(path)
     nodes = {n.get("name") for n in j.get("nodes", [])}
     missing = [n for n in names if n not in nodes]
@@ -66,6 +69,9 @@ def check_glb(path, names):
         for prim in mesh["primitives"]:
             if "TEXCOORD_1" not in prim["attributes"]:
                 raise AssetError(f"{path}: mesh {mesh.get('name')} lost its lightmap UVs")
+            for attr in (attributes or {}).get(mesh.get("name"), []):
+                if attr not in prim["attributes"]:
+                    raise AssetError(f"{path}: mesh {mesh.get('name')} has no {attr} attribute")
     return dict(nodes=len(nodes), meshes=len(j.get("meshes", [])))
 
 

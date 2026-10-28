@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { AgXToneMapping, SRGBColorSpace } from "three";
-import { HERO_CAMERA } from "@/config/scene.generated";
+import { EXPOSURE, HERO_CAMERA } from "@/config/scene.generated";
 import { Experience } from "./Experience";
 
 export default function DeskCanvas() {
@@ -14,7 +14,7 @@ export default function DeskCanvas() {
         antialias: true,
         alpha: false,
         toneMapping: AgXToneMapping,
-        toneMappingExposure: 1,
+        toneMappingExposure: 2 ** EXPOSURE, // Blender's exposure is in stops
         outputColorSpace: SRGBColorSpace,
       }}
       camera={{

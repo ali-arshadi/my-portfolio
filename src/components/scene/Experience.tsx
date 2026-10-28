@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { CameraRig } from "./CameraRig";
 import { DebugView } from "./DebugView";
+import { Effects } from "./Effects";
 import { Lighting } from "./Lighting";
 import { Workspace } from "./Workspace";
 
@@ -17,6 +18,7 @@ export function Experience() {
       <Suspense fallback={null}>
         <Workspace />
       </Suspense>
+      <Effects />
     </>
   );
 }

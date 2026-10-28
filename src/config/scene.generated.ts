@@ -2,23 +2,55 @@
 // three.js coordinates (Y up). fov is vertical degrees for a 16:9 frame.
 
 export const HERO_CAMERA = {
-  position: [-1.082, 1.462, -1.726] as const,
-  target: [0.3369, 0.8193, 0.8379] as const,
+  position: [-1.082, 1.322, -1.726] as const,
+  target: [0.3369, 0.6793, 0.8379] as const,
   fov: 41.11,
 };
 
 // Square-on to the monitor screen, which fills 85% of the frame width.
 export const SCREEN_CAMERA = {
-  position: [-0.366, 1.22, -1.0387] as const,
-  target: [-0.4679, 1.22, -0.4833] as const,
+  position: [-0.366, 1.08, -1.0387] as const,
+  target: [-0.4679, 1.08, -0.4833] as const,
   fov: 41.11,
 };
 
 export const CAMERA_ASPECT = 16 / 9;
 
-// Temporary lights (positions and colours shared with the Blender preview).
-export const TEMP_LIGHTS = {
-  lamp: { type: "spot", position: [0.6, 1.13, -0.3] as const, target: [-0.08, 0.76, -0.4] as const, color: "#ffc690" },
-  shelf_led: { type: "area", position: [0.14, 1.44, -0.12] as const, target: [0.14, 0, -0.12] as const, color: "#ffc47f" },
-  monitor: { type: "area", position: [-0.468, 1.22, -0.5] as const, target: [-0.468, 1.22, -2] as const, color: "#6f8fff" },
+// Every asset: its GLB and, once baked, its two lightmaps (see blender/scripts/bake.py).
+export const ASSETS = [
+  { name: "room", model: "/models/room.glb", lightmaps: { base: "/lightmaps/room.base.png", lamp: "/lightmaps/room.lamp.png" } },
+  { name: "desk", model: "/models/desk.glb", lightmaps: { base: "/lightmaps/desk.base.png", lamp: "/lightmaps/desk.lamp.png" } },
+  { name: "monitor", model: "/models/monitor.glb", lightmaps: { base: "/lightmaps/monitor.base.png", lamp: "/lightmaps/monitor.lamp.png" } },
+  { name: "keyboard", model: "/models/keyboard.glb", lightmaps: { base: "/lightmaps/keyboard.base.png", lamp: "/lightmaps/keyboard.lamp.png" } },
+  { name: "desk_lamp", model: "/models/desk-lamp.glb", lightmaps: { base: "/lightmaps/desk-lamp.base.png", lamp: "/lightmaps/desk-lamp.lamp.png" } },
+  { name: "wall_poster", model: "/models/wall-poster.glb", lightmaps: { base: "/lightmaps/wall-poster.base.png", lamp: "/lightmaps/wall-poster.lamp.png" } },
+  { name: "shelf", model: "/models/shelf.glb", lightmaps: { base: "/lightmaps/shelf.base.png", lamp: "/lightmaps/shelf.lamp.png" } },
+  { name: "books", model: "/models/books.glb", lightmaps: { base: "/lightmaps/books.base.png", lamp: "/lightmaps/books.lamp.png" } },
+  { name: "figurine", model: "/models/figurine.glb", lightmaps: { base: "/lightmaps/figurine.base.png", lamp: "/lightmaps/figurine.lamp.png" } },
+  { name: "candle", model: "/models/candle.glb", lightmaps: { base: "/lightmaps/candle.base.png", lamp: "/lightmaps/candle.lamp.png" } },
+  { name: "shelf_plant", model: "/models/shelf-plant.glb", lightmaps: { base: "/lightmaps/shelf-plant.base.png", lamp: "/lightmaps/shelf-plant.lamp.png" } },
+  { name: "floor_plant", model: "/models/floor-plant.glb", lightmaps: { base: "/lightmaps/floor-plant.base.png", lamp: "/lightmaps/floor-plant.lamp.png" } },
+] as const;
+
+// Lightmap texels store sRGB(light / LIGHTMAP_SCALE).
+export const LIGHTMAP_SCALE = 4.0;
+
+// Scene lights (positions and colours shared with the Blender bake).
+export const LIGHTS = {
+  lamp: { layer: "lamp", type: "spot", position: [0.1268, 1.0682, -0.4239] as const, target: [-0.319, 0.76, -0.796] as const, color: "#ff9a40", watts: 35 },
+  shelf_led: { layer: "base", type: "area", position: [-0.0125, 1.317, -0.17] as const, target: [-0.0125, 0.317, 0.43] as const, color: "#ff8a3a", watts: 7 },
+  candle: { layer: "base", type: "point", position: [-0.134, 1.409, -0.12] as const, target: [-0.134, 0.409, -0.12] as const, color: "#ffb15a", watts: 0.8 },
+  monitor: { layer: "base", type: "area", position: [-0.4643, 1.08, -0.503] as const, target: [-0.1069, 1.08, -2.4505] as const, color: "#6f8fff", watts: 1.2 },
+  picture: { layer: "base", type: "spot", position: [0.72, 1.7565, -0.379] as const, target: [0.9, 1.344, -0.379] as const, color: "#ffb07a", watts: 2 },
+  shelf_fill: { layer: "base", type: "point", position: [0.2, 1.65, -0.45] as const, target: [0.2, 1.4, -0.1] as const, color: "#ffb070", watts: 1.5 },
+  rim: { layer: "base", type: "area", position: [-2, 1.7, -1.2] as const, target: [-0.6, 1, -0.3] as const, color: "#5a74c9", watts: 2 },
 };
+
+// AgX exposure in stops, as in the Blender preview.
+export const EXPOSURE = 0.7;
+
+// The lamp's cone: full angle and soft edge, as in the bake.
+export const LAMP_CONE = { angle: 30, blend: 0.5 };
+
+// Emissive materials that belong to the lamp and fade with it.
+export const LAMP_EMITTERS = ["lamp_bulb", "lamp_shade_inner"] as const;

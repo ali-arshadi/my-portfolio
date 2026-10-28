@@ -1,6 +1,9 @@
 """Builds the scene, validates it, writes one GLB per asset and the camera/light config for the site.
 
-    python -I scripts/export_all.py [--models-dir public/models] [--config src/config/scene.generated.ts]
+    python -I scripts/export_all.py [--no-bake] [--samples 256] [--models-dir public/models]
+                                    [--config src/config/scene.generated.ts]
+
+Baking runs in the same process as the export, so lightmaps always match the GLBs' UV layout.
 
 Paths are relative to the repository root.
 """
@@ -13,7 +16,9 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, HERE)
 
 import config as C  # noqa: E402
-from build_scene import TEMP_LIGHTS, build_all  # noqa: E402
+import bake  # noqa: E402
+import lights  # noqa: E402
+from build_scene import build_all  # noqa: E402
 from shared.export import export_asset  # noqa: E402
 from shared.validation import check_glb  # noqa: E402
 
@@ -27,7 +32,7 @@ def ts_vec(v):
     return "[" + ", ".join(f"{c:g}" for c in three(v)) + "] as const"
 
 
-def write_config(path):
+def write_config(path, assets):
     fov = round(C.vertical_fov_deg(), 2)
     screen_pos, screen_target = C.screen_camera()
     lines = [
@@ -49,15 +54,40 @@ def write_config(path):
         "",
         "export const CAMERA_ASPECT = 16 / 9;",
         "",
-        "// Temporary lights (positions and colours shared with the Blender preview).",
-        "export const TEMP_LIGHTS = {",
+        "// Every asset: its GLB and, once baked, its two lightmaps (see blender/scripts/bake.py).",
+        "export const ASSETS = [",
     ]
-    for name, kind, pos, color, _power, aim, _size in TEMP_LIGHTS:
+    for name, model, maps in assets:
+        maps_ts = ", ".join(f'{k}: "{v}"' for k, v in sorted(maps.items()))
+        lines.append(f'  {{ name: "{name}", model: "{model}", lightmaps: {{ {maps_ts} }} }},')
+    lines += [
+        "] as const;",
+        "",
+        "// Lightmap texels store sRGB(light / LIGHTMAP_SCALE).",
+        f"export const LIGHTMAP_SCALE = {bake.LIGHTMAP_SCALE};",
+        "",
+        "// Scene lights (positions and colours shared with the Blender bake).",
+        "export const LIGHTS = {",
+    ]
+    for name, layer, kind, pos, color, _watts, aim, _size in lights.rig():
         lines.append(
-            f'  {name}: {{ type: "{kind.lower()}", position: {ts_vec(pos)}, '
-            f'target: {ts_vec(aim)}, color: "{color}" }},'
+            f'  {name}: {{ layer: "{layer}", type: "{kind.lower()}", position: {ts_vec(pos)}, '
+            f'target: {ts_vec(aim)}, color: "{color}", watts: {_watts:g} }},'
         )
-    lines += ["};", ""]
+    emitters = ", ".join(f'"{n}"' for n in lights.EMITTERS["lamp"])
+    lines += [
+        "};",
+        "",
+        "// AgX exposure in stops, as in the Blender preview.",
+        f"export const EXPOSURE = {lights.EXPOSURE};",
+        "",
+        "// The lamp's cone: full angle and soft edge, as in the bake.",
+        f"export const LAMP_CONE = {{ angle: {lights.LAMP_CONE['angle']}, blend: {lights.LAMP_CONE['blend']} }};",
+        "",
+        "// Emissive materials that belong to the lamp and fade with it.",
+        f"export const LAMP_EMITTERS = [{emitters}] as const;",
+        "",
+    ]
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         f.write("\n".join(lines))
@@ -68,19 +98,43 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--models-dir", default="public/models")
     ap.add_argument("--config", default="src/config/scene.generated.ts")
+    ap.add_argument("--no-bake", action="store_true", help="skip the bake (keeps existing lightmaps)")
+    ap.add_argument("--samples", type=int, default=256)
     a = ap.parse_args()
 
     import build_scene
 
     built = build_all()
+    models = {}
     for mod in build_scene.ASSETS:
         root, stats = built[mod.NAME]
-        path = export_asset(root, os.path.join(REPO, a.models_dir, f"{mod.NAME}.glb"))
-        glb = check_glb(path, mod.EXPECT["names"])
+        path = os.path.join(REPO, a.models_dir, f"{mod.NAME.replace('_', '-')}.glb")
+        # Lightmaps belong to the exact lightmap UVs they were baked on. Without a bake, keep the GLB on
+        # disk when only those UVs differ (Blender's packer can break ties differently between runs).
+        changed = export_asset(root, path, ignore=("TEXCOORD_1",) if a.no_bake else ())
+        if changed and a.no_bake and existing_lightmaps(mod.NAME):
+            print(f"WARNING: {mod.NAME} changed without a bake; its lightmaps are stale. Run without --no-bake.")
+        glb = check_glb(path, mod.EXPECT["names"], mod.EXPECT.get("attributes"))
         size = os.path.getsize(path)
         print(f"{mod.NAME}: {stats['tris']} tris, bounds {stats['bounds']}, "
               f"{glb['meshes']} meshes, {size / 1024:.1f} KiB -> {os.path.relpath(path, REPO)}")
-    print("config ->", os.path.relpath(write_config(os.path.join(REPO, a.config)), REPO))
+        models[mod.NAME] = "/" + os.path.relpath(path, os.path.join(REPO, "public"))
+
+    if a.no_bake:
+        maps = {name: existing_lightmaps(name) for name in models}
+    else:
+        maps = bake.bake_all(built, a.samples)
+    assets = [(name, model, maps.get(name, {})) for name, model in models.items()]
+    print("config ->", os.path.relpath(write_config(os.path.join(REPO, a.config), assets), REPO))
+
+
+def existing_lightmaps(name):
+    out = {}
+    for layer in bake.LAYERS:
+        path = os.path.join(bake.OUT_DIR, f"{name.replace('_', '-')}.{layer}.png")
+        if os.path.exists(path):
+            out[layer] = "/" + os.path.relpath(path, os.path.join(REPO, "public"))
+    return out
 
 
 if __name__ == "__main__":

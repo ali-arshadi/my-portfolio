@@ -56,18 +56,32 @@ screenshot. It is not part of the design.
 Physical sizes used by the Blender scene. The room and desk are calibrated (Phase 1); the rest come
 from the legacy scene and are re-placed against the solved camera in Phases 2–3.
 
-| Object          | Size (m)                                              |
-| --------------- | ----------------------------------------------------- |
-| Desk top height | 0.76                                                  |
-| Desk            | 3.4 wide × 0.95 deep, running into the left wall      |
-| Room            | back wall `y = 0`, left wall `x = 0.9` (Blender axes) |
-| Monitor screen  | 0.64 × 0.36 (the camera solve's assumption)           |
-| Monitor panel   | 0.66 × 0.385 (≈ 27″ 16:9)                             |
-| Keyboard        | ≈ 0.33 × 0.15 (75 % layout)                           |
-| Poster frame    | ≈ 0.42 × 0.55                                         |
-| Shelf           | 1.10 long, top at 1.4655                              |
-| Lamp            | head Ø ≈ 0.20, overall ≈ 0.45 tall                    |
-| Floor plant     | pot Ø ≈ 0.19, leaves 0.36–0.62                        |
+| Object             | Size (m)                                                                                            |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| Item               | Size (m)                                                                                            | Source                                         |
+| ---                | ---                                                                                                 | ---                                            |
+| Desk top height    | 0.76                                                                                                | chosen (sets the scale with the 0.64 m screen) |
+| Desk               | 3.4 wide × 1.05 deep, running into the left wall                                                    | lamp-pool and front-edge cues (§5)             |
+| Room               | back wall `y = 0`, left wall `x = 0.9` (Blender axes)                                               | wall-corner cue (§5)                           |
+| Monitor screen     | 0.64 × 0.36, centre 0.32 above the desk                                                             | camera solve (§5)                              |
+| Monitor panel      | 0.66 × 0.39, bezels 10 mm (20 mm chin)                                                              | bezel widths in the reference                  |
+| Monitor stand base | 0.27 × 0.20, front edge 45 mm in front of the panel                                                 | back-projected base edge                       |
+| Keyboard           | 0.36 × 0.14 tenkeyless (87 keys, 19 mm pitch)                                                       | back-projected corners measured 0.368 × 0.148  |
+| Lamp               | base Ø 0.17, dish Ø 0.23, head centre 0.28 above the desk                                           | back-projected base, elbow, head               |
+| Poster             | opening 0.43 × 0.63, frame border 35 mm, mat 35 mm                                                  | back-projected mat corners                     |
+| Shelf              | 0.93 long, 0.20 deep, 38 mm thick, top at 1.365                                                     | back-projected front face                      |
+| Books              | 8 books, 3.2–5.7 cm thick, 18.5–23.6 cm tall, 15 cm deep, spines 2 cm behind the shelf's front edge | back-projected spines (depth chosen)           |
+| Figurine           | 11 cm tall cat, 10 cm from the back wall                                                            | back-projected (depth chosen)                  |
+| Candle             | 5.6 cm tall amber cup                                                                               | back-projected (depth chosen)                  |
+| Shelf plant        | pot Ø 8.6 cm × 8.9 cm; vines hang 13 cm below the shelf top in front of it                          | back-projected pot (depth chosen)              |
+| Floor plant        | pot Ø 0.19 × 0.12 m, centre 0.23 m from the back wall; 13 leaves 0.32–0.48 m                        | pot solved from its silhouette in 3D           |
+
+The anchor pixels behind these numbers live in `blender/scripts/calibration.py`, which turns them into
+the placements in `config.py`. Things on the shelf need a chosen depth: the camera sits 4 cm below the
+shelf top, so the shelf's top face and the bases of everything on it are hidden behind its front edge,
+and a single view cannot say how far back they stand. Near the frame's right edge the wide lens
+stretches things sideways, which is why the floor plant's pot is solved in 3D rather than by
+converting pixels to metres.
 
 ---
 
@@ -95,7 +109,7 @@ from the legacy scene and are re-placed against the solved camera in Phases 2–
 
 ## 5. Camera
 
-Solved in Phase 1 from measurements, not by eye. The legacy Blender camera (33.6 mm, 10.3° pitch)
+Solved in Phases 1–2 from measurements, not by eye. The legacy Blender camera (33.6 mm, 10.3° pitch)
 was up to 23 px off on the monitor and put the room at the wrong angle.
 
 **Step 1: pose and focal length from the screen.** The screen's four corners were measured in the
@@ -120,18 +134,27 @@ around the screen centre, which keeps step 1's fit. Checks after the turn:
 - The poster's maps to the left wall's direction within 0.01°.
 - Both vanishing points lie on the same horizon (`v ≈ 0.23`), so camera roll is ≈ 0.
 
-**Step 3: room extents from what sits on the desk.** The left wall's position puts the corner just right
-of the poster (`u ≈ 0.22`). The desk depth (0.95 m) keeps the whole lamp pool on the desk while the
-lower-left corner falls off its front edge. The floor plant's pot, measured at `v ≈ 0.80`, now lands on
-the desk near the back wall; with the old camera it would have been inside the wall.
+**Step 3: camera height above the desk (Phase 2).** Steps 1–2 fix the camera relative to the monitor,
+but not how high the desk is. With the desk 0.70 m below the camera, the back-projected keyboard came
+out 0.46 m wide and the stand base 23 cm _behind_ the screen. Searching desk heights, one value makes
+everything real at once: the keyboard measures 0.368 × 0.148 m (a standard tenkeyless board), the stand
+base's front edge sits 3.5 cm in front of the screen, and the screen centre sits 0.32 m above the desk
+(the low panel with no visible neck in the reference). The camera and monitor were lowered 0.14 m
+together, so steps 1–2 still hold. Independent check: the back-projected base edge runs at 169.0°, the
+monitor's solved heading is 169.6°.
+
+**Step 4: room extents from what sits on the desk.** The left wall's position puts the corner just right
+of the poster (`u ≈ 0.22`). The desk depth (1.05 m) keeps the whole lamp pool on the desk while the
+lower-left corner falls off its front edge. The floor plant's pot, measured at `v ≈ 0.80`, lands on the
+desk about 0.33 m from the back wall.
 
 | Parameter                         | Value                                                                    |
 | --------------------------------- | ------------------------------------------------------------------------ |
-| Position (Blender, Z up)          | (-1.082, 1.726, 1.462)                                                   |
-| Position (three.js, Y up)         | (-1.082, 1.462, -1.726)                                                  |
+| Position (Blender, Z up)          | (-1.082, 1.726, 1.322)                                                   |
+| Position (three.js, Y up)         | (-1.082, 1.322, -1.726)                                                  |
 | Heading / pitch / roll            | 298.96° / 12.37° down / 0°                                               |
 | Lens                              | 27.0 mm on a 36 mm sensor → 67.4° horizontal, 41.1° vertical FOV at 16:9 |
-| Height above desk                 | 0.70 m (seated eye height)                                               |
+| Height above desk                 | 0.56 m (seated eye height)                                               |
 | Distance to screen centre         | 1.41 m                                                                   |
 | Monitor yaw relative to back wall | -10.4° (turned slightly away from the camera)                            |
 

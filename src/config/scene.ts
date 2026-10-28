@@ -1,14 +1,17 @@
-// Assets exported by blender/scripts/export_all.py. All are in world space, placed at the origin.
-export const MODELS = {
-  room: "/models/room.glb",
-  desk: "/models/desk.glb",
-} as const;
+// Invisible meshes that only exist as click targets (see docs/asset-inventory.md).
+export const HIT_TARGET_SUFFIX = "_hit";
 
-// Temporary real-time lighting until the bake in Phase 4. Intensities are three.js physical units.
-export const TEMP_LIGHT_LEVELS = {
-  lamp: { intensity: 6, angle: Math.PI * 0.32, penumbra: 0.9 },
-  shelf_led: { intensity: 7, width: 1.0, height: 0.03 },
-  monitor: { intensity: 1.2, width: 0.6, height: 0.32 },
-  // Stands in for bounce light so the room's edges stay readable; the bake replaces it.
-  fill: { intensity: 0.8, sky: "#2a3550", ground: "#3a2a1c" },
+// Diffuse light comes from the baked light maps. The environment only adds reflections: full strength
+// on metals, which have no diffuse colour to show the bake on, and a trace on everything else.
+export const METAL_ENV_INTENSITY = 1;
+export const PLAIN_ENV_INTENSITY = 0.08;
+
+// Bloom on light sources only: the threshold sits above anything the bake lights (the brightest lit
+// surface is well under 1 before exposure), so only emissive parts glow. A small radius keeps the glow
+// close to them; a wide one hazes the dark walls next to the LED and lamp.
+export const BLOOM = {
+  threshold: 1.5,
+  smoothing: 0.2,
+  intensity: 0.3,
+  radius: 0.4,
 };

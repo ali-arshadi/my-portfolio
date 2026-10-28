@@ -3,7 +3,6 @@
     python -I scripts/build_scene.py [--render out.png] [--res 836x470] [--samples 24] [--save scene.blend]
 """
 import argparse
-import math
 import os
 import sys
 
@@ -13,46 +12,25 @@ sys.path.insert(0, HERE)
 import bpy  # noqa: E402
 
 import config as C  # noqa: E402
+import create_books  # noqa: E402
+import create_candle  # noqa: E402
 import create_desk  # noqa: E402
+import create_desk_lamp  # noqa: E402
+import create_figurine  # noqa: E402
+import create_floor_plant  # noqa: E402
+import create_keyboard  # noqa: E402
+import create_monitor  # noqa: E402
 import create_room  # noqa: E402
-from shared import materials, validation  # noqa: E402
-from shared.geometry import reset  # noqa: E402
+import create_shelf  # noqa: E402
+import create_shelf_plant  # noqa: E402
+import create_wall_poster  # noqa: E402
+import lights  # noqa: E402
+from shared import textures, validation  # noqa: E402
+from shared.geometry import pack_lightmaps, reset  # noqa: E402
 
 # Order matters only for readability of the outliner.
-ASSETS = [create_room, create_desk]
-
-# Temporary lighting until the bake in Phase 4: just enough to judge composition.
-# (name, type, Blender position, colour, power W, aim point or None, size)
-TEMP_LIGHTS = [
-    ("lamp", "SPOT", (0.60, 0.30, 1.13), "#ffc690", 60, (-0.08, 0.40, C.DESK_Z), 0.12),
-    ("shelf_led", "AREA", (0.14, 0.12, 1.44), "#ffc47f", 25, (0.14, 0.12, 0.0), (1.0, 0.03)),
-    ("monitor", "AREA", (-0.468, 0.50, 1.22), "#6f8fff", 2, (-0.468, 2.0, 1.22), (0.6, 0.32)),
-]
-
-
-def build_lights():
-    from mathutils import Vector
-    w = bpy.data.worlds.new("World")
-    bpy.context.scene.world = w
-    w.use_nodes = True
-    bg = w.node_tree.nodes["Background"]
-    bg.inputs["Color"].default_value = (*materials.lin(materials.srgb("#07080f")), 1)
-    bg.inputs["Strength"].default_value = 0.35
-    for name, kind, pos, color, power, aim, size in TEMP_LIGHTS:
-        data = bpy.data.lights.new(f"light_{name}", kind)
-        data.energy = power
-        data.color = materials.lin(materials.srgb(color))
-        if kind == "SPOT":
-            data.spot_size = math.radians(95)
-            data.spot_blend = 0.9
-            data.shadow_soft_size = size
-        else:
-            data.shape = "RECTANGLE"
-            data.size, data.size_y = size
-        o = bpy.data.objects.new(f"light_{name}", data)
-        bpy.context.collection.objects.link(o)
-        o.location = pos
-        o.rotation_euler = (Vector(aim) - Vector(pos)).to_track_quat("-Z", "Y").to_euler()
+ASSETS = [create_room, create_desk, create_monitor, create_keyboard, create_desk_lamp, create_wall_poster,
+          create_shelf, create_books, create_figurine, create_candle, create_shelf_plant, create_floor_plant]
 
 
 def build_camera():
@@ -72,12 +50,14 @@ def build_camera():
 def build_all():
     """Returns {asset name: (root, stats)}; every asset is validated as it is built."""
     reset()
+    textures.build_all(C.BOOKS)
     built = {}
     for mod in ASSETS:
         root = mod.build()
+        pack_lightmaps(root)
         built[mod.NAME] = (root, validation.check_scene(root, mod.EXPECT))
     validation.assert_no_orphans()
-    build_lights()
+    lights.build()
     build_camera()
     return built
 
@@ -93,13 +73,14 @@ def setup_render(res, samples, out):
     sc.render.resolution_x, sc.render.resolution_y = res
     sc.render.resolution_percentage = 100
     sc.view_settings.view_transform = "AgX"
-    sc.view_settings.exposure = 0.7
+    sc.view_settings.exposure = lights.EXPOSURE
     sc.render.filepath = out
     sc.render.image_settings.file_format = "PNG"
 
 
-def render(out, res=(836, 470), samples=24):
+def render(out, res=(836, 470), samples=24, layers=("base", "lamp")):
     setup_render(res, samples, os.path.abspath(out))
+    lights.use_layers(*layers)
     bpy.ops.render.render(write_still=True)
     return out
 
@@ -107,7 +88,9 @@ def render(out, res=(836, 470), samples=24):
 def run_single(build, expect):
     """Entry point for running one create_*.py alone: build, validate, print stats."""
     reset()
+    textures.build_all(C.BOOKS)
     root = build()
+    pack_lightmaps(root)
     print(root.name, validation.check_scene(root, expect))
 
 
