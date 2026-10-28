@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import DESK, DESK_Z  # noqa: E402
 from shared import materials  # noqa: E402
-from shared.geometry import add_lightmap_uv, box, empty  # noqa: E402
+from shared.geometry import add_lightmap_uv, box, delete_faces, empty, slice_along  # noqa: E402
 
 NAME = "desk"
 EXPECT = dict(
@@ -21,6 +21,8 @@ def build():
     (x0, x1), d, t = DESK["x"], DESK["depth"], DESK["thickness"]
     top = box("desk_top", (x1 - x0, d, t), ((x0 + x1) / 2, d / 2, DESK_Z - t / 2), materials.get("desk_wood"),
               bev=0.004, parent=root)
+    delete_faces(top, (0, 0, -1))  # the underside is never seen
+    slice_along(top, 0, d)  # near-square pieces for the lightmap atlas
     add_lightmap_uv(top)
 
     leg_h = DESK_Z - t

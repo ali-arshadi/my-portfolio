@@ -16,8 +16,9 @@ interpreter, set `BLENDER_PYTHON`.
 ## Commands (from the repository root)
 
 ```bash
-pnpm models                          # build, validate, export public/models/*.glb + src/config/scene.generated.ts
-blender/regenerate.sh --compare      # same, plus a render of the opening frame compared with the reference
+pnpm models                          # build, validate, export GLBs, bake lightmaps, write the generated config (~7 min)
+pnpm models --no-bake                # export only, keeping the existing lightmaps (~30 s)
+blender/regenerate.sh --compare      # also render the opening frame and compare it with the reference
 ```
 
 The comparison writes `docs/reference/latest-{render,overlay,edges}.png`. The overlay outlines where the
@@ -29,12 +30,20 @@ configured monitor screen lands, in green.
 - `scripts/create_*.py`: one asset each. Each can also run alone (`python -I scripts/create_room.py`) to build and validate it.
 - `scripts/build_scene.py`: builds every asset plus the camera and temporary lights; can render a preview
 - `scripts/export_all.py`: one GLB per asset, plus the generated TypeScript config
+- `scripts/lights.py`: the light rig and its two baked layers (base, lamp)
+- `scripts/bake.py`: bakes both layers into one lightmap atlas per asset -> `public/lightmaps/`
 - `scripts/compare.py`: renders the opening frame and compares it with `docs/reference/reference.webp`
 - `scripts/calibration.py`: turns pixel points measured in the reference into 3D placements for `config.py`
 - `scripts/shared/`: material library, mesh helpers, textures (poster, placeholder screen), export, validation
 - `fonts/`: fonts used in the textures, vendored with their licences
 
 See `docs/architecture.md` and `docs/asset-inventory.md` for the conventions.
+
+## Lightmaps and the GLBs belong together
+
+A lightmap only fits the exact lightmap UV layout of the GLB it was baked for, so the bake runs in the
+same process as the export. `--no-bake` keeps a GLB on disk when only its lightmap UVs would change, and
+warns when anything else changed (the lightmaps are then stale: run without `--no-bake`).
 
 ## History
 

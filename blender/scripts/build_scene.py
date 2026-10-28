@@ -3,7 +3,6 @@
     python -I scripts/build_scene.py [--render out.png] [--res 836x470] [--samples 24] [--save scene.blend]
 """
 import argparse
-import math
 import os
 import sys
 
@@ -25,61 +24,13 @@ import create_room  # noqa: E402
 import create_shelf  # noqa: E402
 import create_shelf_plant  # noqa: E402
 import create_wall_poster  # noqa: E402
-from mathutils import Matrix, Vector  # noqa: E402
-from shared import materials, textures, validation  # noqa: E402
-from shared.geometry import reset  # noqa: E402
+import lights  # noqa: E402
+from shared import textures, validation  # noqa: E402
+from shared.geometry import pack_lightmaps, reset  # noqa: E402
 
 # Order matters only for readability of the outliner.
 ASSETS = [create_room, create_desk, create_monitor, create_keyboard, create_desk_lamp, create_wall_poster,
           create_shelf, create_books, create_figurine, create_candle, create_shelf_plant, create_floor_plant]
-
-
-def temp_lights():
-    """Temporary lighting until the bake in Phase 4, placed on the objects that emit it.
-    (name, type, Blender position, colour, power W, aim point, size)"""
-    bulb, pool = create_desk_lamp.light_anchor()
-    s = C.SHELF
-    led = Vector(((s["x"][0] + s["x"][1]) / 2, s["depth"] - 0.03, s["top"] - s["thickness"] - 0.01))
-    m = C.MONITOR
-    turn = Matrix.Rotation(m["yaw"], 3, "Z")
-    screen, normal = m["pos"] + turn @ m["screen_center"], turn @ Vector((0, 1, 0))
-    return [
-        ("lamp", "SPOT", tuple(bulb), "#ffc690", 40, tuple(pool), 0.05),
-        ("shelf_led", "AREA", tuple(led), "#ffc47f", 18, tuple(led + Vector((0, -0.25, -1))),
-         (s["x"][1] - s["x"][0] - 0.04, 0.03)),
-        ("monitor", "AREA", tuple(screen + normal * 0.02), "#6f8fff", 2, tuple(screen + normal * 2), (0.6, 0.32)),
-        ("candle", "POINT", (C.CANDLE["x"], C.SHELF_PROPS["candle_y"], C.SHELF["top"] + create_candle.flame_height()),
-         "#ffb15a", 0.6, (C.CANDLE["x"], C.SHELF_PROPS["candle_y"], C.SHELF["top"]), 0.01),
-    ]
-
-
-TEMP_LIGHTS = temp_lights()
-
-
-def build_lights():
-    w = bpy.data.worlds.new("World")
-    bpy.context.scene.world = w
-    w.use_nodes = True
-    bg = w.node_tree.nodes["Background"]
-    bg.inputs["Color"].default_value = (*materials.lin(materials.srgb("#07080f")), 1)
-    bg.inputs["Strength"].default_value = 0.35
-    for name, kind, pos, color, power, aim, size in TEMP_LIGHTS:
-        data = bpy.data.lights.new(f"light_{name}", kind)
-        data.energy = power
-        data.color = materials.lin(materials.srgb(color))
-        if kind == "SPOT":
-            data.spot_size = math.radians(95)
-            data.spot_blend = 0.9
-            data.shadow_soft_size = size
-        elif kind == "POINT":
-            data.shadow_soft_size = size
-        else:
-            data.shape = "RECTANGLE"
-            data.size, data.size_y = size
-        o = bpy.data.objects.new(f"light_{name}", data)
-        bpy.context.collection.objects.link(o)
-        o.location = pos
-        o.rotation_euler = (Vector(aim) - Vector(pos)).to_track_quat("-Z", "Y").to_euler()
 
 
 def build_camera():
@@ -103,9 +54,10 @@ def build_all():
     built = {}
     for mod in ASSETS:
         root = mod.build()
+        pack_lightmaps(root)
         built[mod.NAME] = (root, validation.check_scene(root, mod.EXPECT))
     validation.assert_no_orphans()
-    build_lights()
+    lights.build()
     build_camera()
     return built
 
@@ -121,13 +73,14 @@ def setup_render(res, samples, out):
     sc.render.resolution_x, sc.render.resolution_y = res
     sc.render.resolution_percentage = 100
     sc.view_settings.view_transform = "AgX"
-    sc.view_settings.exposure = 0.7
+    sc.view_settings.exposure = lights.EXPOSURE
     sc.render.filepath = out
     sc.render.image_settings.file_format = "PNG"
 
 
-def render(out, res=(836, 470), samples=24):
+def render(out, res=(836, 470), samples=24, layers=("base", "lamp")):
     setup_render(res, samples, os.path.abspath(out))
+    lights.use_layers(*layers)
     bpy.ops.render.render(write_still=True)
     return out
 
@@ -137,6 +90,7 @@ def run_single(build, expect):
     reset()
     textures.build_all(C.BOOKS)
     root = build()
+    pack_lightmaps(root)
     print(root.name, validation.check_scene(root, expect))
 
 

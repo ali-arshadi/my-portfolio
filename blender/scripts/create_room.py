@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import LEFT_WALL_X, ROOM  # noqa: E402
 from shared import materials  # noqa: E402
-from shared.geometry import add_lightmap_uv, box, empty  # noqa: E402
+from shared.geometry import add_lightmap_uv, box, delete_faces, empty, slice_along  # noqa: E402
 
 NAME = "room"
 EXPECT = dict(
@@ -31,6 +31,13 @@ def build():
     floor = box("room_floor", (fx1 - fx0, fy1 - fy0, 0.05), ((fx0 + fx1) / 2, (fy0 + fy1) / 2, -0.025),
                 materials.get("floor"), parent=root)
 
+    # the outsides of the room are never seen
+    for o, outward in ((back, (0, -1, 0)), (back, (0, 0, 1)), (left, (1, 0, 0)), (left, (0, 0, 1)),
+                       (floor, (0, 0, -1))):
+        delete_faces(o, outward)
+    # near-square pieces for the lightmap atlas
+    slice_along(back, 0, h)
+    slice_along(left, 1, h)
     for o in (back, left, floor):
         add_lightmap_uv(o)
     return root

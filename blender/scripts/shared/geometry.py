@@ -1,7 +1,8 @@
 """Mesh helpers shared by the create_* scripts."""
 import math
 
-import bpy
+import bpy  # must load before bmesh
+import bmesh
 from mathutils import Vector
 
 LIGHTMAP_UV = "lightmap"
@@ -162,19 +163,64 @@ def join(name, objs):
     return o
 
 
+def delete_faces(obj, direction):
+    """Remove faces pointing along `direction` (local space): sides no camera pose ever sees, which
+    would otherwise take a share of the lightmap atlas."""
+    d = Vector(direction).normalized()
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.normal.dot(d) > 0.9], context="FACES")
+    bm.to_mesh(obj.data)
+    bm.free()
+
+
+def slice_along(obj, axis, step):
+    """Cut the mesh with planes every `step` metres along local `axis` (0=x, 1=y, 2=z). Long faces then
+    become near-square islands that pack into a square lightmap without wasting most of it."""
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    lo = min(v.co[axis] for v in bm.verts)
+    hi = max(v.co[axis] for v in bm.verts)
+    cuts = max(1, round((hi - lo) / step))
+    normal = Vector([1.0 if i == axis else 0.0 for i in range(3)])
+    for k in range(1, cuts):
+        co = Vector((0, 0, 0))
+        co[axis] = lo + (hi - lo) * k / cuts
+        geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
+        bmesh.ops.bisect_plane(bm, geom=geom, plane_co=co, plane_no=normal)
+    bm.to_mesh(obj.data)
+    bm.free()
+
+
 def add_lightmap_uv(obj, margin=0.02):
-    """Second UV layer with non-overlapping islands, ready for baking in Phase 4."""
+    """Second UV layer with non-overlapping islands, ready for baking."""
     uvs = obj.data.uv_layers
-    layer = uvs.get(LIGHTMAP_UV) or uvs.new(name=LIGHTMAP_UV)
-    uvs.active = layer
-    _only(obj)
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    # lightmap_pack is deterministic; smart_project's packing is not on small spheres
-    bpy.ops.uv.lightmap_pack(PREF_CONTEXT="ALL_FACES", PREF_MARGIN_DIV=margin * 10)
-    bpy.ops.object.mode_set(mode="OBJECT")
-    obj.select_set(False)
-    uvs.active = uvs[0]
+    if LIGHTMAP_UV not in uvs:
+        uvs.new(name=LIGHTMAP_UV)
+    _lightmap_pack([obj], margin)
+
+
+def pack_lightmaps(root, margin=0.004):
+    """Repack the lightmap UVs of every mesh under `root` into one shared atlas, so the asset bakes into
+    a single image."""
+    _lightmap_pack([o for o in descendants(root) if o.type == "MESH" and not o.hide_render], margin)
+
+
+def _lightmap_pack(objs, margin):
+    """Blender's Lightmap Pack, run on meshes in name order. The operator gathers meshes into a Python
+    set, whose order follows memory addresses, so identical faces (like the desk's four legs) swap places
+    in the atlas from run to run; calling its packer with a sorted list makes the result reproducible."""
+    from bl_operators.uvcalc_lightmap import lightmap_uvpack
+
+    if bpy.context.object and bpy.context.object.mode != "OBJECT":
+        bpy.ops.object.mode_set(mode="OBJECT")
+    meshes = sorted({o.data for o in objs}, key=lambda me: me.name)
+    for me in meshes:
+        me.uv_layers.active = me.uv_layers[LIGHTMAP_UV]
+    lightmap_uvpack(meshes, PREF_SEL_ONLY=False, PREF_PACK_IN_ONE=True, PREF_BOX_DIV=12,
+                    PREF_MARGIN_DIV=int(1.0 / (margin * 10 / 100.0)))
+    for me in meshes:
+        me.uv_layers.active = me.uv_layers[0]
 
 
 def _project_uvs(obj, layer, margin=0.02):

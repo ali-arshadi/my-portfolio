@@ -84,28 +84,64 @@ turns pixel anchors measured in the reference into the placements in `config.py`
 
 ## 4. Rendering
 
-### Light layers
+### Light layers (implemented in Phase 4)
 
-The bake produces, per asset, a lightmap atlas on UV channel 2 for two layers:
+`blender/scripts/lights.py` defines the light rig and splits it into two layers:
 
-- **base**: every light except the desk lamp (shelf LED, candle, monitor, environment fill), with
-  bounce light and contact shadows.
-- **lamp**: the desk lamp alone.
+- **base**: shelf LED strip, candle, monitor glow, a warm picture light above the poster, a small warm
+  fill on the shelf, a cool rim from the right, and a faint world fill.
+- **lamp**: the desk lamp alone (a 40° spot aimed at the measured centre of the reference's light pool).
 
-In three.js each asset keeps a `MeshStandardMaterial` (albedo, roughness, metalness from Blender). A small
-`onBeforeCompile` patch replaces the indirect-diffuse term with
-`base + lampLevel * lamp`, where `lampLevel` is a shared uniform. Toggling the lamp animates `lampLevel`,
-the bulb's emissive intensity and one real-time spot light together, so the baked pool, the glowing
-diffuser and the live specular highlights stay in sync.
+Emissive materials belong to a layer as well. When one layer bakes, the other layer's lights and emitters
+are switched off.
 
-Real-time lights are kept for **specular only** (lamp spot, a weak cool monitor light). They do not cast
-shadows; shadows come from the bake. The exact split is tuned in Phase 4, where double-counting
-diffuse light is the main thing to check.
+`blender/scripts/bake.py` bakes each layer per asset with Cycles: diffuse direct plus indirect, without
+the surface colour, so each lightmap holds light, not colour. Details:
 
-### Effects (candidates, each must earn its place in Phase 4)
+- **One atlas per asset:** all of an asset's meshes share one `lightmap` UV set (`TEXCOORD_1`), packed by
+  `lightmap_pack`.
+- **Better packing:** faces no camera pose sees (desk underside, outsides of the walls) are deleted, and
+  long faces are sliced into near-square pieces, so the visible surfaces get most of the atlas.
+- **Storage:** 8-bit PNGs of `sRGB(light / LIGHTMAP_SCALE)`. The sRGB curve spends the 8 bits on the dark
+  end, which is most of this scene, and sampling them as sRGB textures gives the linear value back.
+- **Same run as the export:** baking runs inside `export_all.py`, so a lightmap always matches the UV
+  layout of the GLB written in that run.
+- **Not baked:** emissive and transparent surfaces (screen, LED, bulb, diffuser, flame, glass) light the
+  scene and are rendered as they are.
 
-- Bloom restricted to emissive surfaces (lamp diffuser, LED strip, candle flame).
-- A very light vignette, only if the comparison shows the reference has one.
+In three.js (`Workspace.tsx`), every lightmapped `MeshStandardMaterial` gets:
+
+- the base layer as its `lightMap`, at intensity `π · LIGHTMAP_SCALE`. three.js divides irradiance by π
+  when it applies the surface colour; Cycles' value multiplies it directly.
+- a small `onBeforeCompile` patch that adds the lamp layer times the shared `lampLevel` uniform
+  (`lampState.ts`).
+
+Changing `lampLevel.value` fades the baked lamp light everywhere at once, and the lamp's emissive bulb
+and diffuser follow it every frame, so the pool and the glowing shade stay in sync. `?lamp=off` (or
+`?lamp=0.4`) sets it for checking.
+
+There are **no real-time lights.** Reflections come from a small generated environment
+(`Lighting.tsx`, drei `Environment` + `Lightformer`s placed at the lamp, LED, monitor and rim
+positions). Metals use it at full strength, since they have no diffuse colour for the bake to show on.
+Everything else uses a trace of it, so it does not double the baked diffuse light.
+
+Tone mapping is AgX in both Blender and three.js, with the same exposure (`EXPOSURE`, in stops).
+
+### Live lamp highlight
+
+Cycles' diffuse bake cannot hold reflections, because they depend on where the camera is. Without them
+the lamp pool lost most of its brightness compared with the Blender preview. A single live spot light
+sits at the bulb with the same cone and power (Blender watts / 4π). On lightmapped materials the shader
+patch discards its diffuse part (`reflectedLight.directDiffuse = 0`), so it adds only the sheen on the
+desk, keyboard and metal, and never double-counts the baked light. It fades with `lampLevel`.
+
+### Effects (`Effects.tsx`)
+
+- **Bloom** on light sources only. The scene renders in linear HDR, and the threshold (1.5) sits above
+  every baked surface, so only the emissive bulb, diffuser, LED and flame glow. A small radius keeps the
+  glow close to them; the first, wider setting hazed the dark walls next to the LED by up to 9×.
+- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview.
+- No vignette: the reference's dark corners come from its lighting, which the bake already reproduces.
 - No real-time AO or soft shadows: both are already in the bake.
 
 ### Plants
@@ -119,9 +155,9 @@ uses two or three incommensurate sine frequencies so it never visibly loops, and
 src/
   app/                    Next.js routes (page.tsx keeps the hero + fallback content)
   config/
-    scene.generated.ts    cameras and temporary lights from Blender (do not edit)
+    scene.generated.ts    cameras, lights, asset + lightmap manifest from Blender (do not edit)
     camera.ts             scroll keyframes and phase ranges
-    scene.ts              asset list, light levels, effect settings
+    scene.ts              environment strengths, hit-target naming
   components/
     scene/
       DeskCanvas.tsx      <Canvas>, renderer settings, Suspense + loader

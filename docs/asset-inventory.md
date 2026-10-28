@@ -39,14 +39,20 @@ because three.js would otherwise multiply the leaves' colour by it.
 | Screen placeholder | `shared/textures.py` | 1600 × 900. The site replaces it with real HTML in Phase 7                                             |
 | Lightmaps          | `bake.py`            | Phase 4: two layers per asset (`base`, `lamp`), see architecture §4                                    |
 
-## Current state (Phase 3)
+## Lightmaps
 
-All twelve assets are built, validated, exported and loaded by the site. Each was placed against the
-solved camera from points measured in the reference (`calibration.py`). They use plain PBR colours plus
-the generated images; the bake comes in Phase 4. The legacy single-file pipeline and
-`desk-scene.glb` were removed (they remain in git history; `bake_export.py` there is a starting point
-for Phase 4).
+Two per asset in `public/lightmaps/` (`<asset>.base.png`, `<asset>.lamp.png`), baked by
+`blender/scripts/bake.py` into the asset's shared `lightmap` UV atlas. Sizes: room and desk 1024²;
+monitor, keyboard, desk lamp, poster and both plants 512²; shelf, books and figurine 256²; candle 128².
+Emissive and transparent meshes (screen, LED, bulb, diffuser, flame, glass, figurine eyes) are not
+baked. 24 files, about 3.6 MB.
 
-Totals: 28,090 triangles and about 3.2 MB of GLB. Most of the size is the lamp and shelf plant (smooth
-meshes whose vertices are split by the lightmap unwrap) and the poster and screen images; Phase 9
-evaluates compression.
+## Current state (Phase 4)
+
+All twelve assets are built, validated, exported and baked. The site renders them with baked light
+(two layers), a specular-only live lamp spot, environment reflections on metal, bloom on the light
+sources and AgX tone mapping. The legacy single-file pipeline was removed in Phase 3 (it is in git
+history).
+
+Totals: about 28k triangles, 3.2 MB of GLB and 3.6 MB of lightmaps. The lamp and shelf plant are most
+of the GLB size (smooth meshes whose vertices the lightmap unwrap splits); Phase 9 evaluates compression.

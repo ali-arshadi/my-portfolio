@@ -45,8 +45,9 @@ ANCHORS = {
     # monitor stand base, front edge on the desk
     "stand_front_left": (790, 668),
     "stand_front_mid": (960, 722),
-    # centre of the lamp's light pool on the desk
-    "lamp_pool_center": (552, 706),
+    # centre of the lamp's light pool on the desk: the luminance-weighted centroid of the warm pixels
+    # below the monitor, ignoring the hero text (it spans u 0.30-0.45, v 0.69-0.93)
+    "lamp_pool_center": (622, 761),
     # shelf props: bottom centre on the shelf top, and top
     "figurine_bottom": (767, 160),
     "figurine_top": (767, 88),

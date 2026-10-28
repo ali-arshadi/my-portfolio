@@ -65,7 +65,7 @@ LAMP = dict(
     head=Vector((0.102, 0.429, 1.044)),  # centre of the dish rim
     dish_normal=Vector((-0.709, 0.145, -0.690)),  # from the rim's ellipse
     dish_diameter=0.226,
-    pool=Vector((-0.161, 0.723, DESK_Z)),  # centre of the light pool, where the light is aimed
+    pool=Vector((-0.319, 0.796, DESK_Z)),  # centre of the light pool, where the light is aimed
 )
 
 # ---------------------------------------------------------------- poster --

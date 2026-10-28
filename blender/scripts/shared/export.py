@@ -23,8 +23,9 @@ def triangulate(root):
         bm.free()
 
 
-def export_asset(root, path):
-    """Export `root` and everything under it, in world space, to a binary glTF."""
+def export_asset(root, path, ignore=()):
+    """Export `root` and everything under it, in world space, to a binary glTF. Returns True when the
+    file on disk changed. Attributes in `ignore` do not count as a change (see export_all.py)."""
     triangulate(root)
     for o in bpy.context.selected_objects:
         o.select_set(False)
@@ -49,11 +50,11 @@ def export_asset(root, path):
     # Blender computes some mesh data on several threads, so vertex order and merging inside a GLB can
     # change between runs. Keep the existing file when the geometry is the same, so unchanged assets
     # never show up in a diff.
-    if os.path.exists(path) and same_asset(path, tmp):
+    if os.path.exists(path) and same_asset(path, tmp, ignore=ignore):
         os.remove(tmp)
-    else:
-        os.replace(tmp, path)
-    return path
+        return False
+    os.replace(tmp, path)
+    return True
 
 
 def glb_json(path):
@@ -123,9 +124,9 @@ def _structure(j):
 TOLERANCE = {"NORMAL": 1e-2}
 
 
-def same_asset(a, b, tol=1e-5):
+def same_asset(a, b, tol=1e-5, ignore=()):
     ja, ma, ia = _fingerprint(a)
     jb, mb, ib = _fingerprint(b)
     return (_structure(ja) == _structure(jb) and ia == ib and len(ma) == len(mb)
-            and all(ka == kb and np.allclose(x, y, rtol=0, atol=TOLERANCE.get(ka, tol))
+            and all(ka == kb and (ka in ignore or np.allclose(x, y, rtol=0, atol=TOLERANCE.get(ka, tol)))
                     for (ka, x), (kb, y) in zip(ma, mb)))

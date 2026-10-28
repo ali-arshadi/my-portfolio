@@ -11,7 +11,9 @@ class AssetError(Exception):
 
 
 def world_bounds(root):
-    pts = [o.matrix_world @ Vector(c) for o in descendants(root) if o.type == "MESH" for c in o.bound_box]
+    # from the vertices themselves: an object's cached bound_box can lag behind bmesh edits
+    bpy.context.view_layer.update()
+    pts = [o.matrix_world @ v.co for o in descendants(root) if o.type == "MESH" for v in o.data.vertices]
     if not pts:
         raise AssetError(f"{root.name}: no meshes")
     lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
