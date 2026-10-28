@@ -30,12 +30,14 @@ configured monitor screen lands, in green.
 - `scripts/build_scene.py`: builds every asset plus the camera and temporary lights; can render a preview
 - `scripts/export_all.py`: one GLB per asset, plus the generated TypeScript config
 - `scripts/compare.py`: renders the opening frame and compares it with `docs/reference/reference.webp`
-- `scripts/shared/`: material library, mesh helpers, export, validation
+- `scripts/calibration.py`: turns pixel points measured in the reference into 3D placements for `config.py`
+- `scripts/shared/`: material library, mesh helpers, textures (poster, placeholder screen), export, validation
+- `fonts/`: fonts used in the textures, vendored with their licences
 
 See `docs/architecture.md` and `docs/asset-inventory.md` for the conventions.
 
-## Legacy scripts
+## History
 
-`scene.py`, `bake_export.py` and `make_textures.py` are the original single-file pipeline that produced
-`public/models/desk-scene.glb`. They were placed for an older, less accurate camera. They stay here as
-source material until every object has been moved into `scripts/` (Phases 2–3), then they are removed.
+The scene started as a single-file pipeline (`scene.py`, `bake_export.py`, `make_textures.py`) that produced
+one baked `desk-scene.glb`. It was replaced by `scripts/` in Phases 1–3 and removed; it is still in git
+history.

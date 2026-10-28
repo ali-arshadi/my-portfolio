@@ -43,7 +43,13 @@ function AreaLight({
 // Temporary lights matching the Blender preview, replaced by baked light layers in Phase 4.
 export function Lighting() {
   const lamp = useRef<SpotLight>(null);
-  const { lamp: lampLevel, shelf_led, monitor, fill } = TEMP_LIGHT_LEVELS;
+  const {
+    lamp: lampLevel,
+    shelf_led,
+    monitor,
+    candle,
+    fill,
+  } = TEMP_LIGHT_LEVELS;
 
   useLayoutEffect(() => {
     const spot = lamp.current;
@@ -68,6 +74,13 @@ export function Lighting() {
       />
       <AreaLight light={TEMP_LIGHTS.shelf_led} {...shelf_led} />
       <AreaLight light={TEMP_LIGHTS.monitor} {...monitor} />
+      <pointLight
+        color={TEMP_LIGHTS.candle.color}
+        intensity={candle.intensity}
+        distance={candle.distance}
+        decay={2}
+        position={[...TEMP_LIGHTS.candle.position]}
+      />
     </>
   );
 }

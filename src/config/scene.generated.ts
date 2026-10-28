@@ -2,15 +2,15 @@
 // three.js coordinates (Y up). fov is vertical degrees for a 16:9 frame.
 
 export const HERO_CAMERA = {
-  position: [-1.082, 1.462, -1.726] as const,
-  target: [0.3369, 0.8193, 0.8379] as const,
+  position: [-1.082, 1.322, -1.726] as const,
+  target: [0.3369, 0.6793, 0.8379] as const,
   fov: 41.11,
 };
 
 // Square-on to the monitor screen, which fills 85% of the frame width.
 export const SCREEN_CAMERA = {
-  position: [-0.366, 1.22, -1.0387] as const,
-  target: [-0.4679, 1.22, -0.4833] as const,
+  position: [-0.366, 1.08, -1.0387] as const,
+  target: [-0.4679, 1.08, -0.4833] as const,
   fov: 41.11,
 };
 
@@ -18,7 +18,8 @@ export const CAMERA_ASPECT = 16 / 9;
 
 // Temporary lights (positions and colours shared with the Blender preview).
 export const TEMP_LIGHTS = {
-  lamp: { type: "spot", position: [0.6, 1.13, -0.3] as const, target: [-0.08, 0.76, -0.4] as const, color: "#ffc690" },
-  shelf_led: { type: "area", position: [0.14, 1.44, -0.12] as const, target: [0.14, 0, -0.12] as const, color: "#ffc47f" },
-  monitor: { type: "area", position: [-0.468, 1.22, -0.5] as const, target: [-0.468, 1.22, -2] as const, color: "#6f8fff" },
+  lamp: { type: "spot", position: [0.1268, 1.0682, -0.4239] as const, target: [-0.161, 0.76, -0.723] as const, color: "#ffc690" },
+  shelf_led: { type: "area", position: [-0.0125, 1.317, -0.17] as const, target: [-0.0125, 0.317, 0.08] as const, color: "#ffc47f" },
+  monitor: { type: "area", position: [-0.4643, 1.08, -0.503] as const, target: [-0.1069, 1.08, -2.4505] as const, color: "#6f8fff" },
+  candle: { type: "point", position: [-0.134, 1.409, -0.12] as const, target: [-0.134, 1.365, -0.12] as const, color: "#ffb15a" },
 };

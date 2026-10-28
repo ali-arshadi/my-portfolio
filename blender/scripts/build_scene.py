@@ -13,25 +13,50 @@ sys.path.insert(0, HERE)
 import bpy  # noqa: E402
 
 import config as C  # noqa: E402
+import create_books  # noqa: E402
+import create_candle  # noqa: E402
 import create_desk  # noqa: E402
+import create_desk_lamp  # noqa: E402
+import create_figurine  # noqa: E402
+import create_floor_plant  # noqa: E402
+import create_keyboard  # noqa: E402
+import create_monitor  # noqa: E402
 import create_room  # noqa: E402
-from shared import materials, validation  # noqa: E402
+import create_shelf  # noqa: E402
+import create_shelf_plant  # noqa: E402
+import create_wall_poster  # noqa: E402
+from mathutils import Matrix, Vector  # noqa: E402
+from shared import materials, textures, validation  # noqa: E402
 from shared.geometry import reset  # noqa: E402
 
 # Order matters only for readability of the outliner.
-ASSETS = [create_room, create_desk]
+ASSETS = [create_room, create_desk, create_monitor, create_keyboard, create_desk_lamp, create_wall_poster,
+          create_shelf, create_books, create_figurine, create_candle, create_shelf_plant, create_floor_plant]
 
-# Temporary lighting until the bake in Phase 4: just enough to judge composition.
-# (name, type, Blender position, colour, power W, aim point or None, size)
-TEMP_LIGHTS = [
-    ("lamp", "SPOT", (0.60, 0.30, 1.13), "#ffc690", 60, (-0.08, 0.40, C.DESK_Z), 0.12),
-    ("shelf_led", "AREA", (0.14, 0.12, 1.44), "#ffc47f", 25, (0.14, 0.12, 0.0), (1.0, 0.03)),
-    ("monitor", "AREA", (-0.468, 0.50, 1.22), "#6f8fff", 2, (-0.468, 2.0, 1.22), (0.6, 0.32)),
-]
+
+def temp_lights():
+    """Temporary lighting until the bake in Phase 4, placed on the objects that emit it.
+    (name, type, Blender position, colour, power W, aim point, size)"""
+    bulb, pool = create_desk_lamp.light_anchor()
+    s = C.SHELF
+    led = Vector(((s["x"][0] + s["x"][1]) / 2, s["depth"] - 0.03, s["top"] - s["thickness"] - 0.01))
+    m = C.MONITOR
+    turn = Matrix.Rotation(m["yaw"], 3, "Z")
+    screen, normal = m["pos"] + turn @ m["screen_center"], turn @ Vector((0, 1, 0))
+    return [
+        ("lamp", "SPOT", tuple(bulb), "#ffc690", 40, tuple(pool), 0.05),
+        ("shelf_led", "AREA", tuple(led), "#ffc47f", 18, tuple(led + Vector((0, -0.25, -1))),
+         (s["x"][1] - s["x"][0] - 0.04, 0.03)),
+        ("monitor", "AREA", tuple(screen + normal * 0.02), "#6f8fff", 2, tuple(screen + normal * 2), (0.6, 0.32)),
+        ("candle", "POINT", (C.CANDLE["x"], C.SHELF_PROPS["candle_y"], C.SHELF["top"] + create_candle.flame_height()),
+         "#ffb15a", 0.6, (C.CANDLE["x"], C.SHELF_PROPS["candle_y"], C.SHELF["top"]), 0.01),
+    ]
+
+
+TEMP_LIGHTS = temp_lights()
 
 
 def build_lights():
-    from mathutils import Vector
     w = bpy.data.worlds.new("World")
     bpy.context.scene.world = w
     w.use_nodes = True
@@ -45,6 +70,8 @@ def build_lights():
         if kind == "SPOT":
             data.spot_size = math.radians(95)
             data.spot_blend = 0.9
+            data.shadow_soft_size = size
+        elif kind == "POINT":
             data.shadow_soft_size = size
         else:
             data.shape = "RECTANGLE"
@@ -72,6 +99,7 @@ def build_camera():
 def build_all():
     """Returns {asset name: (root, stats)}; every asset is validated as it is built."""
     reset()
+    textures.build_all(C.BOOKS)
     built = {}
     for mod in ASSETS:
         root = mod.build()
@@ -107,6 +135,7 @@ def render(out, res=(836, 470), samples=24):
 def run_single(build, expect):
     """Entry point for running one create_*.py alone: build, validate, print stats."""
     reset()
+    textures.build_all(C.BOOKS)
     root = build()
     print(root.name, validation.check_scene(root, expect))
 

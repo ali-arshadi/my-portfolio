@@ -46,12 +46,13 @@ blender/
       materials.py           named PBR material library (one place for every colour/roughness)
       geometry.py            box / cylinder / rod / leaf helpers, bevel, UV unwrap
       textures.py            poster, spine and placeholder-screen images (Pillow)
+      foliage.py             leaf meshes and the plants' sway weight
       export.py              per-asset glTF export
       validation.py          name, bounds, pivot and triangle checks
     config.py                layout knobs: positions, sizes, camera, lights
     create_room.py           create_desk.py   create_monitor.py   create_keyboard.py
     create_desk_lamp.py      create_wall_poster.py   create_shelf.py   create_books.py
-    create_figurine.py       create_shelf_plant.py   create_floor_plant.py
+    create_figurine.py       create_candle.py   create_shelf_plant.py   create_floor_plant.py
     build_scene.py           runs every create_*, adds lights + camera, optional preview render
     bake.py                  bakes light layers into per-asset lightmaps
     export_all.py            writes public/models/*.glb and src/config/scene.generated.ts
@@ -60,10 +61,7 @@ blender/
 public/models/               generated GLBs (committed, so the site runs without Blender)
 ```
 
-Each `create_*.py` exposes `build(cfg) -> root object` and can also run alone for a quick look. The
-current single-file scripts (`blender/scene.py`, `blender/bake_export.py`, `blender/make_textures.py`)
-are the starting material: they are split into the modules above during Phases 1–2 and removed once the
-modular build reaches parity.
+Each `create_*.py` exposes `build() -> root object` and can also run alone for a quick look.
 
 `pnpm models` runs `blender/regenerate.sh`, which reads the Python interpreter from `BLENDER_PYTHON`
 (any Python with `bpy` 5.x, Pillow and NumPy; default `.venv-blender/bin/python`). Setup:
@@ -74,13 +72,15 @@ uv pip install --python .venv-blender/bin/python bpy pillow numpy
 ```
 
 The camera is exported from Blender into `src/config/scene.generated.ts`, so the browser camera can never
-drift from the camera the bake and the comparisons were made with. Regeneration is byte-for-byte
-reproducible (checked over repeated runs), so unchanged assets never show up in a diff.
+drift from the camera the bake and the comparisons were made with. Regeneration is stable: an export
+that matches the existing GLB's geometry, materials and images keeps the existing file, so unchanged
+assets never show up in a diff (checked over five consecutive runs). Blender computes some mesh data on
+several threads, which reorders vertices between runs; the comparison is order-independent for that
+reason (`shared/export.py`).
 
-**Status (Phase 1):** `config.py`, `shared/{materials,geometry,export,validation}.py`, `create_room.py`,
-`create_desk.py`, `build_scene.py`, `export_all.py`, `compare.py` and `regenerate.sh` exist. The other
-`create_*` scripts and `bake.py` arrive in Phases 2–4. `shared/textures.py` and `blender/fonts/` arrive in
-Phase 2.
+**Status (Phase 3):** everything above exists except `bake.py` (Phase 4). The candle has its own
+`create_candle.py`, and `shared/foliage.py` holds the leaf mesh and plant sway weight. `calibration.py`
+turns pixel anchors measured in the reference into the placements in `config.py`.
 
 ## 4. Rendering
 
@@ -208,8 +208,8 @@ src/
    exposure offset and decode in the shader, or use 16-bit/KTX2 maps. Decided in Phase 4 after a test bake.
 4. **Performance on integrated graphics.** The only hardware available for measurement is an Intel Iris
    Xe. Figures in the performance report will be for that machine and labelled as such.
-5. **Font portability.** `make_textures.py` points at system font paths (Inter, DejaVu Sans Mono Bold)
-   that are missing on this machine. Phase 2 vendors OFL fonts into `blender/fonts/`.
+5. **Font portability.** Resolved in Phase 2: DejaVu Sans Mono Bold and Noto Sans are vendored in
+   `blender/fonts/` with their licences.
 6. **Figurine.** The reference figure resembles a well-known brand mascot; it will be modelled as a
    generic stylised cat.
 7. **Tooling location.** The `bpy` venv currently lives in a session scratch folder. `regenerate.sh` and

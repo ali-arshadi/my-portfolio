@@ -53,8 +53,9 @@ def check_scene(root, expect):
     return dict(tris=tris, bounds=(tuple(round(v, 3) for v in lo), tuple(round(v, 3) for v in hi)))
 
 
-def check_glb(path, names):
-    """The exported file parses and still contains the named nodes, meshes, materials and both UV sets."""
+def check_glb(path, names, attributes=None):
+    """The exported file parses and still contains the named nodes, meshes, materials and both UV sets,
+    plus any extra vertex `attributes` ({mesh name: [attribute, ...]})."""
     j = glb_json(path)
     nodes = {n.get("name") for n in j.get("nodes", [])}
     missing = [n for n in names if n not in nodes]
@@ -66,6 +67,9 @@ def check_glb(path, names):
         for prim in mesh["primitives"]:
             if "TEXCOORD_1" not in prim["attributes"]:
                 raise AssetError(f"{path}: mesh {mesh.get('name')} lost its lightmap UVs")
+            for attr in (attributes or {}).get(mesh.get("name"), []):
+                if attr not in prim["attributes"]:
+                    raise AssetError(f"{path}: mesh {mesh.get('name')} has no {attr} attribute")
     return dict(nodes=len(nodes), meshes=len(j.get("meshes", [])))
 
 

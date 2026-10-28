@@ -75,8 +75,8 @@ def main():
     built = build_all()
     for mod in build_scene.ASSETS:
         root, stats = built[mod.NAME]
-        path = export_asset(root, os.path.join(REPO, a.models_dir, f"{mod.NAME}.glb"))
-        glb = check_glb(path, mod.EXPECT["names"])
+        path = export_asset(root, os.path.join(REPO, a.models_dir, f"{mod.NAME.replace('_', '-')}.glb"))
+        glb = check_glb(path, mod.EXPECT["names"], mod.EXPECT.get("attributes"))
         size = os.path.getsize(path)
         print(f"{mod.NAME}: {stats['tris']} tris, bounds {stats['bounds']}, "
               f"{glb['meshes']} meshes, {size / 1024:.1f} KiB -> {os.path.relpath(path, REPO)}")

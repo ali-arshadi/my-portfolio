@@ -1,10 +1,20 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
-import { MODELS } from "@/config/scene";
+import { useLayoutEffect } from "react";
+import { HIT_TARGET_SUFFIX, MODELS } from "@/config/scene";
 
 function Asset({ url }: { url: string }) {
   const { scene } = useGLTF(url);
+
+  useLayoutEffect(() => {
+    scene.traverse((object) => {
+      if (object.name.endsWith(HIT_TARGET_SUFFIX)) {
+        object.visible = false;
+      }
+    });
+  }, [scene]);
+
   return <primitive object={scene} />;
 }
 
