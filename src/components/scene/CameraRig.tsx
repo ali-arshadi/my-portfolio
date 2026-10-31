@@ -8,16 +8,13 @@ import {
   Vector3,
   type PerspectiveCamera as PerspectiveCameraType,
 } from "three";
-import {
-  CAMERA_ASPECT,
-  HERO_CAMERA,
-  SCREEN_CAMERA,
-} from "@/config/scene.generated";
-import { useScrollProgress } from "./useScrollProgress";
+import { evaluateCamera, PHASES } from "@/config/camera";
+import { CAMERA_ASPECT, HERO_CAMERA } from "@/config/scene.generated";
+import { scroll } from "./scrollState";
 
 const PARALLAX = { x: 0.06, y: 0.04 };
 
-const { lerp } = MathUtils;
+const { smoothstep } = MathUtils;
 
 // The poses were framed for 16:9; narrower viewports widen the vertical fov
 // so the horizontal framing stays the same.
@@ -31,11 +28,12 @@ function fitFov(fov: number, aspect: number) {
   );
 }
 
+// The only code that moves the camera: its pose is a function of the scroll progress (config/camera.ts).
 export function CameraRig() {
   const cameraRef = useRef<PerspectiveCameraType>(null);
+  const position = useRef(new Vector3());
   const look = useRef(new Vector3());
   const pointer = useRef({ x: 0, y: 0 });
-  const progress = useScrollProgress();
 
   useEffect(() => {
     const onPointerMove = (event: MouseEvent) => {
@@ -57,27 +55,18 @@ export function CameraRig() {
       return;
     }
 
-    const { e } = progress.current;
-    const fade = 1 - e;
-    const from = HERO_CAMERA;
-    const to = SCREEN_CAMERA;
-
+    const baseFov = evaluateCamera(scroll.t, position.current, look.current);
+    // the pointer parallax belongs to the opening frame and fades out as the camera starts to move
+    const fade = 1 - smoothstep(scroll.t, 0, PHASES.establishing[1]);
     camera.position.set(
-      lerp(from.position[0], to.position[0], e) +
-        pointer.current.x * PARALLAX.x * fade,
-      lerp(from.position[1], to.position[1], e) -
-        pointer.current.y * PARALLAX.y * fade,
-      lerp(from.position[2], to.position[2], e),
-    );
-    look.current.set(
-      lerp(from.target[0], to.target[0], e),
-      lerp(from.target[1], to.target[1], e),
-      lerp(from.target[2], to.target[2], e),
+      position.current.x + pointer.current.x * PARALLAX.x * fade,
+      position.current.y - pointer.current.y * PARALLAX.y * fade,
+      position.current.z,
     );
     camera.lookAt(look.current);
 
     const { width, height } = state.size;
-    const fov = fitFov(lerp(from.fov, to.fov, e), width / Math.max(height, 1));
+    const fov = fitFov(baseFov, width / Math.max(height, 1));
     if (camera.fov !== fov) {
       camera.fov = fov;
       camera.updateProjectionMatrix();

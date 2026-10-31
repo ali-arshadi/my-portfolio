@@ -191,23 +191,32 @@ src/
       DebugView.tsx       `?view=normals` calibration view
     objects/              DeskLamp, Books, Plants, Monitor (interactive wrappers around GLB nodes)
     interfaces/           HeroOverlay, MonitorInterface, PortfolioContent, InteractionHint, Loader
-    interactions/         ScrollController, useInteractive, interaction registry
+    interactions/         useInteractive, interaction registry (ScrollController lives in hero/)
   data/                   portfolio content (existing files reused, see §8)
   hooks/  shaders/  utils/
 ```
 
 ## 6. Scroll and camera
 
-- `ScrollController` creates one GSAP timeline with `ScrollTrigger` (`scrub`, pinned to `#hero`). It
-  tweens a plain object `{ t }` from 0 to 1 and updates the hero overlay's opacity and translation.
-  There is no React state update per frame.
-- `CameraRig` reads `t` in `useFrame` and evaluates position, target and FOV along keyframes from
-  `config/camera.ts` (Catmull-Rom for position and target, eased FOV). Because the camera is a pure
-  function of `t`, reversing direction at any point is exact.
-- Phases (starting values, tuned in Phase 6): establishing 0–0.15, approach 0.15–0.55,
-  screen alignment 0.55–0.85, focused 0.85–1.
-- The keyframe path is checked against the scene's bounding boxes so it never passes through geometry.
-- `prefers-reduced-motion`: the timeline is replaced by a cross-fade between the hero and focused states.
+Implemented in Phase 6.
+
+- `components/hero/ScrollController.tsx` creates one GSAP timeline with `ScrollTrigger`, scrubbed
+  (0.6 s smoothing) through `#hero` (240vh with a sticky inner frame). It tweens the plain object in
+  `scene/scrollState.ts` (`{ t }`) from 0 to 1 and fades and lifts the hero text (`#hero-overlay`) over
+  the establishing phase. There is no React state update per frame.
+- `CameraRig` reads `t` in `useFrame` and evaluates position, target and FOV from the keyframes in
+  `config/camera.ts`: cubic Hermite segments with Catmull-Rom tangents scaled by key spacing, flat at
+  holds, so the camera eases out of the opening frame and into the screen without overshoot. Because the
+  camera is a pure function of `t`, reversing direction at any point is exact. The pointer parallax
+  fades out over the establishing phase.
+- The hero target is the generated one pulled in to the screen's distance (same view), so the target
+  travels a short path to the screen centre instead of swinging in from 3 m behind the wall.
+- Phases: establishing 0–0.15 (hold), approach 0.15–0.55 (60% of the way, lifted 3 cm, view 80%
+  turned), screen alignment 0.55–0.85, focused 0.85–1 (hold on the square-on screen pose).
+- `?view=path` samples the path against every mesh's bounding box. Current closest approach: 0.32 m,
+  to the desk top, at the screen pose.
+- `prefers-reduced-motion`: no camera move. Past the hero's midpoint the scene fades out, cuts to the
+  screen pose and fades back in (and back on the way up); the text hides after the first 15%.
 
 ## 7. Monitor HTML
 

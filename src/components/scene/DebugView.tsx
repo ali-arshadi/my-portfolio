@@ -3,6 +3,7 @@
 import { useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import {
+  Box3,
   Mesh,
   MeshBasicMaterial,
   MeshNormalMaterial,
@@ -10,7 +11,10 @@ import {
   type MeshStandardMaterial,
   type Scene,
   type Texture,
+  Vector3,
 } from "three";
+import { evaluateCamera } from "@/config/camera";
+import { HIT_TARGET_SUFFIX } from "@/config/scene";
 import { lampLevel } from "./lampState";
 
 // Calibration aids:
@@ -18,6 +22,8 @@ import { lampLevel } from "./lampState";
 // colours with crisp edges regardless of lighting.
 // `?view=lightmap` / `?view=lampmap` show only the baked base / lamp layer, as the site maps them.
 // `?lamp=off` (or a number from 0 to 1) sets the desk lamp's level.
+// `?view=path` checks the scroll camera path against every mesh's bounding box and logs the closest
+// approach (also on `window.cameraPathClearance`).
 export function DebugView() {
   const get = useThree((state) => state.get);
 
@@ -33,6 +39,9 @@ export function DebugView() {
     const view = new URLSearchParams(window.location.search).get("view");
     if (view === "lightmap" || view === "lampmap") {
       return showLightmaps(get().scene, view);
+    }
+    if (view === "path") {
+      return checkPath(get().scene);
     }
     if (view !== "normals") {
       return;
@@ -78,4 +87,46 @@ function showLightmaps(scene: Scene, view: "lightmap" | "lampmap") {
       mesh.material = material;
     }
   };
+}
+
+// Samples the camera path and measures how close it comes to each mesh's world bounding box. Waits until
+// the workspace has loaded (some meshes present and stable for a second).
+function checkPath(scene: Scene) {
+  let last = -1;
+  const timer = window.setInterval(() => {
+    const meshes: Mesh[] = [];
+    scene.traverse((o) => {
+      if (o instanceof Mesh && !o.name.endsWith(HIT_TARGET_SUFFIX)) {
+        meshes.push(o);
+      }
+    });
+    if (meshes.length === 0 || meshes.length !== last) {
+      last = meshes.length;
+      return;
+    }
+    window.clearInterval(timer);
+    const boxes = meshes.map((m) => ({
+      name: m.name,
+      box: new Box3().setFromObject(m),
+    }));
+    const position = new Vector3();
+    const target = new Vector3();
+    let closest = { distance: Infinity, name: "", t: 0 };
+    for (let i = 0; i <= 400; i++) {
+      const t = i / 400;
+      evaluateCamera(t, position, target);
+      for (const { name, box } of boxes) {
+        const distance = box.distanceToPoint(position);
+        if (distance < closest.distance) {
+          closest = { distance, name, t };
+        }
+      }
+    }
+    const result = { ...closest, meshes: boxes.length };
+    (
+      window as unknown as { cameraPathClearance: unknown }
+    ).cameraPathClearance = result;
+    console.info("camera path clearance", result);
+  }, 1000);
+  return () => window.clearInterval(timer);
 }

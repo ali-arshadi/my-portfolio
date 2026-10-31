@@ -1,10 +1,15 @@
 import { DeskCanvasLoader } from "@/components/scene/DeskCanvasLoader";
+import { ScrollController } from "./ScrollController";
 import { StaticHero } from "./StaticHero";
 
 export function Hero() {
   return (
     <>
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
+      <div
+        id="scene"
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0"
+      >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_45%,#14161d_0%,#090a0e_65%)]" />
         <div className="absolute inset-0">
           <DeskCanvasLoader />
@@ -15,6 +20,7 @@ export function Hero() {
           <StaticHero />
         </div>
       </section>
+      <ScrollController />
     </>
   );
 }
