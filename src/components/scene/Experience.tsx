@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { MonitorScreen } from "@/components/screen/MonitorScreen";
 import { CameraRig } from "./CameraRig";
 import { DebugView } from "./DebugView";
 import { Effects } from "./Effects";
@@ -17,6 +18,7 @@ export function Experience() {
       <Lighting />
       <Suspense fallback={null}>
         <Workspace />
+        <MonitorScreen />
       </Suspense>
       <Effects />
     </>

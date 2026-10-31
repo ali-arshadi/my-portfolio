@@ -34,3 +34,9 @@ body {
   outline: 2px solid var(--lamp);
   outline-offset: 3px;
 }
+
+/* GSAP's wrapper around the pinned #hero takes its place in the stacking order but not its
+   pointer-events: none, which would put it over the monitor's content (see Hero.tsx). */
+.pin-spacer {
+  pointer-events: none;
+}
