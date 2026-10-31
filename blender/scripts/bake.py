@@ -29,7 +29,7 @@ sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
 import numpy as np  # noqa: E402
-from PIL import Image, ImageFilter  # noqa: E402
+from PIL import Image, PngImagePlugin  # noqa: E402
 
 import build_scene  # noqa: E402
 import lights  # noqa: E402
@@ -37,7 +37,7 @@ from shared import materials  # noqa: E402
 from shared.geometry import LIGHTMAP_UV, descendants  # noqa: E402
 
 OUT_DIR = os.path.join(REPO, "public", "lightmaps")
-LIGHTMAP_SCALE = 4.0
+LIGHTMAP_SCALE = 6.0
 LAYERS = ("base", "lamp")
 
 # Atlas size per asset, by how much of the frame it covers.
@@ -91,19 +91,48 @@ def bake_asset(root, size, layer):
 
 
 def encode(light):
-    """Linear light -> 8-bit sRGB of light / LIGHTMAP_SCALE."""
+    """Linear light -> 8-bit sRGB of light / LIGHTMAP_SCALE.
+
+    The blur runs before quantising, and the quantising is dithered: the scene is mostly near-black, and
+    straight rounding there leaves visible contour bands across the light falloff."""
     x = np.clip(light / LIGHTMAP_SCALE, 0, 1)
-    srgb = np.where(x <= 0.0031308, 12.92 * x, 1.055 * np.power(x, 1 / 2.4) - 0.055)
-    img = Image.fromarray(np.round(srgb * 255).astype(np.uint8), "RGB")
+    srgb = np.where(x <= 0.0031308, 12.92 * x, 1.055 * np.power(x, 1 / 2.4) - 0.055) * 255
     # a very light blur hides the last of the sampling noise without smearing across UV islands
-    return img.filter(ImageFilter.GaussianBlur(0.6))
+    srgb = blur(srgb, 0.6)
+    # triangular dither of +-1 step, seeded so a re-bake of the same light gives the same file
+    rng = np.random.default_rng(0)
+    srgb = srgb + rng.random(srgb.shape) - rng.random(srgb.shape)
+    return Image.fromarray(np.clip(np.round(srgb), 0, 255).astype(np.uint8), "RGB")
 
 
-def same_image(path, img, tol=1.5):
-    """Keep an existing lightmap when the new bake differs only by noise (mean difference in 8-bit steps)."""
+def web_path(path):
+    """URL of a file under public/ ("/lightmaps/x.png"), with forward slashes on every OS."""
+    return "/" + os.path.relpath(path, os.path.join(REPO, "public")).replace(os.sep, "/")
+
+
+def blur(a, sigma):
+    """Separable Gaussian blur of an (h, w, c) float array, edges clamped."""
+    r = int(np.ceil(3 * sigma))
+    k = np.exp(-0.5 * (np.arange(-r, r + 1) / sigma) ** 2)
+    k /= k.sum()
+    for axis in (0, 1):
+        pad = [(r, r) if i == axis else (0, 0) for i in range(a.ndim)]
+        p = np.pad(a, pad, mode="edge")
+        n = a.shape[axis]
+        a = sum(w * np.take(p, range(i, i + n), axis=axis) for i, w in enumerate(k))
+    return a
+
+
+def same_image(path, img, tol=0.5):
+    """Keep an existing lightmap when the new bake differs only by noise (mean difference in 8-bit steps).
+    Most maps are near-black, so a real lighting change can move the mean by less than one step; the
+    tolerance is kept small, and a map stored at another LIGHTMAP_SCALE always counts as changed."""
     if not os.path.exists(path):
         return False
-    old = np.asarray(Image.open(path).convert("RGB"), dtype=np.float32)
+    stored = Image.open(path)
+    if stored.info.get("lightmap_scale") != str(LIGHTMAP_SCALE):
+        return False
+    old = np.asarray(stored.convert("RGB"), dtype=np.float32)
     new = np.asarray(img, dtype=np.float32)
     return old.shape == new.shape and float(np.abs(old - new).mean()) < tol
 
@@ -137,11 +166,13 @@ def bake_all(built, samples=256, only=(), scale=1.0):
             img = encode(light)
             kept = same_image(path, img)
             if not kept:
-                img.save(path)
+                meta = PngImagePlugin.PngInfo()
+                meta.add_text("lightmap_scale", str(LIGHTMAP_SCALE))
+                img.save(path, pnginfo=meta)
             peak = float(light.max())
             print(f"{name}.{layer}: {count} meshes, {size}px, peak {peak:.2f}"
                   f"{' (clipped)' if peak > LIGHTMAP_SCALE else ''}{', unchanged' if kept else ''}", flush=True)
-            out.setdefault(name, {})[layer] = "/" + os.path.relpath(path, os.path.join(REPO, "public"))
+            out.setdefault(name, {})[layer] = web_path(path)
     return out
 
 

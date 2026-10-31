@@ -118,7 +118,7 @@ def main():
         size = os.path.getsize(path)
         print(f"{mod.NAME}: {stats['tris']} tris, bounds {stats['bounds']}, "
               f"{glb['meshes']} meshes, {size / 1024:.1f} KiB -> {os.path.relpath(path, REPO)}")
-        models[mod.NAME] = "/" + os.path.relpath(path, os.path.join(REPO, "public"))
+        models[mod.NAME] = bake.web_path(path)
 
     if a.no_bake:
         maps = {name: existing_lightmaps(name) for name in models}
@@ -133,7 +133,7 @@ def existing_lightmaps(name):
     for layer in bake.LAYERS:
         path = os.path.join(bake.OUT_DIR, f"{name.replace('_', '-')}.{layer}.png")
         if os.path.exists(path):
-            out[layer] = "/" + os.path.relpath(path, os.path.join(REPO, "public"))
+            out[layer] = bake.web_path(path)
     return out
 
 

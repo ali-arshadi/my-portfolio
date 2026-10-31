@@ -66,7 +66,9 @@ def screen(path):
         t = y / h
         for x in range(w):
             s = x / w
-            px[x, y] = (int(8 + 6 * t), int(12 + 8 * t + 4 * s), int(30 + 14 * t + 10 * s))
+            # the reference's screen is lifted by a soft blue glow behind the name
+            g = max(0.0, 1 - ((s - 0.7) / 0.4) ** 2 - ((t - 0.45) / 0.55) ** 2) ** 2
+            px[x, y] = (int(8 + 6 * t + 6 * g), int(12 + 8 * t + 4 * s + 11 * g), int(30 + 14 * t + 10 * s + 24 * g))
     d = ImageDraw.Draw(img)
     for i, c in enumerate(["#ff5f57", "#febc2e", "#28c840"]):
         cx = int(w * 0.035) + i * 34
@@ -80,6 +82,27 @@ def screen(path):
     # monitor's perspective maps to ~0.57 across the screen itself)
     d.text((int(w * 0.57), int(h * 0.40)), "Ali Arshadi", font=_font(SANS_BOLD, 96), fill=(240, 240, 236))
     d.text((int(w * 0.575), int(h * 0.54)), "Front-end developer", font=_font(SANS, 40), fill=(140, 150, 175))
+    img.save(path)
+
+
+# Lamp shade interior, centre to rim. The dish is half a UV sphere, so v runs from its centre (0) to the
+# rim (0.5): a vertical gradient is a radial one. The reference's dish glows cream in the middle and
+# orange toward the rim.
+SHADE_STOPS = [(0.0, "#fff4d8"), (0.12, "#ffd080"), (0.26, "#f09030"), (0.4, "#a85410"), (0.5, "#783c08"), (1.0, "#783c08")]
+
+
+def shade(path, height=256):
+    img = Image.new("RGB", (4, height))
+    px = img.load()
+    stops = [(t, _rgb(c)) for t, c in SHADE_STOPS]
+    for y in range(height):
+        v = 1 - (y + 0.5) / height  # image rows run top-down, UV v bottom-up
+        for (t0, c0), (t1, c1) in zip(stops, stops[1:]):
+            if t0 <= v <= t1:
+                k = (v - t0) / (t1 - t0)
+                col = tuple(int(round(a + (b - a) * k)) for a, b in zip(c0, c1))
+        for x in range(4):
+            px[x, y] = col
     img.save(path)
 
 
@@ -121,4 +144,5 @@ def build_all(books=()):
     os.makedirs(TEX_DIR, exist_ok=True)
     poster(os.path.join(TEX_DIR, "poster.png"))
     screen(os.path.join(TEX_DIR, "screen.png"))
+    shade(os.path.join(TEX_DIR, "shade.png"))
     spines(os.path.join(TEX_DIR, "spines.png"), books)

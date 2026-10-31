@@ -39,7 +39,8 @@ def build():
     base_y = sc.y + MONITOR_STAND["base_front"] - bd / 2
     box("monitor_base", (bw, bd, bt), (0, base_y, bt / 2), plastic, bev=0.004, parent=root)
     neck_top = sc.z - 0.03
-    box("monitor_neck", (0.06, 0.022, neck_top - bt), (0, sc.y - t - 0.055, (bt + neck_top) / 2), plastic,
+    # in the bezel's near-black so the strip that shows under the panel reads as shadow, as in the reference
+    box("monitor_neck", (0.06, 0.022, neck_top - bt), (0, sc.y - t - 0.055, (bt + neck_top) / 2), bezel,
         bev=0.004, parent=root)
 
     # the site anchors its HTML to this node; it starts out with a placeholder image

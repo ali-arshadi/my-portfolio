@@ -2,7 +2,8 @@
 
 Colours are sRGB hex (picked from the reference, then adjusted for albedo) and converted to linear for
 Blender. Optional keys: metal, specular (Principled "Specular IOR Level", 0.5 = default), image (file in
-the generated texture folder), emit + emit_strength, alpha.
+the generated texture folder), emit + emit_strength, alpha, emit_only (the image drives only the
+emission; the surface colour stays `color`).
 """
 import os
 
@@ -21,14 +22,16 @@ LIBRARY = {
     # monitor
     "monitor_plastic": dict(color="#0a0b0e", rough=0.55, metal=0.1),
     "monitor_bezel": dict(color="#050507", rough=0.35, metal=0.1),
-    "monitor_screen": dict(color="#000000", rough=0.25, image="screen.png", emit_image=True, emit_strength=0.45),
+    "monitor_screen": dict(color="#000000", rough=0.25, image="screen.png", emit_image=True, emit_strength=0.6),
     # keyboard
     "keyboard_case": dict(color="#17171c", rough=0.4, metal=0.2),
-    "keyboard_key": dict(color="#1c1b21", rough=0.45),
-    # desk lamp
-    "lamp_metal": dict(color="#6e5236", rough=0.35, metal=0.85),
+    "keyboard_key": dict(color="#221c21", rough=0.45),
+    # desk lamp (the shade's glow is painted, centre to rim, so the browser shows the same gradient: emissive
+    # surfaces are not baked, so they carry no light from the bulb)
+    "lamp_metal": dict(color="#8a6440", rough=0.35, metal=0.6),
     "lamp_dark": dict(color="#211d1a", rough=0.45, metal=0.6),
-    "lamp_shade_inner": dict(color="#f4e6cf", rough=0.6, emit="#ffb35c", emit_strength=1.2),
+    "lamp_shade_inner": dict(color="#1a1410", rough=0.6, specular=0.0, image="shade.png", emit_image=True, emit_only=True,
+                             emit_strength=2.2),
     "lamp_bulb": dict(color="#fff4e0", rough=0.3, emit="#ffe2b0", emit_strength=6.0),
     # wall poster
     "frame_wood": dict(color="#151210", rough=0.5),
@@ -37,7 +40,7 @@ LIBRARY = {
     "glass": dict(color="#ffffff", rough=0.05, alpha=0.06),
     # shelf
     "shelf_wood": dict(color="#3a2416", rough=0.55),
-    "shelf_led": dict(color="#ffd2a0", rough=0.5, emit="#ff9a45", emit_strength=3.0),
+    "shelf_led": dict(color="#ffb070", rough=0.5, emit="#ff7a20", emit_strength=1.2),
     # books (covers come from config.BOOKS; spines share one atlas image)
     "book_spine": dict(color="#ffffff", rough=0.7, image="spines.png"),
     # figurine and candle
@@ -90,7 +93,8 @@ def get(name, spec=None):
     if "image" in spec:
         tex = nt.nodes.new("ShaderNodeTexImage")
         tex.image = bpy.data.images.load(os.path.join(TEX_DIR, spec["image"]), check_existing=True)
-        nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        if not spec.get("emit_only"):
+            nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
         if spec.get("emit_image"):
             nt.links.new(tex.outputs["Color"], bsdf.inputs["Emission Color"])
     if "emit" in spec:
