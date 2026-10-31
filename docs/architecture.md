@@ -90,7 +90,12 @@ turns pixel anchors measured in the reference into the placements in `config.py`
 
 - **base**: shelf LED strip, candle, monitor glow, a warm picture light above the poster, a small warm
   fill on the shelf, a cool rim from the right, and a faint world fill.
-- **lamp**: the desk lamp alone (a 40° spot aimed at the measured centre of the reference's light pool).
+- **lamp**: the desk lamp: a 60° fully soft spot aimed near the measured centre of the reference's light
+  pool, plus two faint helpers the reference needs: a warm glow in the wall corner behind the lamp (it
+  also lights the poster's lower half) and a narrow fringe of the beam that reaches the floor plant's pot.
+
+Phase 5 tuned the powers against the reference patch by patch (wall, LED spill, poster, pool, keyboard,
+plant, screen), from Blender renders through `compare.py`.
 
 Emissive materials belong to a layer as well. When one layer bakes, the other layer's lights and emitters
 are switched off.
@@ -98,12 +103,16 @@ are switched off.
 `blender/scripts/bake.py` bakes each layer per asset with Cycles: diffuse direct plus indirect, without
 the surface colour, so each lightmap holds light, not colour. Details:
 
-- **One atlas per asset:** all of an asset's meshes share one `lightmap` UV set (`TEXCOORD_1`), packed by
-  `lightmap_pack`.
+- **One atlas per asset:** all of an asset's meshes share one `lightmap` UV set (`TEXCOORD_1`). Flat
+  meshes are packed face by face by `lightmap_pack`. Smooth-shaded meshes (pots, leaves, the lamp's dish)
+  get connected islands from Smart UV Project instead: one island per face showed as a seam at every
+  face of a pot. When an asset has both, all islands are packed together at an even texel density.
 - **Better packing:** faces no camera pose sees (desk underside, outsides of the walls) are deleted, and
   long faces are sliced into near-square pieces, so the visible surfaces get most of the atlas.
 - **Storage:** 8-bit PNGs of `sRGB(light / LIGHTMAP_SCALE)`. The sRGB curve spends the 8 bits on the dark
-  end, which is most of this scene, and sampling them as sRGB textures gives the linear value back.
+  end, which is most of this scene, and sampling them as sRGB textures gives the linear value back. The
+  values are blurred very lightly in float and dithered before rounding, so the near-black falloffs do
+  not band (risk 3 in §11).
 - **Same run as the export:** baking runs inside `export_all.py`, so a lightmap always matches the UV
   layout of the GLB written in that run.
 - **Not baked:** emissive and transparent surfaces (screen, LED, bulb, diffuser, flame, glass) light the
@@ -134,6 +143,19 @@ the lamp pool lost most of its brightness compared with the Blender preview. A s
 sits at the bulb with the same cone and power (Blender watts / 4π). On lightmapped materials the shader
 patch discards its diffuse part (`reflectedLight.directDiffuse = 0`), so it adds only the sheen on the
 desk, keyboard and metal, and never double-counts the baked light. It fades with `lampLevel`.
+
+### Baked reflection on dark surfaces
+
+Most surfaces here are near-black (the walls' albedo is under 1% linear), so in Blender what shows on
+them is mostly their rough reflection, several times their diffuse light. A diffuse-only bake loses it,
+and in Phase 5 the browser crushed the walls and poster to pure black where Blender showed a lifted
+near-black. The shader patch adds it back: baked light / π times three's `EnvironmentBRDF` (the same
+split-sum term its environment lighting uses), on dielectrics only. The lamp layer counts only on the
+roughest surfaces (roughness ≥ 0.9, the walls), because on glossier ones the live lamp spot already
+draws that reflection; counting both made the pool 1.6× Blender's.
+
+After this, browser and Blender agree within about ±15% on the pool, keyboard, books, screen, lamp
+and plant pot (measured patch by patch at 1672 × 941).
 
 ### Effects (`Effects.tsx`)
 

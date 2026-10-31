@@ -65,7 +65,7 @@ def spring(name, a, b, radius, turns, m, parent):
         t = i / steps
         ang = t * turns * 2 * math.pi
         pts.append(a + axis * t + u * math.cos(ang) * radius + v * math.sin(ang) * radius)
-    return tube(name, pts, 0.0016, m, parent=parent, sides=4)
+    return tube(name, pts, 0.0026, m, parent=parent, sides=6)
 
 
 def build():
@@ -103,7 +103,7 @@ def build():
     ring.name = ring.data.name = "lamp_rim"
     assign(ring, metal)
     ring.parent = head
-    sphere("lamp_bulb", 0.024, (0, 0, -0.035), materials.get("lamp_bulb"), parent=head)
+    sphere("lamp_bulb", 0.016, (0, 0, -0.035), materials.get("lamp_bulb"), parent=head)
 
     # where the site's live light sits (the bulb) and what it aims at (the measured light pool)
     empty("lamp_light_anchor", rim - n * 0.035, parent=root)

@@ -36,6 +36,12 @@ function prepare(texture: Texture) {
 // Adds the lamp's baked layer on top of the base light map, scaled by the shared lamp level. Diffuse
 // light comes only from the light maps, so the live lamp spot (Lighting.tsx) is limited to its
 // specular part here: the sheen the bake cannot hold, because it depends on where the camera is.
+//
+// The bake holds diffuse light only. Most surfaces here are near-black, and what Blender shows on them
+// is mostly their rough reflection (a few percent of the light, several times their diffuse), so
+// without it walls and the poster crush to black. Dielectrics get that reflection back from the baked
+// light, weighted by three's own split-sum term. The lamp layer counts only on the roughest surfaces
+// (the walls): on glossier ones the live spot already draws the lamp's reflection.
 function addLampLayer(material: MeshStandardMaterial, lampMap: Texture) {
   material.userData.lampMap = lampMap; // for the ?view=lightmap debug view
   material.onBeforeCompile = (shader) => {
@@ -55,7 +61,15 @@ function addLampLayer(material: MeshStandardMaterial, lampMap: Texture) {
       )
       .replace(
         "#include <lights_fragment_end>",
-        "#include <lights_fragment_end>\n  reflectedLight.directDiffuse = vec3( 0.0 );",
+        `#include <lights_fragment_end>
+  reflectedLight.directDiffuse = vec3( 0.0 );
+#ifdef USE_LIGHTMAP
+  reflectedLight.indirectSpecular += ( texture2D( lightMap, vLightMapUv ).rgb
+      + texture2D( lampMap, vLightMapUv ).rgb * lampLevel * smoothstep( 0.85, 0.95, material.roughness ) )
+    * lightMapIntensity * RECIPROCAL_PI
+    * EnvironmentBRDF( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness )
+    * ( 1.0 - metalnessFactor );
+#endif`,
       );
   };
   material.customProgramCacheKey = () => "lamp-layer";

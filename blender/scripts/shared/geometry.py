@@ -209,7 +209,13 @@ def pack_lightmaps(root, margin=0.004):
 def _lightmap_pack(objs, margin):
     """Blender's Lightmap Pack, run on meshes in name order. The operator gathers meshes into a Python
     set, whose order follows memory addresses, so identical faces (like the desk's four legs) swap places
-    in the atlas from run to run; calling its packer with a sorted list makes the result reproducible."""
+    in the atlas from run to run; calling its packer with a sorted list makes the result reproducible.
+
+    Lightmap Pack gives every face its own island. On the plants' smooth pots and leaves that shows as a
+    seam at every face, because neighbouring faces bake and filter separately; an asset whose meshes are
+    all smooth-shaded gets connected islands from Smart UV Project instead, packed at an even texel
+    density. Assets with flat or many small parts (the lamp's spring and joints would split into hundreds
+    of islands that the packer's margins shrink to dots) keep Lightmap Pack."""
     from bl_operators.uvcalc_lightmap import lightmap_uvpack
 
     if bpy.context.object and bpy.context.object.mode != "OBJECT":
@@ -217,10 +223,39 @@ def _lightmap_pack(objs, margin):
     meshes = sorted({o.data for o in objs}, key=lambda me: me.name)
     for me in meshes:
         me.uv_layers.active = me.uv_layers[LIGHTMAP_UV]
-    lightmap_uvpack(meshes, PREF_SEL_ONLY=False, PREF_PACK_IN_ONE=True, PREF_BOX_DIV=12,
-                    PREF_MARGIN_DIV=int(1.0 / (margin * 10 / 100.0)))
+    if all(_mostly_smooth(me) for me in meshes):
+        owner = {}
+        for o in sorted(objs, key=lambda o: o.name):
+            owner.setdefault(o.data, o)
+        _edit([owner[me] for me in meshes])
+        bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0, scale_to_bounds=False)
+        bpy.ops.uv.average_islands_scale()
+        bpy.ops.uv.pack_islands(rotate=True, margin_method="FRACTION", margin=max(margin, 0.008))
+        bpy.ops.object.mode_set(mode="OBJECT")
+        for o in bpy.context.selected_objects:
+            o.select_set(False)
+    else:
+        lightmap_uvpack(meshes, PREF_SEL_ONLY=False, PREF_PACK_IN_ONE=True, PREF_BOX_DIV=12,
+                        PREF_MARGIN_DIV=int(1.0 / (margin * 10 / 100.0)))
     for me in meshes:
         me.uv_layers.active = me.uv_layers[0]
+
+
+def _mostly_smooth(me):
+    return sum(p.use_smooth for p in me.polygons) > len(me.polygons) / 2
+
+
+def _edit(objs):
+    """Edit mode on `objs` together, every face selected."""
+    for o in bpy.context.selected_objects:
+        o.select_set(False)
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    # with select sync on, the selected faces' UVs count as selected for the UV operators
+    bpy.context.scene.tool_settings.use_uv_select_sync = True
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
 
 
 def _project_uvs(obj, layer, margin=0.02):
