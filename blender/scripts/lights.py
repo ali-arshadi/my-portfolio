@@ -32,7 +32,8 @@ LAMP_CONE = dict(angle=60, blend=1.0)
 # Full cone angles (degrees) of the other spots.
 SPOT_ANGLES = dict(picture=75, lamp_fringe=40)
 # Area lights that throw a narrower beam than a bare panel (Blender's "spread", degrees).
-SPREAD = dict(shelf_led=90)
+# (none at the moment: a narrowed LED spread cut its wash off in hard edges at the strip's ends)
+SPREAD = {}
 
 
 def rig():
@@ -52,12 +53,12 @@ def rig():
         ("lamp", "lamp", "SPOT", bulb, "#ff9a40", 55, pool, 0.03),
         # the lamp's glow in the wall corner behind it: the reference shows that corner and the poster's
         # lower half warm. It sits below the shelf, so the board keeps it off the books
-        ("lamp_glow", "lamp", "POINT", Vector((C.LEFT_WALL_X - 0.45, 0.12, 1.15)), "#ff9a40", 0.6, pool, 0.1),
+        ("lamp_glow", "lamp", "POINT", Vector((C.LEFT_WALL_X - 0.32, 0.32, 1.02)), "#ff9a40", 1.4, pool, 0.15),
         # the faint outer fringe of the dish's beam, reaching the floor plant's pot at the right end of
         # the desk, which the reference shows lit warm from the left
         ("lamp_fringe", "lamp", "SPOT", bulb, "#ff9a40", 25, C.FLOOR_PLANT["pos"] + Vector((0, 0, 0.12)), 0.05),
         # the strip washes the wall under the shelf, so it aims down and back
-        ("shelf_led", "base", "AREA", led, "#ff8a3a", 1.1, led + Vector((0, -1, -0.6)),
+        ("shelf_led", "base", "AREA", led, "#ff8a3a", 0.9, led + Vector((0, -1, -0.6)),
          (s["x"][1] - s["x"][0] - 0.04, 0.02)),
         ("candle", "base", "POINT", candle, "#ffb15a", 0.5, candle - Vector((0, 0, 1)), 0.01),
         ("monitor", "base", "AREA", screen + normal * 0.02, "#6f8fff", 0.6, screen + normal * 2, (0.6, 0.32)),
@@ -67,6 +68,10 @@ def rig():
         ("shelf_fill", "base", "POINT", Vector((0.2, 0.45, 1.65)), "#ffb070", 0.25, Vector((0.2, 0.1, 1.4)), 0.1),
         # a cool rim from the right so the plant and the monitor's right edge read against the dark
         ("rim", "base", "AREA", Vector((-2.0, 1.2, 1.7)), "#5a74c9", 3, Vector((-0.6, 0.3, 1.0)), (1.0, 1.0)),
+        # cool night light from the front right washing the right half of the back wall, which the
+        # reference shows as a deep navy gradient rather than black; it falls off before the poster side
+        ("wall_wash", "base", "AREA", Vector((-1.7, 1.6, 2.1)), "#2f4590", 4, Vector((-0.9, 0.0, 1.35)),
+         (1.4, 1.4)),
     ]
 
 

@@ -202,18 +202,27 @@ def spines(path, books):
 
 # ------------------------------------------------------------------ surfaces --
 
-def noise(size, cells, seed, octaves=4):
-    """Tileable fractal value noise in 0-1: random grids, smoothly upscaled from a 3 x 3 tiling so the
-    edges wrap, summed over octaves with halving weight."""
+def _filtered(size, seed, sigma, stretch=1.0, angle=0.0):
+    """White noise blurred by a Gaussian of `sigma` pixels in the frequency domain, so it tiles exactly
+    and has no grid. `stretch` > 1 elongates the kernel along `angle` (radians) for brush-like strokes."""
     rng = np.random.default_rng(seed)
+    f = np.fft.fft2(rng.standard_normal((size, size)))
+    fy, fx = np.meshgrid(np.fft.fftfreq(size), np.fft.fftfreq(size), indexing="ij")
+    c, s_ = math.cos(angle), math.sin(angle)
+    along, across = fx * c + fy * s_, -fx * s_ + fy * c
+    k = np.exp(-2 * (math.pi * sigma) ** 2 * ((along * stretch) ** 2 + across ** 2))
+    out = np.real(np.fft.ifft2(f * k))
+    return (out - out.min()) / (out.max() - out.min())
+
+
+def noise(size, cells, seed, octaves=4):
+    """Tileable fractal noise in 0-1: octaves of filtered white noise, `cells` blobs across at the
+    coarsest, each octave twice as fine at half the weight. Spectral, so it has none of the
+    axis-aligned grid lines that upscaled value noise leaves."""
     out = np.zeros((size, size))
     weight, total = 1.0, 0.0
     for o in range(octaves):
-        n = cells * 2 ** o
-        grid = rng.random((n, n))
-        big = Image.fromarray(np.tile(grid, (3, 3)).astype(np.float32), "F").resize((size * 3, size * 3),
-                                                                                    Image.BICUBIC)
-        out += weight * np.asarray(big)[size:2 * size, size:2 * size]
+        out += weight * _filtered(size, seed * 31 + o, size / (cells * 2 ** o) / 2.5)
         total += weight
         weight *= 0.5
     out /= total
@@ -227,11 +236,16 @@ def _tinted(base, field, amount):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB")
 
 
-def plaster(path, base, size=512):
-    """Painted plaster: broad soft unevenness plus a fine trowel grain, both faint."""
-    broad = noise(size, 3, 1)
-    grain = noise(size, 48, 2, octaves=2)
-    _tinted(base, broad * 0.7 + grain * 0.3, 0.12).save(path)
+def plaster(path, base, size=1024):
+    """Limewash: cloudy, overlapping brush passes (broad, soft and fairly strong, as the finish is
+    meant to look), a few directional sweeps, and a fine mineral grain."""
+    clouds = noise(size, 3, 1, octaves=5)
+    # crossing brush passes: elongated blobs at two angles
+    sweeps = (_filtered(size, 9, size / 40, stretch=0.25, angle=0.6)
+              + _filtered(size, 10, size / 40, stretch=0.25, angle=-0.9)) / 2
+    grain = _filtered(size, 2, 0.8)
+    field = clouds * 0.6 + sweeps * 0.25 + grain * 0.15
+    _tinted(base, field, 0.22).save(path)
 
 
 def concrete(path, base, size=512):
@@ -293,7 +307,7 @@ def build_all(books=()):
     screen(os.path.join(TEX_DIR, "screen.png"))
     shade(os.path.join(TEX_DIR, "shade.png"))
     spines(os.path.join(TEX_DIR, "spines.png"), books)
-    plaster(os.path.join(TEX_DIR, "plaster.png"), "#16171b")
+    plaster(os.path.join(TEX_DIR, "plaster.png"), "#272b32")
     concrete(os.path.join(TEX_DIR, "concrete.png"), "#665e57")
     pothos(os.path.join(TEX_DIR, "pothos.png"))
     snake_leaf(os.path.join(TEX_DIR, "snake.png"))

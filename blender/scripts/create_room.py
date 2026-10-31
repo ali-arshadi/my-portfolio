@@ -38,9 +38,9 @@ def build():
     # near-square pieces for the lightmap atlas
     slice_along(back, 0, h)
     slice_along(left, 1, h)
-    # the plaster texture repeats every 80 cm, at its real scale on both walls
-    planar_uv(back, (0, 2), 0.8)
-    planar_uv(left, (1, 2), 0.8)
+    # the limewash texture repeats every 1.6 m, at its real scale on both walls
+    planar_uv(back, (0, 2), 1.6)
+    planar_uv(left, (1, 2), 1.6)
     for o in (back, left, floor):
         add_lightmap_uv(o)
     return root

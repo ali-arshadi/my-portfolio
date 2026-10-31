@@ -88,8 +88,10 @@ turns pixel anchors measured in the reference into the placements in `config.py`
 
 `blender/scripts/lights.py` defines the light rig and splits it into two layers:
 
-- **base**: shelf LED strip, candle, monitor glow, a warm picture light above the poster, a small warm
-  fill on the shelf, a cool rim from the right, and a faint world fill.
+- **base**: shelf LED (full soft spread, so its wash fades out rather than ending in hard edges),
+  candle, monitor glow, a picture lamp just above the poster, a small warm fill on the shelf, a cool
+  rim from the right, a broad cool night-light wash on the right half of the back wall, and a faint
+  world fill.
 - **lamp**: the desk lamp: a 60° fully soft spot aimed near the measured centre of the reference's light
   pool, plus two faint helpers the reference needs: a warm glow in the wall corner behind the lamp (it
   also lights the poster's lower half) and a narrow fringe of the beam that reaches the floor plant's pot.

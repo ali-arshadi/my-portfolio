@@ -39,14 +39,15 @@ export const LIGHTMAP_SCALE = 6.0;
 // Scene lights (positions and colours shared with the Blender bake).
 export const LIGHTS = {
   lamp: { layer: "lamp", type: "spot", position: [0.1268, 1.0682, -0.4239] as const, target: [-0.24, 0.76, -0.78] as const, color: "#ff9a40", watts: 55 },
-  lamp_glow: { layer: "lamp", type: "point", position: [0.45, 1.15, -0.12] as const, target: [-0.24, 0.76, -0.78] as const, color: "#ff9a40", watts: 0.6 },
+  lamp_glow: { layer: "lamp", type: "point", position: [0.58, 1.02, -0.32] as const, target: [-0.24, 0.76, -0.78] as const, color: "#ff9a40", watts: 1.4 },
   lamp_fringe: { layer: "lamp", type: "spot", position: [0.1268, 1.0682, -0.4239] as const, target: [-1.105, 0.88, -0.23] as const, color: "#ff9a40", watts: 25 },
-  shelf_led: { layer: "base", type: "area", position: [-0.0125, 1.317, -0.17] as const, target: [-0.0125, 0.717, 0.83] as const, color: "#ff8a3a", watts: 1.1 },
+  shelf_led: { layer: "base", type: "area", position: [-0.0125, 1.317, -0.17] as const, target: [-0.0125, 0.717, 0.83] as const, color: "#ff8a3a", watts: 0.9 },
   candle: { layer: "base", type: "point", position: [-0.134, 1.409, -0.12] as const, target: [-0.134, 0.409, -0.12] as const, color: "#ffb15a", watts: 0.5 },
   monitor: { layer: "base", type: "area", position: [-0.4643, 1.08, -0.503] as const, target: [-0.1069, 1.08, -2.4505] as const, color: "#6f8fff", watts: 0.6 },
   picture: { layer: "base", type: "spot", position: [0.76, 1.6765, -0.379] as const, target: [0.9, 1.444, -0.379] as const, color: "#ffb07a", watts: 2.4 },
   shelf_fill: { layer: "base", type: "point", position: [0.2, 1.65, -0.45] as const, target: [0.2, 1.4, -0.1] as const, color: "#ffb070", watts: 0.25 },
   rim: { layer: "base", type: "area", position: [-2, 1.7, -1.2] as const, target: [-0.6, 1, -0.3] as const, color: "#5a74c9", watts: 3 },
+  wall_wash: { layer: "base", type: "area", position: [-1.7, 2.1, -1.6] as const, target: [-0.9, 1.35, -0] as const, color: "#2f4590", watts: 4 },
 };
 
 // AgX exposure in stops, as in the Blender preview.

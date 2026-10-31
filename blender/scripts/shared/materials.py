@@ -13,8 +13,9 @@ TEX_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 
 LIBRARY = {
     # room
-    # painted plaster (the colour lives in the generated texture, shared/textures.py)
-    "wall": dict(color="#ffffff", rough=0.95, image="plaster.png"),
+    # deep slate limewash (the colour and its cloudy variation live in the generated texture,
+    # shared/textures.py); a real dark paint, about 2% reflectance, so light reads on it
+    "wall": dict(color="#ffffff", rough=0.92, image="plaster.png"),
     "floor": dict(color="#15161b", rough=0.85),
     # a low specular level: the lamp sits in front of the camera, so a glossy desk throws a long sheen
     # toward it that the reference does not have
