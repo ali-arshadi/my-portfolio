@@ -1,11 +1,11 @@
 // The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
-// starts to move.
+// starts to move. #hero lets clicks through to the monitor, so the skip link takes them back.
 export function StaticHero() {
   return (
     <>
       <a
         href="#content"
-        className="absolute left-4 top-4 z-20 -translate-y-[200%] rounded-card bg-card px-3 py-2 text-sm text-fg focus-visible:translate-y-0"
+        className="pointer-events-auto absolute left-4 top-4 z-20 -translate-y-[200%] rounded-card bg-card px-3 py-2 text-sm text-fg focus-visible:translate-y-0"
       >
         Skip to content
       </a>

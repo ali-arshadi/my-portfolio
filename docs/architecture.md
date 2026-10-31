@@ -226,19 +226,32 @@ Implemented in Phase 6.
 
 ## 7. Monitor HTML
 
-- drei `<Html transform>` attached to the `Screen` node. A fixed-size DOM surface (16:9) is scaled so its
-  width equals the 3D screen's width.
-- The shelf plant overlaps the monitor's top-right corner in the reference, and plain `<Html>` always
-  draws on top of the canvas. Phase 7 evaluates `occlude="blending"` (DOM placed behind a transparent hole
-  in the canvas) to keep that overlap correct.
-- At the focused pose the camera looks at the screen head-on, so the CSS transform is close to identity
-  and text stays sharp.
-- Pointer events are off until the focused phase, then on. Inside the screen, the portfolio scrolls in
-  its own container with `overscroll-behavior: contain`. A wheel-up at its top passes through to the
-  page, which reverses the camera.
-- **Fallback:** if the transformed DOM is blurry or unreliable at the focused pose, the focused state
-  hands over to a full-viewport HTML layer styled as the screen, cross-faded at the moment the 3D
-  screen fills the view.
+Implemented (`components/screen/`).
+
+- **One scroll.** `ScrollController` pins `#hero` for the camera move (2.2 viewport heights) plus the
+  monitor content's scroll distance, and one timeline drives both: `scroll.t` for the camera, then
+  `scroll.content` for the screen, one page pixel per content pixel. There is no nested scroll box:
+  wheel, trackpad, keys and the scrollbar all scroll the page, and reversing is exact. The timeline is
+  rebuilt when the content's height or the viewport height changes, and refreshed after it is built
+  (a trigger made after the page's load event is not measured until something refreshes it).
+- **The screen.** `MonitorScreen` puts drei `<Html transform>` at the `Screen` node's world pose, turned
+  to face the viewer, with `distanceFactor` chosen so its 1280 × 720 CSS px cover the 0.64 m screen
+  (1 px = distanceFactor / 400 world units). It sits at the scene root rather than in a portal under
+  the node: a portal keeps its own copy of the scene state, and when it was made before `CameraRig`'s
+  camera became the default, the HTML was projected through the old camera.
+- **The swap.** `ScreenContent`'s first view repeats the screen image baked into the model (dots, code
+  bars, name, in the same layout, in the colours the image shows after tone mapping), and the HTML
+  fades in over the last 0.08 of the camera's alignment, so the swap can't be seen. The sections
+  follow, with tighter vertical padding than on the page. A title-bar strip fades the content out
+  under the window dots.
+- **Input and accessibility.** The HTML is drawn into `ScreenLayer`, over the canvas but outside its
+  `aria-hidden` wrapper. It is `inert` and ignores the pointer until the camera has arrived. `#hero`
+  (and GSAP's pin spacer, in `globals.css`) let clicks through to it. "Skip to content" scrolls to
+  the camera's arrival.
+- **Narrow screens.** Below 900 px wide the screen would be unreadable, so the HTML is not mounted and
+  the page shows the sections below the hero instead (`SCREEN_MEDIA`, `min-[900px]:hidden`).
+- **Sharpness.** At the focused pose the screen is square on and the CSS transform close to identity;
+  text was sharp at 1440 × 810. The full-viewport fallback this section planned has not been needed.
 
 ## 8. Interaction model
 
