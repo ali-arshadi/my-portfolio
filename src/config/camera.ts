@@ -13,12 +13,14 @@ export type CameraKey = {
   fov: number;
 };
 
-// Phase boundaries along the scroll.
+// Phase boundaries along the scroll. The holds are short: a long opening hold plus the ease out of it
+// made the first quarter of the scroll feel dead. The middle key sits at the move's time midpoint, so
+// the camera passes through it at an even speed.
 export const PHASES = {
-  establishing: [0, 0.15],
-  approach: [0.15, 0.55],
-  alignment: [0.55, 0.85],
-  focused: [0.85, 1],
+  establishing: [0, 0.1],
+  approach: [0.1, 0.51],
+  alignment: [0.51, 0.92],
+  focused: [0.92, 1],
 } as const;
 
 const hero = new Vector3(...HERO_CAMERA.position);
@@ -52,14 +54,14 @@ export const CAMERA_KEYS: CameraKey[] = [
     target: toVec3(heroTarget),
     fov: HERO_CAMERA.fov,
   },
-  // halfway in, lifted a little so the move reads as stepping up to the desk; the view has already
-  // turned most of the way to the screen
+  // halfway in, lifted a little so the move reads as stepping up to the desk; the view leads the step
+  // and has turned most of the way to the screen
   {
     t: PHASES.approach[1],
     position: toVec3(
-      mix(hero, screenPosition, 0.6).add(new Vector3(0, 0.03, 0)),
+      mix(hero, screenPosition, 0.55).add(new Vector3(0, 0.03, 0)),
     ),
-    target: toVec3(mix(heroTarget, screenCenter, 0.8)),
+    target: toVec3(mix(heroTarget, screenCenter, 0.7)),
     fov: HERO_CAMERA.fov,
   },
   {

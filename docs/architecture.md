@@ -201,7 +201,7 @@ src/
 Implemented in Phase 6.
 
 - `components/hero/ScrollController.tsx` creates one GSAP timeline with `ScrollTrigger`, scrubbed
-  (0.6 s smoothing) through `#hero` (240vh with a sticky inner frame). It tweens the plain object in
+  (0.6 s smoothing) through `#hero` (320vh with a sticky inner frame). It tweens the plain object in
   `scene/scrollState.ts` (`{ t }`) from 0 to 1 and fades and lifts the hero text (`#hero-overlay`) over
   the establishing phase. There is no React state update per frame.
 - `CameraRig` reads `t` in `useFrame` and evaluates position, target and FOV from the keyframes in
@@ -211,8 +211,12 @@ Implemented in Phase 6.
   fades out over the establishing phase.
 - The hero target is the generated one pulled in to the screen's distance (same view), so the target
   travels a short path to the screen centre instead of swinging in from 3 m behind the wall.
-- Phases: establishing 0–0.15 (hold), approach 0.15–0.55 (60% of the way, lifted 3 cm, view 80%
-  turned), screen alignment 0.55–0.85, focused 0.85–1 (hold on the square-on screen pose).
+- Phases: establishing 0–0.1 (hold), approach 0.1–0.51 (55% of the way, lifted 3 cm, view 70%
+  turned), screen alignment 0.51–0.92, focused 0.92–1 (hold on the square-on screen pose). The hero is
+  320vh, so the move gets 220vh of scroll. Tuned from a contact sheet of the move and a frame-to-frame
+  difference profile: the first layout (15% hold, middle key at 0.55, 240vh) left the first quarter of
+  the scroll dead and crammed most of the motion into 0.4–0.7; the profile is now an even bell that
+  peaks mid-move.
 - `?view=path` samples the path against every mesh's bounding box. Current closest approach: 0.32 m,
   to the desk top, at the screen pose.
 - `prefers-reduced-motion`: no camera move. Past the hero's midpoint the scene fades out, cuts to the

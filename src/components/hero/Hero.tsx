@@ -15,7 +15,7 @@ export function Hero() {
           <DeskCanvasLoader />
         </div>
       </div>
-      <section id="hero" className="relative z-[1] h-[240vh]">
+      <section id="hero" className="relative z-[1] h-[320vh]">
         <div className="sticky top-0 flex h-dvh flex-col justify-end">
           <StaticHero />
         </div>
