@@ -20,7 +20,7 @@ WORLD = dict(color="#1a2238", strength=2.0)
 
 # Emissive materials per layer (see shared/materials.py).
 EMITTERS = {
-    "base": ["shelf_led", "candle_flame", "monitor_screen", "figurine_eyes"],
+    "base": ["shelf_led", "candle_flame", "monitor_screen"],
     "lamp": ["lamp_bulb", "lamp_shade_inner"],
 }
 

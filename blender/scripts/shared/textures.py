@@ -106,6 +106,40 @@ def shade(path, height=256):
     img.save(path)
 
 
+KEYCAP_ATLAS = 1024
+KEYCAP_GRID = 10  # cells per side; the last cell is left blank for the caps' sides
+KEYCAP_COLOR = "#141217"
+LEGEND_COLOR = "#e4e2ea"
+
+
+def keycap_cell(i):
+    """(u0, v0, size) of atlas cell i in UV space (v up), filled row by row from the image's top."""
+    s = 1 / KEYCAP_GRID
+    return (i % KEYCAP_GRID) * s, 1 - (i // KEYCAP_GRID + 1) * s, s
+
+
+def keycaps(path, keys):
+    """Legend atlas: one cell per key, in `keys` order ([(label, width in key units)]). A wide key's
+    legend is drawn at its real aspect and squeezed into the square cell, so the cap's UVs stretch it
+    back. Legends are small and centred, as on the reference board."""
+    cell = KEYCAP_ATLAS // KEYCAP_GRID
+    img = Image.new("RGB", (KEYCAP_ATLAS, KEYCAP_ATLAS), _rgb(KEYCAP_COLOR))
+    ink = _rgb(LEGEND_COLOR)
+    for i, (label, width) in enumerate(keys):
+        if not label:
+            continue
+        w = round(cell * width)
+        face = Image.new("RGB", (w, cell), _rgb(KEYCAP_COLOR))
+        d = ImageDraw.Draw(face)
+        single = len(label) == 1
+        # arrows are not in Noto Sans; DejaVu Sans Mono has them
+        font = _font(MONO_BOLD if label in "←↑→↓" else SANS, int(cell * (0.4 if single else 0.22)))
+        d.text((w / 2, cell / 2), label, font=font, fill=ink, anchor="mm")
+        x, y = (i % KEYCAP_GRID) * cell, (i // KEYCAP_GRID) * cell
+        img.paste(face.resize((cell, cell), Image.LANCZOS), (x, y))
+    img.save(path)
+
+
 SPINE_ATLAS = 1024
 SPINE_COLUMN = 128  # each book's spine gets one column, 8 across
 

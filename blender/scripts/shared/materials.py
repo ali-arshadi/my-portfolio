@@ -24,8 +24,10 @@ LIBRARY = {
     "monitor_bezel": dict(color="#050507", rough=0.35, metal=0.1),
     "monitor_screen": dict(color="#000000", rough=0.25, image="screen.png", emit_image=True, emit_strength=0.6),
     # keyboard
-    "keyboard_case": dict(color="#17171c", rough=0.4, metal=0.2),
-    "keyboard_key": dict(color="#221c21", rough=0.45),
+    # a dark anodised case whose rounded edge catches the lamp; low-profile caps with printed legends
+    "keyboard_case": dict(color="#2a2a30", rough=0.32, metal=0.7),
+    "keyboard_plate": dict(color="#0c0c0f", rough=0.6),
+    "keyboard_key": dict(color="#ffffff", rough=0.55, specular=0.3, image="keycaps.png"),
     # desk lamp (the shade's glow is painted, centre to rim, so the browser shows the same gradient: emissive
     # surfaces are not baked, so they carry no light from the bulb)
     "lamp_metal": dict(color="#8a6440", rough=0.35, metal=0.6),
@@ -44,8 +46,10 @@ LIBRARY = {
     # books (covers come from config.BOOKS; spines share one atlas image)
     "book_spine": dict(color="#ffffff", rough=0.7, image="spines.png"),
     # figurine and candle
-    "figurine_ceramic": dict(color="#121215", rough=0.22),
-    "figurine_eyes": dict(color="#ffd27a", rough=0.4, emit="#ffb54a", emit_strength=2.0),
+    # satin vinyl collectible: black body, a muted peach face, small glossy black eyes
+    "figurine_vinyl": dict(color="#16161a", rough=0.42),
+    "figurine_face": dict(color="#5c4b42", rough=0.5),
+    "figurine_eyes": dict(color="#060608", rough=0.12),
     "candle_glass": dict(color="#c98a4a", rough=0.15, alpha=0.75),
     "candle_wax": dict(color="#efe4d0", rough=0.6),
     "candle_flame": dict(color="#ffe2a8", rough=0.5, emit="#ffc86e", emit_strength=20.0),
