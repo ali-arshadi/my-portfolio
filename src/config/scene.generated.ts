@@ -22,6 +22,7 @@ export const ASSETS = [
   { name: "desk", model: "/models/desk.glb", lightmaps: { base: "/lightmaps/desk.base.png", lamp: "/lightmaps/desk.lamp.png" } },
   { name: "monitor", model: "/models/monitor.glb", lightmaps: { base: "/lightmaps/monitor.base.png", lamp: "/lightmaps/monitor.lamp.png" } },
   { name: "keyboard", model: "/models/keyboard.glb", lightmaps: { base: "/lightmaps/keyboard.base.png", lamp: "/lightmaps/keyboard.lamp.png" } },
+  { name: "mouse", model: "/models/mouse.glb", lightmaps: { base: "/lightmaps/mouse.base.png", lamp: "/lightmaps/mouse.lamp.png" } },
   { name: "desk_lamp", model: "/models/desk-lamp.glb", lightmaps: { base: "/lightmaps/desk-lamp.base.png", lamp: "/lightmaps/desk-lamp.lamp.png" } },
   { name: "wall_poster", model: "/models/wall-poster.glb", lightmaps: { base: "/lightmaps/wall-poster.base.png", lamp: "/lightmaps/wall-poster.lamp.png" } },
   { name: "shelf", model: "/models/shelf.glb", lightmaps: { base: "/lightmaps/shelf.base.png", lamp: "/lightmaps/shelf.lamp.png" } },
@@ -43,9 +44,9 @@ export const LIGHTS = {
   shelf_led: { layer: "base", type: "area", position: [-0.0125, 1.317, -0.17] as const, target: [-0.0125, 0.717, 0.83] as const, color: "#ff8a3a", watts: 1.1 },
   candle: { layer: "base", type: "point", position: [-0.134, 1.409, -0.12] as const, target: [-0.134, 0.409, -0.12] as const, color: "#ffb15a", watts: 0.5 },
   monitor: { layer: "base", type: "area", position: [-0.4643, 1.08, -0.503] as const, target: [-0.1069, 1.08, -2.4505] as const, color: "#6f8fff", watts: 0.6 },
-  picture: { layer: "base", type: "spot", position: [0.72, 1.7565, -0.379] as const, target: [0.9, 1.344, -0.379] as const, color: "#ffb07a", watts: 0.6 },
+  picture: { layer: "base", type: "spot", position: [0.76, 1.6765, -0.379] as const, target: [0.9, 1.444, -0.379] as const, color: "#ffb07a", watts: 2.4 },
   shelf_fill: { layer: "base", type: "point", position: [0.2, 1.65, -0.45] as const, target: [0.2, 1.4, -0.1] as const, color: "#ffb070", watts: 0.25 },
-  rim: { layer: "base", type: "area", position: [-2, 1.7, -1.2] as const, target: [-0.6, 1, -0.3] as const, color: "#5a74c9", watts: 5 },
+  rim: { layer: "base", type: "area", position: [-2, 1.7, -1.2] as const, target: [-0.6, 1, -0.3] as const, color: "#5a74c9", watts: 3 },
 };
 
 // AgX exposure in stops, as in the Blender preview.

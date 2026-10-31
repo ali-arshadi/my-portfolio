@@ -16,11 +16,11 @@ import create_candle
 import create_desk_lamp
 from shared import materials
 
-WORLD = dict(color="#1a2238", strength=2.0)
+WORLD = dict(color="#1c2232", strength=1.4)
 
 # Emissive materials per layer (see shared/materials.py).
 EMITTERS = {
-    "base": ["shelf_led", "candle_flame", "monitor_screen"],
+    "base": ["shelf_led", "candle_flame", "monitor_screen", "monitor_led"],
     "lamp": ["lamp_bulb", "lamp_shade_inner"],
 }
 
@@ -30,7 +30,7 @@ EXPOSURE = 0.7
 # The reference's lamp pool is a large soft gradient from the lamp base past the keyboard.
 LAMP_CONE = dict(angle=60, blend=1.0)
 # Full cone angles (degrees) of the other spots.
-SPOT_ANGLES = dict(picture=60, lamp_fringe=40)
+SPOT_ANGLES = dict(picture=75, lamp_fringe=40)
 # Area lights that throw a narrower beam than a bare panel (Blender's "spread", degrees).
 SPREAD = dict(shelf_led=90)
 
@@ -44,7 +44,9 @@ def rig():
     turn = Matrix.Rotation(m["yaw"], 3, "Z")
     screen, normal = m["pos"] + turn @ m["screen_center"], turn @ Vector((0, 1, 0))
     p = C.POSTER
-    picture = Vector((C.LEFT_WALL_X - 0.18, p["center"].y, p["center"].z + p["opening"][1] / 2 + 0.2))
+    # a picture lamp just above the frame and a little out from the wall, as the reference's bright pool
+    # on the top of the mat and the wall above it suggests
+    picture = Vector((C.LEFT_WALL_X - 0.14, p["center"].y, p["center"].z + p["opening"][1] / 2 + 0.12))
     candle = Vector((C.CANDLE["x"], C.SHELF_PROPS["candle_y"], s["top"] + create_candle.flame_height()))
     return [
         ("lamp", "lamp", "SPOT", bulb, "#ff9a40", 55, pool, 0.03),
@@ -60,11 +62,11 @@ def rig():
         ("candle", "base", "POINT", candle, "#ffb15a", 0.5, candle - Vector((0, 0, 1)), 0.01),
         ("monitor", "base", "AREA", screen + normal * 0.02, "#6f8fff", 0.6, screen + normal * 2, (0.6, 0.32)),
         # a warm picture light above the poster: the reference's frame top is lit from above
-        ("picture", "base", "SPOT", picture, "#ffb07a", 0.6, p["center"] + Vector((0, 0, 0.1)), 0.05),
+        ("picture", "base", "SPOT", picture, "#ffb07a", 2.4, p["center"] + Vector((0, 0, 0.2)), 0.03),
         # a small warm fill so the books and figurine read, as the reference's shelf does
         ("shelf_fill", "base", "POINT", Vector((0.2, 0.45, 1.65)), "#ffb070", 0.25, Vector((0.2, 0.1, 1.4)), 0.1),
         # a cool rim from the right so the plant and the monitor's right edge read against the dark
-        ("rim", "base", "AREA", Vector((-2.0, 1.2, 1.7)), "#5a74c9", 5, Vector((-0.6, 0.3, 1.0)), (1.0, 1.0)),
+        ("rim", "base", "AREA", Vector((-2.0, 1.2, 1.7)), "#5a74c9", 3, Vector((-0.6, 0.3, 1.0)), (1.0, 1.0)),
     ]
 
 

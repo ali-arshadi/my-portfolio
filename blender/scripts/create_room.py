@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import LEFT_WALL_X, ROOM  # noqa: E402
 from shared import materials  # noqa: E402
-from shared.geometry import add_lightmap_uv, box, delete_faces, empty, slice_along  # noqa: E402
+from shared.geometry import add_lightmap_uv, box, delete_faces, empty, planar_uv, slice_along  # noqa: E402
 
 NAME = "room"
 EXPECT = dict(
@@ -38,6 +38,9 @@ def build():
     # near-square pieces for the lightmap atlas
     slice_along(back, 0, h)
     slice_along(left, 1, h)
+    # the plaster texture repeats every 80 cm, at its real scale on both walls
+    planar_uv(back, (0, 2), 0.8)
+    planar_uv(left, (1, 2), 0.8)
     for o in (back, left, floor):
         add_lightmap_uv(o)
     return root
