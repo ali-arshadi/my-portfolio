@@ -46,7 +46,7 @@ MONITOR = dict(
 # confirmed (e.g. the keyboard measures 0.368 x 0.148 m, a tenkeyless board).
 
 MONITOR_STAND = dict(
-    base_size=(0.27, 0.20, 0.012),
+    base_size=(0.30, 0.21, 0.010),
     base_front=0.045,  # base front edge, in front of the panel (measured 0.035-0.07 m)
 )
 
@@ -56,6 +56,11 @@ KEYBOARD = dict(
     yaw=math.radians(-2.3),
     tilt=math.radians(3),  # back raised on its feet
 )
+
+# ------------------------------------------------------------------ mouse --
+# Not in the reference: added by the owner. Just right of the keyboard (viewer's right is -x), level
+# with its middle row, turned a little toward the hand.
+MOUSE = dict(pos=Vector((-0.74, 0.725, DESK_Z)), yaw=math.radians(-8))
 
 # ------------------------------------------------------------------- lamp --
 # Elbow and head are assumed to sit at the base's distance from the back wall (one view cannot fix it).

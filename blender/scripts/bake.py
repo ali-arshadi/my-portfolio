@@ -42,7 +42,7 @@ LAYERS = ("base", "lamp")
 
 # Atlas size per asset, by how much of the frame it covers.
 SIZES = {
-    "room": 1024, "desk": 1024, "monitor": 512, "keyboard": 512, "desk_lamp": 512, "wall_poster": 512,
+    "room": 1024, "desk": 1024, "monitor": 512, "keyboard": 512, "mouse": 128, "desk_lamp": 512, "wall_poster": 512,
     "shelf": 256, "books": 256, "figurine": 256, "candle": 128, "shelf_plant": 512, "floor_plant": 512,
 }
 

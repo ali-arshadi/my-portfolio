@@ -33,11 +33,14 @@ def leaf_mesh(name, length, width, kind="heart", seg_l=10, seg_w=6, droop=0.25, 
     for i in range(seg_l):
         for j in range(seg_w):
             bm.faces.new((grid[i][j], grid[i][j + 1], grid[i + 1][j + 1], grid[i + 1][j]))
+    # u runs edge to edge across the leaf and v stem to tip, so a leaf texture's margins and midrib
+    # land on the leaf's edges and centre whatever its outline
     uv = bm.loops.layers.uv.new("UVMap")
+    index = {v: (i, j) for i, row in enumerate(grid) for j, v in enumerate(row)}
     for f in bm.faces:
         for loop in f.loops:
-            v = loop.vert.co
-            loop[uv].uv = (v.x / (width * 2 + 1e-6) + 0.5, v.y / (length + 1e-6))
+            i, j = index[loop.vert]
+            loop[uv].uv = (j / seg_w, i / seg_l)
     bm.to_mesh(me)
     bm.free()
     for p in me.polygons:

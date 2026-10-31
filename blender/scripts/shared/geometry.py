@@ -163,6 +163,57 @@ def join(name, objs):
     return o
 
 
+def lathe(name, profile, m, loc=(0, 0, 0), segments=48, tile=None, parent=None):
+    """A surface of revolution around local z from `profile`, a list of (radius, z) points in order
+    (e.g. outside up, over the lip, inside down). Smooth-shaded, with UVs: u around, v along the
+    profile by length, both 0-1, or, with `tile`, both in units of `tile` metres so a repeating texture
+    keeps its real scale."""
+    bm = bmesh.new()
+    rings = []
+    for r, z in profile:
+        ring = []
+        for k in range(segments):
+            a = 2 * math.pi * k / segments
+            ring.append(bm.verts.new((r * math.cos(a), r * math.sin(a), z)))
+        rings.append(ring)
+    lengths = [0.0]
+    for (r0, z0), (r1, z1) in zip(profile, profile[1:]):
+        lengths.append(lengths[-1] + math.hypot(r1 - r0, z1 - z0))
+    if tile:
+        su, sv = 2 * math.pi * max(r for r, _ in profile) / tile, lengths[-1] / tile
+    else:
+        su, sv = 1.0, 1.0
+    uv = bm.loops.layers.uv.new("UVMap")
+    for i in range(len(rings) - 1):
+        for k in range(segments):
+            k1 = (k + 1) % segments
+            f = bm.faces.new((rings[i][k], rings[i][k1], rings[i + 1][k1], rings[i + 1][k]))
+            for loop, (kk, ii) in zip(f.loops, ((k, i), (k + 1, i), (k + 1, i + 1), (k, i + 1))):
+                loop[uv].uv = (su * kk / segments, sv * lengths[ii] / lengths[-1])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(o)
+    o.location = loc
+    assign(o, m)
+    _smooth(o)
+    if parent:
+        o.parent = parent
+    return o
+
+
+def planar_uv(obj, axes, tile):
+    """Texture UVs projected from local coordinates: u, v = co[axes[0]], co[axes[1]] / `tile` metres, so
+    a repeating texture keeps its real scale however big the surface is."""
+    me = obj.data
+    uv = me.uv_layers[0]
+    for loop in me.loops:
+        co = me.vertices[loop.vertex_index].co
+        uv.data[loop.index].uv = (co[axes[0]] / tile, co[axes[1]] / tile)
+
+
 def delete_faces(obj, direction):
     """Remove faces pointing along `direction` (local space): sides no camera pose ever sees, which
     would otherwise take a share of the lightmap atlas."""

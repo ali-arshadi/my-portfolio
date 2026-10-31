@@ -20,6 +20,7 @@ import create_figurine  # noqa: E402
 import create_floor_plant  # noqa: E402
 import create_keyboard  # noqa: E402
 import create_monitor  # noqa: E402
+import create_mouse  # noqa: E402
 import create_room  # noqa: E402
 import create_shelf  # noqa: E402
 import create_shelf_plant  # noqa: E402
@@ -29,7 +30,7 @@ from shared import textures, validation  # noqa: E402
 from shared.geometry import pack_lightmaps, reset  # noqa: E402
 
 # Order matters only for readability of the outliner.
-ASSETS = [create_room, create_desk, create_monitor, create_keyboard, create_desk_lamp, create_wall_poster,
+ASSETS = [create_room, create_desk, create_monitor, create_keyboard, create_mouse, create_desk_lamp, create_wall_poster,
           create_shelf, create_books, create_figurine, create_candle, create_shelf_plant, create_floor_plant]
 
 

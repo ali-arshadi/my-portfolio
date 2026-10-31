@@ -1,28 +1,6 @@
-"use client";
-
-import { useScrollProgress } from "@/components/scene/useScrollProgress";
-import { useEffect, useRef } from "react";
-
+// The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
+// starts to move.
 export function StaticHero() {
-  const textRef = useRef<HTMLDivElement>(null);
-  const progress = useScrollProgress();
-
-  useEffect(() => {
-    let frame = 0;
-
-    const tick = () => {
-      if (textRef.current) {
-        textRef.current.style.opacity = String(
-          Math.max(0, 1 - progress.current.p * 3.2),
-        );
-      }
-      frame = requestAnimationFrame(tick);
-    };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [progress]);
-
   return (
     <>
       <a
@@ -32,8 +10,8 @@ export function StaticHero() {
         Skip to content
       </a>
       <div
-        ref={textRef}
-        className="pointer-events-none relative z-10 w-full px-[clamp(1.25rem,5vw,4rem)] pb-[9vh] pt-24 will-change-[opacity]"
+        id="hero-overlay"
+        className="pointer-events-none relative z-10 w-full px-[clamp(1.25rem,5vw,4rem)] pb-[9vh] pt-24 will-change-[opacity,transform]"
       >
         <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.92] tracking-[-0.03em]">
           Ali Arshadi
