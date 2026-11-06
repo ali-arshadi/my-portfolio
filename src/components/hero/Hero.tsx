@@ -2,6 +2,7 @@ import Image from "next/image";
 import openingFrame from "@/assets/opening-frame.webp";
 import { DeskCanvasLoader } from "@/components/scene/DeskCanvasLoader";
 import { ScreenLayer } from "@/components/screen/ScreenLayer";
+import { ShelfPanel } from "@/components/shelf/ShelfPanel";
 import { Loader } from "./Loader";
 import { ScrollController } from "./ScrollController";
 import { StaticHero } from "./StaticHero";
@@ -12,6 +13,7 @@ import { StaticHero } from "./StaticHero";
 // downloaded). #hero is pinned by ScrollController for as long as the camera move and the monitor's
 // content take to scroll. It lets clicks through to the monitor's
 // content, which is drawn in ScreenLayer, over the canvas but outside its aria-hidden wrapper.
+// ShelfPanel holds the panels the shelf objects open; it sits outside #hero, which takes no clicks.
 export function Hero() {
   return (
     <>
@@ -37,6 +39,7 @@ export function Hero() {
       >
         <StaticHero />
       </section>
+      <ShelfPanel />
       <ScrollController />
       <Loader />
     </>

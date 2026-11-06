@@ -213,9 +213,11 @@ src/
       Lighting.tsx        real-time lights
       Effects.tsx         postprocessing
       DebugView.tsx       `?view=normals` calibration view
-    objects/              DeskLamp, Books, Plants, Monitor (interactive wrappers around GLB nodes)
+      ScenePointer.tsx    the one window pointer handler; useSceneTarget registry (§8)
+      LampSwitch.tsx      the lamp's switch
+      ShelfObjects.tsx    the books and figurine: hover lift, open a panel
+    shelf/                ShelfPanel (the dialog), panelState
     interfaces/           HeroOverlay, MonitorInterface, PortfolioContent, InteractionHint, Loader
-    interactions/         useInteractive, interaction registry (ScrollController lives in hero/)
   data/                   portfolio content (existing files reused, see §8)
   hooks/  shaders/  utils/
 ```
@@ -277,25 +279,49 @@ Implemented (`components/screen/`).
 
 ## 8. Interaction model
 
+- **One pointer handler** (`scene/ScenePointer.tsx`). The canvas takes no pointer events (the page
+  scrolls over it and the monitor's links sit above it), so `ScenePointer` listens on the window
+  (`pointermove`, `click`) and raycasts into every registered target; the nearest hit wins and the
+  cursor turns to a pointer over it. Objects register with `useSceneTarget({ root, part?, onHover?,
+onActivate })`: `root` is a scene node name (all its descendants are tested, hidden `*_hit` boxes
+  included), and `part` maps a hit to the piece it stands for (one book of the row). Having a single
+  handler keeps the targets from fighting over the cursor. Targets are live only in the opening frame
+  (`scroll.t <= ACTIVE_UNTIL`, 0.02), once `<html data-scene-ready>` is set, and while no panel is
+  open; events over page controls (links, buttons, an open dialog) are left to them. Scrolling away or
+  opening a panel ends a hover even if the pointer did not move.
 - **Implemented: the lamp** (`LampSwitch.tsx`, Phase 8). Clicking the desk lamp in the opening frame
-  switches it off and on; the cursor turns to a pointer over it. The canvas takes no pointer events (the
-  page scrolls over it and the monitor's links sit above it), so the switch listens on the window and
-  raycasts into the lamp. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
+  switches it off and on. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
   and diffuser together; switching on, the bulb catches with a brief flicker (instant with reduced
   motion). Active only before the camera moves and once the scene is ready. On every load the lamp
   starts off and catches on by itself 0.7 s into the loader's reveal, so the first thing the reader
   sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
-- The rest below is still planned. `useInteractive({ id, label, enabled, onActivate, onHoverChange })` handles pointer and keyboard
-  focus, cursor, tooltip and cleanup for any object. Hit testing uses the object's own mesh or a simple
-  invisible proxy box.
-- Interactive objects: **lamp** (toggle), **books** (each opens a configured panel), and **figurine** and
-  **candle** (the figurine opens the About panel, the candle toggles the shelf accent light). The
-  candle is optional and is dropped if it doesn't earn its place.
-- Object interactions are enabled in the establishing phase only. During the approach they are
-  disabled, and in the focused phase the monitor UI owns input.
+- **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
+  own mesh, no proxy box needed) opens the **tools panel**: "Tools I use" with that book's entry of
+  `data/tools.ts` marked, then "Selected work". `config/shelf.ts` maps each spine title (painted from
+  `blender/scripts/config.py` `BOOKS`) to its tool; Node.js and CSS have no entry in `tools.ts`, so
+  those books mark nothing. The **figurine** opens the **About panel**: name and tagline
+  (`data/about.ts`, which the hero now reads too), the bio, "Where I've worked" and "Say hello".
+  Hovering an object lifts it (books 14 mm, figurine 8 mm; the shelf's front edge hides their bases),
+  damped, or instantly when `motionScale` is 0; the object stays lifted while its panel is open.
+- **Panels** (`shelf/ShelfPanel.tsx`, state in `shelf/panelState.ts`). HTML over the canvas, not
+  WebGL: one modal `<dialog>` (`aria-labelledby` its heading) in the top layer, so the browser traps
+  focus and makes the page inert. Escape, the close button or a click on the backdrop closes it, and
+  focus returns to the element that had it. While one is open `html[data-panel-open]` stops the page
+  scrolling (with `scrollbar-gutter: stable`, so the canvas does not resize), so the pinned hero and
+  the camera stay put. The panel fades and rises in, with no animation under reduced motion. The panels
+  reuse the sections' list components (`ToolList`, `WorkList`, `ExperienceList`, `ContactList`) and
+  titles, so their content stays in step with the page.
+- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Tools
+  I use", the owner's name), hidden until focused, open the same panels. In the static page
+  (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`; only the
+  bio, still a placeholder, is panel-only.
+- **Placeholders.** `data/about.ts` `bio` is `null` until the owner writes one; the About panel shows
+  a marked placeholder in its place.
+- Still planned: the **candle** toggling the shelf accent light (optional; dropped if it doesn't earn
+  its place).
 - Content: the existing `src/data/work.ts`, `tools.ts`, `experience.ts` and `contact.ts` are the owner's
-  own data and are reused as-is. Book panels reference entries in those files by id. Anything missing is
-  marked as a placeholder in the data file, never invented.
+  own data and are reused as-is. Anything missing is marked as a placeholder in the data file, never
+  invented.
 
 ## 9. Loading and fallback
 

@@ -1,3 +1,5 @@
+import { about } from "@/data/about";
+
 // The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
 // starts to move. #hero lets clicks through to the monitor, so the skip link takes them back.
 // The scroll hint depends on the scene mode; globals.css shows the right one.
@@ -15,10 +17,10 @@ export function StaticHero() {
         className="pointer-events-none relative z-10 w-full px-[clamp(1.25rem,5vw,4rem)] pb-[9vh] pt-24 will-change-[opacity,transform]"
       >
         <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.92] tracking-[-0.03em]">
-          Ali Arshadi
+          {about.name}
         </h1>
         <p className="mt-4 text-[clamp(1rem,2vw,1.35rem)] text-muted">
-          Front-end developer. Vue, Nuxt, React, TypeScript.
+          {about.tagline}
         </p>
         <p className="mt-8 text-[0.95rem] text-lamp">
           <span className="hint-3d">Scroll to step up to the screen</span>
