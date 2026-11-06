@@ -1,6 +1,7 @@
 # Asset inventory
 
-One generator script and one GLB per asset, all in `blender/scripts/` and `public/models/`. Every GLB is
+One generator script and one GLB per asset, in `blender/scripts/` and `public/models/` (compressed; the raw
+export is in the git-ignored `blender/build/models/`). Every GLB is
 in world space (see [architecture.md §2](architecture.md#2-coordinate-system)), so the site places them
 all at the origin. "Pivot" is the asset root inside the GLB. **Bold** names are looked up by the site,
 so they must not change without updating `src/config/scene.ts`.
@@ -45,11 +46,12 @@ because three.js would otherwise multiply the leaves' colour by it.
 
 ## Lightmaps
 
-Two per asset in `public/lightmaps/` (`<asset>.base.png`, `<asset>.lamp.png`), baked by
+Two per asset in `public/lightmaps/` (`<asset>.base.webp`, `<asset>.lamp.webp`; the raw PNGs are in
+`blender/build/lightmaps/`), baked by
 `blender/scripts/bake.py` into the asset's shared `lightmap` UV atlas. Sizes: room and desk 1024²;
 monitor, keyboard, desk lamp, poster and both plants 512²; shelf, books and figurine 256²; candle 128².
 Emissive and transparent meshes (screen, LED, bulb, diffuser, flame, glass, figurine eyes) are not
-baked. 24 files, about 3.6 MB.
+baked. 26 files: 5.4 MiB raw, 3.2 MiB as near-lossless WebP.
 
 ## Current state (Phase 4)
 

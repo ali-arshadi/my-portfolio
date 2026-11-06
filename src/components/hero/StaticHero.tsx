@@ -1,5 +1,6 @@
 // The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
 // starts to move. #hero lets clicks through to the monitor, so the skip link takes them back.
+// The scroll hint and the loading line depend on the scene mode; globals.css shows the right ones.
 export function StaticHero() {
   return (
     <>
@@ -20,7 +21,15 @@ export function StaticHero() {
           Front-end developer. Vue, Nuxt, React, TypeScript.
         </p>
         <p className="mt-8 text-[0.95rem] text-lamp">
-          Scroll to step up to the screen
+          <span className="hint-3d">Scroll to step up to the screen</span>
+          <span className="hint-static">Scroll for my work</span>
+        </p>
+        <p
+          id="load-progress"
+          role="status"
+          className="load-progress mt-3 text-xs tracking-wide text-muted tabular-nums"
+        >
+          Setting up the desk… <span data-percent>0%</span>
         </p>
       </div>
     </>

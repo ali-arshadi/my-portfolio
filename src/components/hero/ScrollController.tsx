@@ -3,8 +3,9 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useSyncExternalStore } from "react";
+import { useSceneMode } from "@/components/scene/sceneMode";
 import { scroll, screenScroll } from "@/components/scene/scrollState";
-import { PHASES } from "@/config/camera";
+import { PHASES } from "@/config/phases";
 
 // Scroll spent on the camera move, in viewport heights.
 const CAMERA_SCROLL = 2.2;
@@ -45,6 +46,7 @@ export function ScrollController() {
     screenScroll.get,
     () => 0,
   );
+  const mode = useSceneMode();
   const viewport = useSyncExternalStore(
     subscribeViewport,
     viewportHeight,
@@ -52,7 +54,8 @@ export function ScrollController() {
   );
 
   useEffect(() => {
-    if (!viewport) {
+    // the static fallback has no camera move and its sections are on the page: nothing to pin
+    if (!viewport || mode !== "3d") {
       return;
     }
     gsap.registerPlugin(ScrollTrigger);
@@ -137,7 +140,7 @@ export function ScrollController() {
       skip?.removeEventListener("click", onSkip);
       mm.revert();
     };
-  }, [distance, viewport]);
+  }, [distance, viewport, mode]);
 
   return null;
 }

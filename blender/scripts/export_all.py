@@ -1,6 +1,6 @@
 """Builds the scene, validates it, writes one GLB per asset and the camera/light config for the site.
 
-    python -I scripts/export_all.py [--no-bake] [--samples 256] [--models-dir public/models]
+    python -I scripts/export_all.py [--no-bake] [--samples 256] [--models-dir blender/build/models]
                                     [--config src/config/scene.generated.ts]
 
 Baking runs in the same process as the export, so lightmaps always match the GLBs' UV layout.
@@ -96,7 +96,8 @@ def write_config(path, assets):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models-dir", default="public/models")
+    # raw GLBs go to the local build folder; scripts/optimize-assets.mjs compresses them into public/models
+    ap.add_argument("--models-dir", default="blender/build/models")
     ap.add_argument("--config", default="src/config/scene.generated.ts")
     ap.add_argument("--no-bake", action="store_true", help="skip the bake (keeps existing lightmaps)")
     ap.add_argument("--samples", type=int, default=256)
@@ -118,7 +119,7 @@ def main():
         size = os.path.getsize(path)
         print(f"{mod.NAME}: {stats['tris']} tris, bounds {stats['bounds']}, "
               f"{glb['meshes']} meshes, {size / 1024:.1f} KiB -> {os.path.relpath(path, REPO)}")
-        models[mod.NAME] = bake.web_path(path)
+        models[mod.NAME] = f"/models/{os.path.basename(path)}"
 
     if a.no_bake:
         maps = {name: existing_lightmaps(name) for name in models}
@@ -133,7 +134,7 @@ def existing_lightmaps(name):
     for layer in bake.LAYERS:
         path = os.path.join(bake.OUT_DIR, f"{name.replace('_', '-')}.{layer}.png")
         if os.path.exists(path):
-            out[layer] = bake.web_path(path)
+            out[layer] = bake.served_lightmap(name, layer)
     return out
 
 

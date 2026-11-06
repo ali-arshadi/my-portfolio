@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Rebuild every Blender asset, validate it, bake its lighting, and write public/models/*.glb,
-# public/lightmaps/*.png and src/config/scene.generated.ts.
+# Rebuild every Blender asset, validate it, bake its lighting, write the raw models and lightmaps to
+# blender/build/ and src/config/scene.generated.ts, then compress them into public/models/*.glb and
+# public/lightmaps/*.webp (scripts/optimize-assets.mjs, needs Node and `pnpm install`).
 #
 #   blender/regenerate.sh               export and bake (about 7 minutes on 12 CPU threads)
 #   blender/regenerate.sh --no-bake     export only; keeps the existing lightmaps
@@ -27,6 +28,7 @@ for arg in "$@"; do
 done
 
 "$PY" -I blender/scripts/export_all.py "${export_args[@]}"
+node scripts/optimize-assets.mjs
 if [[ $compare == 1 ]]; then
   "$PY" -I blender/scripts/compare.py --out docs/reference/latest
 fi

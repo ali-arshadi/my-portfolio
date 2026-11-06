@@ -18,19 +18,19 @@ export const CAMERA_ASPECT = 16 / 9;
 
 // Every asset: its GLB and, once baked, its two lightmaps (see blender/scripts/bake.py).
 export const ASSETS = [
-  { name: "room", model: "/models/room.glb", lightmaps: { base: "/lightmaps/room.base.png", lamp: "/lightmaps/room.lamp.png" } },
-  { name: "desk", model: "/models/desk.glb", lightmaps: { base: "/lightmaps/desk.base.png", lamp: "/lightmaps/desk.lamp.png" } },
-  { name: "monitor", model: "/models/monitor.glb", lightmaps: { base: "/lightmaps/monitor.base.png", lamp: "/lightmaps/monitor.lamp.png" } },
-  { name: "keyboard", model: "/models/keyboard.glb", lightmaps: { base: "/lightmaps/keyboard.base.png", lamp: "/lightmaps/keyboard.lamp.png" } },
-  { name: "mouse", model: "/models/mouse.glb", lightmaps: { base: "/lightmaps/mouse.base.png", lamp: "/lightmaps/mouse.lamp.png" } },
-  { name: "desk_lamp", model: "/models/desk-lamp.glb", lightmaps: { base: "/lightmaps/desk-lamp.base.png", lamp: "/lightmaps/desk-lamp.lamp.png" } },
-  { name: "wall_poster", model: "/models/wall-poster.glb", lightmaps: { base: "/lightmaps/wall-poster.base.png", lamp: "/lightmaps/wall-poster.lamp.png" } },
-  { name: "shelf", model: "/models/shelf.glb", lightmaps: { base: "/lightmaps/shelf.base.png", lamp: "/lightmaps/shelf.lamp.png" } },
-  { name: "books", model: "/models/books.glb", lightmaps: { base: "/lightmaps/books.base.png", lamp: "/lightmaps/books.lamp.png" } },
-  { name: "figurine", model: "/models/figurine.glb", lightmaps: { base: "/lightmaps/figurine.base.png", lamp: "/lightmaps/figurine.lamp.png" } },
-  { name: "candle", model: "/models/candle.glb", lightmaps: { base: "/lightmaps/candle.base.png", lamp: "/lightmaps/candle.lamp.png" } },
-  { name: "shelf_plant", model: "/models/shelf-plant.glb", lightmaps: { base: "/lightmaps/shelf-plant.base.png", lamp: "/lightmaps/shelf-plant.lamp.png" } },
-  { name: "floor_plant", model: "/models/floor-plant.glb", lightmaps: { base: "/lightmaps/floor-plant.base.png", lamp: "/lightmaps/floor-plant.lamp.png" } },
+  { name: "room", model: "/models/room.glb", lightmaps: { base: "/lightmaps/room.base.webp", lamp: "/lightmaps/room.lamp.webp" } },
+  { name: "desk", model: "/models/desk.glb", lightmaps: { base: "/lightmaps/desk.base.webp", lamp: "/lightmaps/desk.lamp.webp" } },
+  { name: "monitor", model: "/models/monitor.glb", lightmaps: { base: "/lightmaps/monitor.base.webp", lamp: "/lightmaps/monitor.lamp.webp" } },
+  { name: "keyboard", model: "/models/keyboard.glb", lightmaps: { base: "/lightmaps/keyboard.base.webp", lamp: "/lightmaps/keyboard.lamp.webp" } },
+  { name: "mouse", model: "/models/mouse.glb", lightmaps: { base: "/lightmaps/mouse.base.webp", lamp: "/lightmaps/mouse.lamp.webp" } },
+  { name: "desk_lamp", model: "/models/desk-lamp.glb", lightmaps: { base: "/lightmaps/desk-lamp.base.webp", lamp: "/lightmaps/desk-lamp.lamp.webp" } },
+  { name: "wall_poster", model: "/models/wall-poster.glb", lightmaps: { base: "/lightmaps/wall-poster.base.webp", lamp: "/lightmaps/wall-poster.lamp.webp" } },
+  { name: "shelf", model: "/models/shelf.glb", lightmaps: { base: "/lightmaps/shelf.base.webp", lamp: "/lightmaps/shelf.lamp.webp" } },
+  { name: "books", model: "/models/books.glb", lightmaps: { base: "/lightmaps/books.base.webp", lamp: "/lightmaps/books.lamp.webp" } },
+  { name: "figurine", model: "/models/figurine.glb", lightmaps: { base: "/lightmaps/figurine.base.webp", lamp: "/lightmaps/figurine.lamp.webp" } },
+  { name: "candle", model: "/models/candle.glb", lightmaps: { base: "/lightmaps/candle.base.webp", lamp: "/lightmaps/candle.lamp.webp" } },
+  { name: "shelf_plant", model: "/models/shelf-plant.glb", lightmaps: { base: "/lightmaps/shelf-plant.base.webp", lamp: "/lightmaps/shelf-plant.lamp.webp" } },
+  { name: "floor_plant", model: "/models/floor-plant.glb", lightmaps: { base: "/lightmaps/floor-plant.base.webp", lamp: "/lightmaps/floor-plant.lamp.webp" } },
 ] as const;
 
 // Lightmap texels store sRGB(light / LIGHTMAP_SCALE).

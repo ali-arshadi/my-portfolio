@@ -36,7 +36,9 @@ import lights  # noqa: E402
 from shared import materials  # noqa: E402
 from shared.geometry import LIGHTMAP_UV, descendants  # noqa: E402
 
-OUT_DIR = os.path.join(REPO, "public", "lightmaps")
+# Raw bakes go to the local build folder; scripts/optimize-assets.mjs compresses them into
+# public/lightmaps/*.webp, which is what the site loads (see served_lightmap).
+OUT_DIR = os.path.join(REPO, "blender", "build", "lightmaps")
 LIGHTMAP_SCALE = 6.0
 LAYERS = ("base", "lamp")
 
@@ -105,9 +107,9 @@ def encode(light):
     return Image.fromarray(np.clip(np.round(srgb), 0, 255).astype(np.uint8), "RGB")
 
 
-def web_path(path):
-    """URL of a file under public/ ("/lightmaps/x.png"), with forward slashes on every OS."""
-    return "/" + os.path.relpath(path, os.path.join(REPO, "public")).replace(os.sep, "/")
+def served_lightmap(name, layer):
+    """The URL the site loads a lightmap from: the compressed copy in public/lightmaps."""
+    return f"/lightmaps/{name.replace('_', '-')}.{layer}.webp"
 
 
 def blur(a, sigma):
@@ -172,7 +174,7 @@ def bake_all(built, samples=256, only=(), scale=1.0):
             peak = float(light.max())
             print(f"{name}.{layer}: {count} meshes, {size}px, peak {peak:.2f}"
                   f"{' (clipped)' if peak > LIGHTMAP_SCALE else ''}{', unchanged' if kept else ''}", flush=True)
-            out.setdefault(name, {})[layer] = web_path(path)
+            out.setdefault(name, {})[layer] = served_lightmap(name, layer)
     return out
 
 

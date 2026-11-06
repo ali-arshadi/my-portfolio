@@ -2,7 +2,10 @@
 // scroll progress t (0-1), so reversing direction at any point is exact.
 
 import { Vector3 } from "three";
+import { PHASES } from "./phases";
 import { HERO_CAMERA, SCREEN_CAMERA } from "./scene.generated";
+
+export { PHASES };
 
 type Vec3 = readonly [number, number, number];
 
@@ -12,16 +15,6 @@ export type CameraKey = {
   target: Vec3;
   fov: number;
 };
-
-// Phase boundaries along the scroll. The holds are short: a long opening hold plus the ease out of it
-// made the first quarter of the scroll feel dead. The middle key sits at the move's time midpoint, so
-// the camera passes through it at an even speed.
-export const PHASES = {
-  establishing: [0, 0.1],
-  approach: [0.1, 0.51],
-  alignment: [0.51, 0.92],
-  focused: [0.92, 1],
-} as const;
 
 const hero = new Vector3(...HERO_CAMERA.position);
 const screenPosition = new Vector3(...SCREEN_CAMERA.position);

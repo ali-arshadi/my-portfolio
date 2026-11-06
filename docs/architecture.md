@@ -55,10 +55,15 @@ blender/
     create_figurine.py       create_candle.py   create_shelf_plant.py   create_floor_plant.py
     build_scene.py           runs every create_*, adds lights + camera, optional preview render
     bake.py                  bakes light layers into per-asset lightmaps
-    export_all.py            writes public/models/*.glb and src/config/scene.generated.ts
+    export_all.py            writes blender/build/models/*.glb and src/config/scene.generated.ts
     compare.py               renders the hero frame and overlays it on the reference
-  regenerate.sh              one command: textures -> scene -> bake -> export -> validate
-public/models/               generated GLBs (committed, so the site runs without Blender)
+    render_still.py          renders the opening frame -> src/assets/opening-frame.webp
+  regenerate.sh              one command: textures -> scene -> bake -> export -> validate -> compress
+  build/                     raw models and lightmaps (git-ignored local output)
+scripts/optimize-assets.mjs  compresses blender/build/ into what the site serves (pnpm assets)
+public/models/               compressed GLBs: meshopt geometry, WebP textures
+public/lightmaps/            compressed lightmaps: near-lossless WebP
+                             (both committed, so the site runs without Blender)
 ```
 
 Each `create_*.py` exposes `build() -> root object` and can also run alone for a quick look.
@@ -76,7 +81,17 @@ drift from the camera the bake and the comparisons were made with. Regeneration 
 that matches the existing GLB's geometry, materials and images keeps the existing file, so unchanged
 assets never show up in a diff (checked over five consecutive runs). Blender computes some mesh data on
 several threads, which reorders vertices between runs; the comparison is order-independent for that
-reason (`shared/export.py`).
+reason (`shared/export.py`). The comparison runs against the raw output in `blender/build/`, and the
+compressor only rewrites a served file whose source is newer, so a regeneration that changes nothing
+leaves `public/` untouched. On a fresh clone, without `blender/build/`, the first regeneration
+rewrites everything once.
+
+**Compression** (`scripts/optimize-assets.mjs`, Phase 7): models get meshopt geometry (positions
+quantized to 14 bits, about 0.3 mm across the room; the scale moves onto each node, so code that
+measures a mesh multiplies by its world scale) and WebP textures (0.4–1.5 of 255 mean error). Lightmaps
+are near-lossless WebP, every texel within 2 of 255 of the bake, dither intact: lossy WebP broke the dark
+falloffs into blocks, and the dither noise is what limits the saving. 10.0 MiB of raw output becomes
+4.5 MiB (models 4.6 -> 1.3, lightmaps 5.4 -> 3.2).
 
 **Status (Phase 3):** everything above exists except `bake.py` (Phase 4). The candle has its own
 `create_candle.py`, and `shared/foliage.py` holds the leaf mesh and plant sway weight. `calibration.py`
@@ -269,10 +284,21 @@ Implemented (`components/screen/`).
 
 ## 9. Loading and fallback
 
-- Assets load under one `Suspense` boundary. A loader overlay shows `useProgress` progress and fades out
-  only when every GLB and lightmap is ready, so the workspace never appears half-built.
-- Viewports narrower than ~900 px, browsers without WebGL 2, and `prefers-reduced-motion` get the static
-  hero image (a Blender render of the opening frame) and the existing HTML sections.
+Implemented in Phase 7.
+
+- **Still first.** The hero's first layer is a render of the opening frame
+  (`blender/scripts/render_still.py` -> `src/assets/opening-frame.webp`, 67 KB, served through
+  `next/image` with `preload`), on screen at once. In 3D mode the canvas loads behind it and fades in
+  (0.9 s) once `useProgress` reports every GLB and lightmap loaded, so the workspace never appears
+  half-built; meanwhile a line under the hero text shows the progress.
+- **Scene mode** (`scene/sceneMode.ts`). 3D needs a viewport at least 900 px wide and WebGL 2. Otherwise
+  the page is static: the still, then the sections below the hero, no pin and no camera move.
+  `<html data-scene>` (`3d`, `static`, `pending`) drives the CSS that swaps the sections, the scroll
+  hint and the loading line (`globals.css`).
+- **Static mode downloads no 3D code.** The canvas module (three.js, R3F, drei, postprocessing) is
+  loaded only in 3D mode, and nothing outside it imports three.js: the camera phases live in
+  `config/phases.ts`, apart from `config/camera.ts`, for that reason.
+- `prefers-reduced-motion` keeps the 3D scene with the fade cut of §6 rather than the still.
 
 ## 10. Budgets
 
@@ -280,7 +306,7 @@ Implemented (`components/screen/`).
 | --------------------------- | --------------------------------------------------------------------------------------------- |
 | Triangles (whole scene)     | ≤ 120k (current scene: 36.5k)                                                                 |
 | Draw calls at the hero pose | ≤ 120. Keycaps are merged into one mesh per material (they are not individually interactive). |
-| GLB download (all assets)   | ≤ 8 MB before KTX2; texture compression evaluated in Phase 9                                  |
+| GLB download (all assets)   | ≤ 8 MB. Current: 1.3 MiB of models + 3.2 MiB of lightmaps (Phase 7, see §3)                   |
 | Lightmap GPU memory         | ≤ 64 MB                                                                                       |
 | DPR                         | clamped to [1, 1.75]                                                                          |
 

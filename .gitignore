@@ -49,3 +49,5 @@ next-env.d.ts
 /blender/tex/
 /blender/out/
 __pycache__/
+# raw pipeline output, before scripts/optimize-assets.mjs compresses it into public/
+/blender/build/

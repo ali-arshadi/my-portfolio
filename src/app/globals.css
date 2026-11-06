@@ -40,3 +40,30 @@ body {
 .pin-spacer {
   pointer-events: none;
 }
+
+/* Scene mode (DeskCanvasLoader sets <html data-scene>: 3d, static or pending; DeskCanvas adds
+   data-scene-ready). In 3D mode the sections live on the monitor; otherwise the page shows them below
+   the hero. The live canvas fades in over the still frame once everything has loaded. */
+[data-scene="3d"] #content {
+  display: none;
+}
+.scene-canvas {
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+[data-scene-ready] .scene-canvas {
+  opacity: 1;
+}
+.load-progress,
+.hint-static {
+  display: none;
+}
+[data-scene="3d"]:not([data-scene-ready]) .load-progress {
+  display: block;
+}
+[data-scene="static"] .hint-3d {
+  display: none;
+}
+[data-scene="static"] .hint-static {
+  display: inline;
+}
