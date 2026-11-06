@@ -296,9 +296,10 @@ Implemented in Phase 7.
 - **Mode before paint.** An inline `beforeInteractive` script in the root layout
   (`scene/sceneMedia.ts`) sets `<html data-scene>` while the page is parsed, so a phone never flashes
   the loader; without JavaScript no mode is set and the loader stays hidden.
-- **Still underneath.** A render of the opening frame (`blender/scripts/render_still.py` ->
-  `src/assets/opening-frame.webp`, 67 KB, `next/image` with `preload`) is the hero's first layer: the
-  whole hero in static mode, and under the canvas in 3D mode.
+- **Still for static mode only.** A render of the opening frame (`blender/scripts/render_still.py` ->
+  `src/assets/opening-frame.webp`, 67 KB, `next/image`) is the whole hero in static mode. In 3D mode it
+  is hidden, and as a lazy image it is not even downloaded: the loader reveals the live scene directly,
+  with no still in between.
 - **Scene mode** (`scene/sceneMode.ts`). 3D needs a viewport at least 900 px wide and WebGL 2. Otherwise
   the page is static: the still, then the sections below the hero, no pin and no camera move.
   `<html data-scene>` (`3d`, `static`, `pending`) drives the CSS that swaps the sections, the scroll

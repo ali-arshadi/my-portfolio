@@ -11,7 +11,7 @@ import { Experience } from "./Experience";
 export default function DeskCanvas() {
   return (
     <>
-      <div className="scene-canvas absolute inset-0">
+      <div className="absolute inset-0">
         <Canvas
           className="h-full w-full"
           dpr={[1, 1.75]}
