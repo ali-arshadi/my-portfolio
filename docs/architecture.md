@@ -286,11 +286,19 @@ Implemented (`components/screen/`).
 
 Implemented in Phase 7.
 
-- **Still first.** The hero's first layer is a render of the opening frame
-  (`blender/scripts/render_still.py` -> `src/assets/opening-frame.webp`, 67 KB, served through
-  `next/image` with `preload`), on screen at once. In 3D mode the canvas loads behind it and fades in
-  (0.9 s) once `useProgress` reports every GLB and lightmap loaded, so the workspace never appears
-  half-built; meanwhile a line under the hero text shows the progress.
+- **Loader** (`hero/Loader.tsx`, styles in `globals.css`). In 3D mode a full-screen loader covers the
+  page from the first paint: an amber ring (the desk lamp's colour) filling around the percentage, with
+  "Setting up the desk" under it, the way 3D sites such as Lusion and Bruno Simon's portfolio open on a
+  minimal centred loader. `DeskCanvas`'s `LoadStatus` reads drei's progress store each frame and eases
+  the shown value toward it, so it never jumps or runs backwards; at 100% the ring glows for half a
+  second, like the lamp switching on, then `<html data-scene-ready>` fades the loader out over the
+  ready scene. The page does not scroll while it shows.
+- **Mode before paint.** An inline `beforeInteractive` script in the root layout
+  (`scene/sceneMedia.ts`) sets `<html data-scene>` while the page is parsed, so a phone never flashes
+  the loader; without JavaScript no mode is set and the loader stays hidden.
+- **Still underneath.** A render of the opening frame (`blender/scripts/render_still.py` ->
+  `src/assets/opening-frame.webp`, 67 KB, `next/image` with `preload`) is the hero's first layer: the
+  whole hero in static mode, and under the canvas in 3D mode.
 - **Scene mode** (`scene/sceneMode.ts`). 3D needs a viewport at least 900 px wide and WebGL 2. Otherwise
   the page is static: the still, then the sections below the hero, no pin and no camera move.
   `<html data-scene>` (`3d`, `static`, `pending`) drives the CSS that swaps the sections, the scroll

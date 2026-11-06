@@ -1,6 +1,9 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { SCENE_MEDIA } from "./sceneMedia";
+
+export { SCENE_MEDIA };
 
 // How the hero is shown:
 //   3d       the live scene, the scroll-driven camera and the portfolio on the monitor
@@ -9,9 +12,6 @@ import { useSyncExternalStore } from "react";
 //            without WebGL 2
 //   pending  on the server and before hydration: the still frame shows, nothing else is decided yet
 export type SceneMode = "3d" | "static" | "pending";
-
-// The width from which the scene (and the content on its monitor) is used.
-export const SCENE_MEDIA = "(min-width: 900px)";
 
 let webgl2: boolean | undefined;
 function hasWebGL2() {

@@ -43,7 +43,7 @@ body {
 
 /* Scene mode (DeskCanvasLoader sets <html data-scene>: 3d, static or pending; DeskCanvas adds
    data-scene-ready). In 3D mode the sections live on the monitor; otherwise the page shows them below
-   the hero. The live canvas fades in over the still frame once everything has loaded. */
+   the hero. The live canvas fades in behind the loader once everything has loaded. */
 [data-scene="3d"] #content {
   display: none;
 }
@@ -54,16 +54,103 @@ body {
 [data-scene-ready] .scene-canvas {
   opacity: 1;
 }
-.load-progress,
 .hint-static {
   display: none;
-}
-[data-scene="3d"]:not([data-scene-ready]) .load-progress {
-  display: block;
 }
 [data-scene="static"] .hint-3d {
   display: none;
 }
 [data-scene="static"] .hint-static {
   display: inline;
+}
+
+/* The full-screen loader (hero/Loader.tsx): only in 3D mode, until the scene is ready. The page does
+   not scroll meanwhile. At 100% the ring lights up like the desk lamp, then the loader fades out. */
+html[data-scene="3d"]:not([data-scene-ready]) {
+  overflow: hidden;
+}
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: radial-gradient(ellipse at 50% 45%, #12141b 0%, var(--bg) 70%);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 900ms ease,
+    visibility 0s linear 900ms;
+}
+[data-scene="3d"]:not([data-scene-ready]) .loader {
+  visibility: visible;
+  opacity: 1;
+  transition: none;
+}
+.loader-ring {
+  position: relative;
+  width: 7.5rem;
+  height: 7.5rem;
+}
+.loader-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.loader-track,
+.loader-fill {
+  fill: none;
+  stroke-width: 1.5;
+}
+.loader-track {
+  stroke: var(--line);
+  animation: loader-breathe 1.8s ease-in-out infinite;
+}
+.loader-fill {
+  stroke: var(--lamp);
+  stroke-linecap: round;
+  transition: filter 450ms ease;
+}
+.loader[data-complete] .loader-fill {
+  filter: drop-shadow(0 0 4px var(--lamp))
+    drop-shadow(0 0 14px rgba(255, 180, 84, 0.55));
+}
+.loader-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.loader-percent {
+  margin-left: 0.1em;
+  font-size: 0.55em;
+  color: var(--muted);
+}
+.loader-caption {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@keyframes loader-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-track {
+    animation: none;
+  }
+  .loader-fill {
+    transition: none;
+  }
 }
