@@ -183,10 +183,17 @@ and plant pot (measured patch by patch at 1672 × 941).
 - No vignette: the reference's dark corners come from its lighting, which the bake already reproduces.
 - No real-time AO or soft shadows: both are already in the bake.
 
-### Plants
+### Ambient motion (Phase 8)
 
-Subtle sway in the vertex shader (`onBeforeCompile`): displacement grows with height above the pot,
-uses two or three incommensurate sine frequencies so it never visibly loops, and costs no CPU per frame.
+- **Plants** sway in the vertex shader (`Workspace.tsx`, `addSway`): each vertex moves sideways by
+  its `_sway` weight (0 at the pot, 1 at the tips), along incommensurate sines of time and position,
+  so it never visibly loops and costs no CPU per frame. Up to 8 mm at the pothos's vine tips, 4 mm on
+  the snake plant. The offset is in world metres, turned into the mesh's own space, because the
+  compressed models carry a scale on each node. Shader patches chain (`patch`), once per material: the
+  leaves also carry the lamp-layer patch.
+- **The candle** flickers (`SceneMotion.tsx`): the flame's glow and height wobble on incommensurate
+  sines; bloom carries it into the room.
+- **Reduced motion** sets `motionScale` to 0: the plants hold still and the flame burns steadily.
 
 ## 5. Application structure
 
@@ -270,7 +277,13 @@ Implemented (`components/screen/`).
 
 ## 8. Interaction model
 
-- `useInteractive({ id, label, enabled, onActivate, onHoverChange })` handles pointer and keyboard
+- **Implemented: the lamp** (`LampSwitch.tsx`, Phase 8). Clicking the desk lamp in the opening frame
+  switches it off and on; the cursor turns to a pointer over it. The canvas takes no pointer events (the
+  page scrolls over it and the monitor's links sit above it), so the switch listens on the window and
+  raycasts into the lamp. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
+  and diffuser together; switching on, the bulb catches with a brief flicker (instant with reduced
+  motion). Active only before the camera moves and once the scene is ready.
+- The rest below is still planned. `useInteractive({ id, label, enabled, onActivate, onHoverChange })` handles pointer and keyboard
   focus, cursor, tooltip and cleanup for any object. Hit testing uses the object's own mesh or a simple
   invisible proxy box.
 - Interactive objects: **lamp** (toggle), **books** (each opens a configured panel), and **figurine** and

@@ -5,7 +5,9 @@ import { MonitorScreen } from "@/components/screen/MonitorScreen";
 import { CameraRig } from "./CameraRig";
 import { DebugView } from "./DebugView";
 import { Effects } from "./Effects";
+import { LampSwitch } from "./LampSwitch";
 import { Lighting } from "./Lighting";
+import { SceneMotion } from "./SceneMotion";
 import { Workspace } from "./Workspace";
 
 export function Experience() {
@@ -20,6 +22,8 @@ export function Experience() {
         <Workspace />
         <MonitorScreen />
       </Suspense>
+      <SceneMotion />
+      <LampSwitch />
       <Effects />
     </>
   );

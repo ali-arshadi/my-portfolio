@@ -19,8 +19,39 @@ import {
   LIGHTMAP_SCALE,
 } from "@/config/scene.generated";
 import { lampLevel } from "./lampState";
+import { motionScale, sceneTime } from "./motionState";
 
 type Asset = (typeof ASSETS)[number];
+type Shader = Parameters<MeshStandardMaterial["onBeforeCompile"]>[0];
+
+// How far a plant's leaf tips sway, in metres: the pothos's long vines move more than the stiff
+// snake-plant blades.
+const SWAY: Partial<Record<Asset["name"], number>> = {
+  shelf_plant: 0.008,
+  floor_plant: 0.004,
+};
+
+// Adds a shader patch to a material, after any it already has: the plants' leaves take both the
+// lamp-layer patch and the sway, so patches chain instead of replacing each other. A patch is applied
+// once per material (the effect that applies them can run again, e.g. in development).
+function patch(
+  material: MeshStandardMaterial,
+  key: string,
+  apply: (shader: Shader) => void,
+) {
+  const keys: string[] = (material.userData.patches ??= []);
+  if (keys.includes(key)) {
+    return;
+  }
+  const previous = material.onBeforeCompile;
+  keys.push(key);
+  material.onBeforeCompile = (shader, renderer) => {
+    previous.call(material, shader, renderer);
+    apply(shader);
+  };
+  material.customProgramCacheKey = () => keys.join("|");
+  material.needsUpdate = true;
+}
 
 // The bake stores light without surface colour; three.js divides irradiance by pi when it applies the
 // surface colour, so the stored value is scaled back up by pi.
@@ -44,7 +75,7 @@ function prepare(texture: Texture) {
 // (the walls): on glossier ones the live spot already draws the lamp's reflection.
 function addLampLayer(material: MeshStandardMaterial, lampMap: Texture) {
   material.userData.lampMap = lampMap; // for the ?view=lightmap debug view
-  material.onBeforeCompile = (shader) => {
+  patch(material, "lamp-layer", (shader) => {
     shader.uniforms.lampMap = { value: lampMap };
     shader.uniforms.lampLevel = lampLevel;
     shader.fragmentShader = shader.fragmentShader
@@ -71,13 +102,12 @@ function addLampLayer(material: MeshStandardMaterial, lampMap: Texture) {
     * ( 1.0 - metalnessFactor );
 #endif`,
       );
-  };
-  material.customProgramCacheKey = () => "lamp-layer";
+  });
 }
 
 // The lamp's own glowing parts (bulb, diffuser) dim with the same uniform as its baked light.
 function fadeWithLamp(material: MeshStandardMaterial) {
-  material.onBeforeCompile = (shader) => {
+  patch(material, "lamp-emitter", (shader) => {
     shader.uniforms.lampLevel = lampLevel;
     shader.fragmentShader = shader.fragmentShader
       .replace(
@@ -88,9 +118,42 @@ function fadeWithLamp(material: MeshStandardMaterial) {
         "#include <emissivemap_fragment>",
         "#include <emissivemap_fragment>\n  totalEmissiveRadiance *= lampLevel;",
       );
-  };
-  material.customProgramCacheKey = () => "lamp-emitter";
-  material.needsUpdate = true;
+  });
+}
+
+// Plant sway: each vertex moves sideways by its _sway weight (0 at the pot, 1 at the tips, exported by
+// blender/scripts/shared/foliage.py), along two or three incommensurate sines of time and position, so
+// the motion never visibly loops and costs nothing on the CPU. The offset is in world metres, turned
+// into the mesh's own space: the compressed models carry a scale on each node.
+function addSway(material: MeshStandardMaterial, amount: number) {
+  patch(material, `sway-${amount}`, (shader) => {
+    shader.uniforms.sceneTime = sceneTime;
+    shader.uniforms.motionScale = motionScale;
+    shader.uniforms.swayAmount = { value: amount };
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+attribute float _sway;
+uniform float sceneTime;
+uniform float motionScale;
+uniform float swayAmount;`,
+      )
+      .replace(
+        "#include <begin_vertex>",
+        `#include <begin_vertex>
+{
+  vec3 wp = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;
+  float t = sceneTime;
+  vec3 drift = vec3(
+    sin( t * 0.9 + wp.y * 3.1 + wp.x * 1.7 ) + 0.45 * sin( t * 2.3 + wp.z * 5.3 ),
+    0.0,
+    sin( t * 0.7 + wp.y * 2.3 + wp.z * 1.9 ) + 0.35 * sin( t * 1.9 + wp.x * 4.1 )
+  );
+  transformed += inverse( mat3( modelMatrix ) ) * ( drift * _sway * swayAmount * motionScale );
+}`,
+      );
+  });
 }
 
 function isLightmapped(material: MeshStandardMaterial) {
@@ -131,10 +194,13 @@ function AssetModel({ asset }: { asset: Asset }) {
         material.lightMap = base;
         material.lightMapIntensity = LIGHTMAP_INTENSITY;
         addLampLayer(material, lamp);
-        material.needsUpdate = true;
+      }
+      const sway = SWAY[asset.name];
+      if (sway && object.geometry.getAttribute("_sway")) {
+        addSway(material, sway);
       }
     });
-  }, [scene, maps]);
+  }, [scene, maps, asset.name]);
 
   return <primitive object={scene} />;
 }
