@@ -282,7 +282,9 @@ Implemented (`components/screen/`).
   page scrolls over it and the monitor's links sit above it), so the switch listens on the window and
   raycasts into the lamp. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
   and diffuser together; switching on, the bulb catches with a brief flicker (instant with reduced
-  motion). Active only before the camera moves and once the scene is ready.
+  motion). Active only before the camera moves and once the scene is ready. On every load the lamp
+  starts off and catches on by itself 0.7 s into the loader's reveal, so the first thing the reader
+  sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
 - The rest below is still planned. `useInteractive({ id, label, enabled, onActivate, onHoverChange })` handles pointer and keyboard
   focus, cursor, tooltip and cleanup for any object. Hit testing uses the object's own mesh or a simple
   invisible proxy box.
