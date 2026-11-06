@@ -298,8 +298,8 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
   own mesh, no proxy box needed) opens the **tools panel**: "Tools I use" with that book's entry of
   `data/tools.ts` marked, then "Selected work". `config/shelf.ts` maps each spine title (painted from
-  `blender/scripts/config.py` `BOOKS`) to its tool; Node.js and CSS have no entry in `tools.ts`, so
-  those books mark nothing. The **figurine** opens the **About panel**: name and tagline
+  `blender/scripts/config.py` `BOOKS`) to its tool; Node.js has no entry in `tools.ts`, so that
+  book marks nothing. The **figurine** opens the **About panel**: name and tagline
   (`data/about.ts`, which the hero now reads too), the bio, "Where I've worked" and "Say hello".
   Hovering an object lifts it (books 14 mm, figurine 8 mm; the shelf's front edge hides their bases),
   damped, or instantly when `motionScale` is 0; the object stays lifted while its panel is open.
@@ -313,10 +313,10 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   titles, so their content stays in step with the page.
 - **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Tools
   I use", the owner's name), hidden until focused, open the same panels. In the static page
-  (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`; only the
-  bio, still a placeholder, is panel-only.
-- **Placeholders.** `data/about.ts` `bio` is `null` until the owner writes one; the About panel shows
-  a marked placeholder in its place.
+  (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`, the bio
+  as an About section that only the static page shows.
+- **Content source.** The data files follow the owner's resume (title, summary, skills, projects,
+  experience). If `data/about.ts` `bio` is `null`, the About panel shows a marked placeholder.
 - Still planned: the **candle** toggling the shelf accent light (optional; dropped if it doesn't earn
   its place).
 - Content: the existing `src/data/work.ts`, `tools.ts`, `experience.ts` and `contact.ts` are the owner's

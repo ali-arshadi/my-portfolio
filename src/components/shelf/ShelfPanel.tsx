@@ -96,9 +96,14 @@ export function ShelfPanel() {
     }
   }, [panel]);
 
-  const onClose = () => {
+  // Escape closes the dialog at once, but its close event comes a task later: clear the state on
+  // cancel too, so a click straight after Escape already reaches the scene.
+  const release = () => {
     delete document.documentElement.dataset.panelOpen;
     shelfPanel.close();
+  };
+  const onClose = () => {
+    release();
     const back = returnTo.current;
     returnTo.current = null;
     if (back instanceof HTMLElement && back.isConnected) {
@@ -127,17 +132,23 @@ export function ShelfPanel() {
       <dialog
         ref={dialog}
         aria-labelledby={TITLE_ID}
+        onCancel={release}
         onClose={onClose}
         onClick={(event) => {
           // the dialog has no padding of its own: a click on it is a click on the backdrop
           if (event.target === event.currentTarget) {
             event.currentTarget.close();
+            release();
           }
         }}
         className="shelf-panel m-auto max-h-[min(85dvh,46rem)] w-[min(92vw,36rem)] overflow-y-auto overscroll-contain rounded-card border border-line bg-bg p-0 text-fg shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
       >
         <div className="relative px-6 pb-8 pt-12 md:px-8">
-          <form method="dialog" className="absolute right-3 top-3">
+          <form
+            method="dialog"
+            onSubmit={release}
+            className="absolute right-3 top-3"
+          >
             <button
               type="submit"
               aria-label="Close"
