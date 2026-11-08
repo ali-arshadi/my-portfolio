@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/StaticHero.tsx": {
-    "mtime": 1794166967.0814412,
-    "seen": 1794167023.8521125,
-    "ast_hash": "bec262c28bfc47efd3de33ca1873638a",
+    "mtime": 1794167166.0197248,
+    "seen": 1794167215.9612677,
+    "ast_hash": "fca9a7ee7693c5d48db0e602f4751a7b",
     "semantic_hash": ""
   },
   "src/components/scene/CameraRig.tsx": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794165492.6575723,
-    "seen": 1794165542.7436066,
-    "ast_hash": "f9f50d403ce3ac8d838dc1408fe28a59",
+    "mtime": 1794167176.4746976,
+    "seen": 1794167215.9613147,
+    "ast_hash": "037caf06472566d8b9ddb199428c70a9",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {
