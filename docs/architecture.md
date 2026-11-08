@@ -278,7 +278,7 @@ Implemented (`components/screen/`).
   `data-section`, not `id`, as the static page's copy of them is in the DOM too.
 - **Scroll cues are drawn, not written** (`hero/ScrollCue.tsx`): a mouse outline whose wheel dot
   slides down and fades, on a loop (held still with reduced motion), with a screen-reader label. The
-  page's hero shows it in the lamp's amber (labelled "Scroll to step up to the screen", or "Scroll
+  page's hero shows it in the design's lime (labelled "Scroll to step up to the screen", or "Scroll
   for my work" in static mode); the monitor's hero shows it bottom right, as a link to the profile.
   The texture paints that one with the dot at rest, where the animation starts (`SCROLL_CUE` and
   `SCREEN_HERO["scroll"]` in step).
@@ -350,7 +350,7 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
 Implemented in Phase 7.
 
 - **Loader** (`hero/Loader.tsx`, styles in `globals.css`). In 3D mode a full-screen loader covers the
-  page from the first paint: an amber ring (the desk lamp's colour) filling around the percentage, with
+  page from the first paint: a lime ring (the portfolio's accent) filling around the percentage, with
   "Setting up the desk" under it, the way 3D sites such as Lusion and Bruno Simon's portfolio open on a
   minimal centred loader. `DeskCanvas`'s `LoadStatus` reads drei's progress store each frame and eases
   the shown value toward it, so it never jumps or runs backwards; at 100% the ring glows for half a

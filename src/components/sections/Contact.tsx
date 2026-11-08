@@ -20,7 +20,7 @@ export function ContactList({ inline = false }: { inline?: boolean }) {
           <li key={link.label}>
             <a
               href={link.href}
-              className="underline decoration-lamp underline-offset-4"
+              className="underline decoration-lime underline-offset-4"
               {...(isExternal ? { target: "_blank", rel: "noreferrer" } : {})}
             >
               {link.label}

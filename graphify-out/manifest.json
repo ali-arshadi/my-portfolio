@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/StaticHero.tsx": {
-    "mtime": 1794164600.804657,
-    "seen": 1794165276.1660142,
-    "ast_hash": "1e025d4f958c7dcfe311127c3aed26a1",
+    "mtime": 1794165482.1555562,
+    "seen": 1794165542.7435071,
+    "ast_hash": "1333c3bc6215d6f67b2a64866c7080d1",
     "semantic_hash": ""
   },
   "src/components/scene/CameraRig.tsx": {
@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "src/components/sections/Contact.tsx": {
-    "mtime": 1794162624.6619394,
-    "seen": 1794163623.4624202,
-    "ast_hash": "b1d8f052a2a056157d5a8401cfde6a3b",
+    "mtime": 1794165482.1685765,
+    "seen": 1794165542.7435467,
+    "ast_hash": "e2faa47bff4549fdf3a0213047ca195e",
     "semantic_hash": ""
   },
   "src/components/sections/Experience.tsx": {
@@ -96,15 +96,15 @@
     "semantic_hash": ""
   },
   "src/components/sections/SelectedWork.tsx": {
-    "mtime": 1794162624.610183,
-    "seen": 1794163623.4624302,
-    "ast_hash": "32cdcdabc485b66b97d6181a3b9b8d33",
+    "mtime": 1794165482.180616,
+    "seen": 1794165542.743561,
+    "ast_hash": "1807542e037588a10b50680955f068ce",
     "semantic_hash": ""
   },
   "src/components/sections/Tools.tsx": {
-    "mtime": 1794162624.6303966,
-    "seen": 1794163623.4624314,
-    "ast_hash": "8c3e5daadef8268acb282b3b4a57e38a",
+    "mtime": 1794165482.1927378,
+    "seen": 1794165542.7435622,
+    "ast_hash": "0be658b13638661e7ac9c6358fc2f245",
     "semantic_hash": ""
   },
   "src/data/contact.ts": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/Loader.tsx": {
-    "mtime": 1794164663.0888133,
-    "seen": 1794165276.16601,
-    "ast_hash": "295126d17f294958770be843979ed657",
+    "mtime": 1794165492.7485182,
+    "seen": 1794165542.7434998,
+    "ast_hash": "d96200a05a13b6e0c92b9a10c066cd25",
     "semantic_hash": ""
   },
   "src/components/hero/ScrollController.tsx": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "src/components/shelf/ShelfPanel.tsx": {
-    "mtime": 1793988640.260087,
-    "seen": 1794162387.3321044,
-    "ast_hash": "194fa71ef51ffcc4a6d94fc58a905a9d",
+    "mtime": 1794165482.2092755,
+    "seen": 1794165542.7435641,
+    "ast_hash": "6ad36402029d5da8b6ecd5c9e3b4710e",
     "semantic_hash": ""
   },
   "src/components/shelf/panelState.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794164670.8099597,
-    "seen": 1794165276.16607,
-    "ast_hash": "50cc5034e435cd7f00128ed9ccfa981f",
+    "mtime": 1794165492.6575723,
+    "seen": 1794165542.7436066,
+    "ast_hash": "f9f50d403ce3ac8d838dc1408fe28a59",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {

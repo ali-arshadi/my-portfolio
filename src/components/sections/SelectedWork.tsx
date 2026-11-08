@@ -22,7 +22,7 @@ export function WorkList({ compact = false }: { compact?: boolean }) {
               {item.title}
             </h3>
             <p className="mt-2 max-w-prose text-muted">{item.description}</p>
-            <p className="mt-3 text-sm text-lamp">{item.site}</p>
+            <p className="mt-3 text-sm text-lime">{item.site}</p>
           </a>
         </li>
       ))}

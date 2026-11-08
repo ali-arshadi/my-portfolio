@@ -23,7 +23,7 @@ export function StaticHero() {
         <p className="mt-4 text-[clamp(1rem,2vw,1.35rem)] text-muted">
           {about.tagline}
         </p>
-        <div className="mt-8 text-lamp">
+        <div className="mt-8 text-lime">
           <span className="hint-3d">
             <ScrollCue label="Scroll to step up to the screen" />
           </span>

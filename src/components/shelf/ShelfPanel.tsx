@@ -45,7 +45,7 @@ function AboutPanel() {
       {about.bio ? (
         <p className="mt-6 max-w-prose">{about.bio}</p>
       ) : (
-        <p className="mt-6 rounded-card border border-dashed border-lamp/60 px-4 py-3 text-sm text-lamp">
+        <p className="mt-6 rounded-card border border-dashed border-lime/60 px-4 py-3 text-sm text-lime">
           [Placeholder: bio not written yet. Add it to src/data/about.ts.]
         </p>
       )}

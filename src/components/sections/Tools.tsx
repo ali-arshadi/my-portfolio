@@ -11,7 +11,7 @@ export function ToolList({ marked = null }: { marked?: Tool | null }) {
         <li
           key={tool}
           aria-current={tool === marked ? "true" : undefined}
-          className={`rounded-card border bg-card px-3 py-1.5 text-sm ${tool === marked ? "border-lamp text-lamp" : "border-line"}`}
+          className={`rounded-card border bg-card px-3 py-1.5 text-sm ${tool === marked ? "border-lime text-lime" : "border-line"}`}
         >
           {tool}
         </li>
