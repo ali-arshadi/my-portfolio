@@ -3,7 +3,9 @@ import { ScrollCue } from "./ScrollCue";
 
 // The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
 // starts to move. #hero lets clicks through to the monitor, so the skip link takes them back.
-// The scroll hint depends on the scene mode; globals.css shows the right one.
+// The scroll hint depends on the scene mode; globals.css shows the right one. The name is on the
+// monitor's screen in the opening frame (the live scene and the still alike), so the page's title is
+// for screen readers only.
 export function StaticHero() {
   return (
     <>
@@ -17,10 +19,8 @@ export function StaticHero() {
         id="hero-overlay"
         className="pointer-events-none relative z-10 w-full px-[clamp(1.25rem,5vw,4rem)] pb-[9vh] pt-24 will-change-[opacity,transform]"
       >
-        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.92] tracking-[-0.03em]">
-          {about.name}
-        </h1>
-        <p className="mt-4 text-[clamp(1rem,2vw,1.35rem)] text-muted">
+        <h1 className="sr-only">{about.name}</h1>
+        <p className="text-[clamp(1rem,2vw,1.35rem)] text-muted">
           {about.tagline}
         </p>
         <div className="mt-8 text-lime">

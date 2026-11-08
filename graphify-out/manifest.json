@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/StaticHero.tsx": {
-    "mtime": 1794165482.1555562,
-    "seen": 1794165542.7435071,
-    "ast_hash": "1333c3bc6215d6f67b2a64866c7080d1",
+    "mtime": 1794166041.4568923,
+    "seen": 1794166081.9514673,
+    "ast_hash": "4da9226db71dd4421f6fb7ecb03cd59a",
     "semantic_hash": ""
   },
   "src/components/scene/CameraRig.tsx": {
