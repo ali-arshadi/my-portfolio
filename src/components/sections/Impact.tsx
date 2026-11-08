@@ -7,7 +7,7 @@ const BIG =
 export function Impact() {
   const { buildTime, bundle, stats } = impact;
   return (
-    <Section id="impact" title="Receipts, not claims">
+    <Section name="impact" title="Receipts, not claims">
       <div className="grid grid-cols-12 gap-4">
         <div className="tile col-span-12 flex min-h-[420px] min-w-0 flex-col justify-between gap-10 bg-lime p-9 text-ink @min-[980px]:col-span-7">
           <div className="label">{buildTime.label}</div>

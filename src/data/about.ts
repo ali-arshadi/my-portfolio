@@ -5,6 +5,9 @@ export type About = {
   title: string;
   location: string;
   tagline: string;
+  // The line under the name on the monitor's first view, in its two lines (it is also painted into
+  // the screen texture: blender/scripts/shared/textures.py, keep the two in step).
+  heroLine: readonly [string, string];
   // While it is null, the About panel (the shelf figurine) shows a marked placeholder in its place.
   bio: string | null;
   // What the work is about, as the running band under the intro.
@@ -23,6 +26,10 @@ export const about: About = {
   title: "Senior Front-end Developer",
   location: "Tehran, Iran",
   tagline: "Senior front-end developer. Vue, Nuxt, JavaScript, TypeScript.",
+  heroLine: [
+    "Senior Front-end Developer for large",
+    "Vue and Nuxt applications.",
+  ],
   bio: "Senior Front-end Developer with 4+ years of experience building and maintaining scalable web applications using Vue.js, Nuxt.js, JavaScript, and TypeScript. Experienced in front-end architecture, technical decision-making, code reviews, performance optimization, and mentoring developers.",
   practices: [
     "Architecture",

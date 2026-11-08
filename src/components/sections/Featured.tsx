@@ -8,15 +8,12 @@ export function Featured() {
   const last = featured.flow.length - 1;
   return (
     <section
-      id="featured"
-      aria-labelledby="featured-title"
+      data-section="featured"
+      aria-label={featured.name.join(" ")}
       className="px-[clamp(20px,5cqw,72px)] pb-[88px]"
     >
       <div className="border-t border-rule pt-[72px]">
-        <h2
-          id="featured-title"
-          className="m-0 text-[clamp(64px,12cqw,200px)] leading-[0.86] font-extrabold tracking-[-0.05em] uppercase"
-        >
+        <h2 className="m-0 text-[clamp(64px,12cqw,200px)] leading-[0.86] font-extrabold tracking-[-0.05em] uppercase">
           {featured.name[0]} <br />
           {featured.name[1]}
         </h2>

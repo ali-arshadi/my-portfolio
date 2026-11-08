@@ -4,7 +4,7 @@ import { Section } from "./Section";
 export function Profile() {
   const { profile } = about;
   return (
-    <Section id="profile" title={profile.title}>
+    <Section name="profile" title={profile.title}>
       <p className="m-0 max-w-[1100px] text-[clamp(32px,4.4cqw,68px)] leading-[1.04] font-medium tracking-[-0.03em] text-balance">
         {profile.lead}
       </p>

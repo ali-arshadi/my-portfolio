@@ -32,7 +32,7 @@ export function WorkList({ compact = false }: { compact?: boolean }) {
 
 export function SelectedWork() {
   return (
-    <Section id="work" title={WORK_TITLE}>
+    <Section name="work" title={WORK_TITLE}>
       <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(340px,100%),1fr))] gap-x-12 gap-y-[72px] p-0">
         {work.map((item) => (
           <li key={item.title} className="min-w-0 @min-[760px]:even:mt-24">

@@ -33,7 +33,7 @@ export function ExperienceList({ compact = false }: { compact?: boolean }) {
 // length of the page's scroll, under the reader.
 export function Experience() {
   return (
-    <Section id="experience" title={EXPERIENCE_TITLE}>
+    <Section name="experience" title={EXPERIENCE_TITLE}>
       <ul className="m-0 list-none border-b border-rule p-0">
         {experience.map((job) => (
           <li key={job.company} className="border-t border-rule py-8">

@@ -1,4 +1,4 @@
-"""Flat images (poster print, placeholder screen) drawn with Pillow into blender/tex/.
+"""Flat images (poster print, the monitor screen's hero) drawn with Pillow into blender/tex/.
 
 Fonts are vendored in blender/fonts/ so the output is the same on every machine.
 """
@@ -13,7 +13,6 @@ from .materials import TEX_DIR
 
 FONTS = os.path.join(os.path.dirname(TEX_DIR), "fonts")
 MONO_BOLD = os.path.join(FONTS, "DejaVuSansMono-Bold.ttf")
-SANS_BOLD = os.path.join(FONTS, "NotoSans-Bold.ttf")
 SANS = os.path.join(FONTS, "NotoSans-Regular.ttf")
 
 # Print aspect matches the poster's print area (see create_wall_poster.py).
@@ -64,36 +63,137 @@ def poster(path):
 
 
 SCREEN_SIZE = (1600, 900)
-# (indent, length) per code line, in screen-width fractions; colours cycle through the palette
-CODE_LINES = [(0, .11), (.01, .17), (.03, .14), (.04, .24), (0, .15), (.01, .19), (.03, .13), (.04, .18),
-              (0, .21), (.01, .13), (.03, .17), (.04, .15), (.01, .12), (0, .19), (.03, .17), (.04, .22)]
-CODE_COLORS = ["#7aa2ff", "#be96ff", "#ffb454", "#5a647d", "#8fd3a8"]
+
+# The screen shows the portfolio's hero and header: the same layout as the site's first view of the
+# monitor (src/components/screen/ScreenHero.tsx, HERO), which replaces this texture with live HTML once
+# the camera arrives, so the swap can't be seen. Keep the two in step. Positions are CSS pixels on the
+# 1280 x 720 screen, painted here at 1.25x; text is placed the way the browser does it: a line box of
+# `line-height`, the font's ascent and descent centred in it, letter-spacing after every character.
+BRICOLAGE = os.path.join(FONTS, "BricolageGrotesque-Variable.ttf")  # axes: opsz, wght, wdth
+JETBRAINS = os.path.join(FONTS, "JetBrainsMono-Variable.ttf")  # axes: wght; advance 0.6 em
+FONT_METRICS = {BRICOLAGE: (0.93, 0.27), JETBRAINS: (1.02, 0.30)}  # ascent, descent in em
+
+SCREEN_HERO = dict(
+    width=1280, pad_x=64, columns=12,
+    location=dict(top=96, text="Tehran, Iran"),
+    name=dict(top=156, size=210, line_height=0.86, tracking=-0.045, lines=("Ali", "Arshadi")),
+    rule=dict(top=584),
+    line=dict(top=612, size=25, line_height=1.25, tracking=-0.01,
+              lines=("Senior Front-end Developer for large", "Vue and Nuxt applications.")),
+    scroll=dict(center=652.5, rule=64, gap=16),
+    nav=dict(top=16, height=44, pad_y=8, gap=24, link_gap=25.6,
+             links=("Profile", "Impact", "Work", "Featured", "Experience", "Stack")),
+)
+SCREEN_COLORS = dict(ink="#0d0d0b", paper="#eceae3", dim="#a19f96", rule="#2b2b27", grid="#1b1b18",
+                     lime="#c8f03c")
+LABEL = dict(size=13, line_height=1.5, tracking=0.04)  # the design's mono labels
+
+
+def _variable(path, size, **axes):
+    f = ImageFont.truetype(path, size)
+    if path == BRICOLAGE:
+        f.set_variation_by_axes([min(axes.get("opsz", 96), 96), axes.get("wght", 400), 100])
+    else:
+        f.set_variation_by_axes([axes.get("wght", 400)])
+    return f
+
+
+def _mix(a, b, t):
+    return tuple(round(x * t + y * (1 - t)) for x, y in zip(_rgb(a), _rgb(b)))
+
+
+class _Painter:
+    """Draws CSS-pixel layout into the texture at its scale."""
+
+    def __init__(self, img, scale):
+        self.d = ImageDraw.Draw(img)
+        self.s = scale
+
+    def width(self, text, path, size, tracking, **axes):
+        f = _variable(path, size * self.s, **axes)
+        return sum(f.getlength(c) / self.s + tracking * size for c in text)
+
+    def text(self, x, top, line_height, text, path, size, tracking, fill, **axes):
+        s = self.s
+        f = _variable(path, size * s, **axes)
+        ascent, descent = FONT_METRICS[path]
+        baseline = top + (line_height - (ascent + descent) * size) / 2 + ascent * size
+        for c in text:
+            self.d.text((x * s, baseline * s), c, font=f, fill=_rgb(fill) if isinstance(fill, str) else fill,
+                        anchor="ls")
+            x += f.getlength(c) / s + tracking * size
+        return x
+
+    def rect(self, x0, y0, x1, y1, fill, radius=0):
+        box = (round(x0 * self.s), round(y0 * self.s), round(x1 * self.s) - 1, round(y1 * self.s) - 1)
+        fill = _rgb(fill) if isinstance(fill, str) else fill
+        if radius:
+            self.d.rounded_rectangle(box, radius=radius * self.s, fill=fill)
+        else:
+            self.d.rectangle(box, fill=fill)
 
 
 def screen(path):
     w, h = SCREEN_SIZE
-    img = Image.new("RGB", (w, h))
-    px = img.load()
-    for y in range(h):
-        t = y / h
-        for x in range(w):
-            s = x / w
-            # the reference's screen is lifted by a soft blue glow behind the name
-            g = max(0.0, 1 - ((s - 0.7) / 0.4) ** 2 - ((t - 0.45) / 0.55) ** 2) ** 2
-            px[x, y] = (int(6 + 5 * t + 5 * g), int(9 + 6 * t + 3 * s + 10 * g), int(24 + 11 * t + 8 * s + 24 * g))
-    d = ImageDraw.Draw(img)
-    for i, c in enumerate(["#ff5f57", "#febc2e", "#28c840"]):
-        cx = int(w * 0.035) + i * 34
-        d.ellipse((cx - 9, 46, cx + 9, 64), fill=_rgb(c))
-    y = int(h * 0.12)
-    for i, (indent, length) in enumerate(CODE_LINES):
-        x0 = int(w * (0.04 + indent))
-        d.rounded_rectangle((x0, y, x0 + int(w * length * 1.3), y + 16), radius=4, fill=_rgb(CODE_COLORS[i % 5]))
-        y += int(h * 0.046)
-    # name block starts just right of the screen's middle (measured: 0.556 of the frame width, which the
-    # monitor's perspective maps to ~0.57 across the screen itself)
-    d.text((int(w * 0.57), int(h * 0.40)), "Ali Arshadi", font=_font(SANS_BOLD, 96), fill=(240, 240, 236))
-    d.text((int(w * 0.575), int(h * 0.54)), "Front-end developer", font=_font(SANS, 40), fill=(140, 150, 175))
+    hero, c = SCREEN_HERO, SCREEN_COLORS
+    img = Image.new("RGB", (w, h), _rgb(c["ink"]))
+    p = _Painter(img, w / hero["width"])
+    css_h = h / p.s
+    pad = hero["pad_x"]
+    right = hero["width"] - pad
+
+    # the design's column grid: a 1 px line at the left of each twelfth
+    for i in range(hero["columns"]):
+        x = i * hero["width"] / hero["columns"]
+        p.rect(x, 0, x + 1, css_h, c["grid"])
+
+    def label(x, top, text, fill, weight=400):
+        return p.text(x, top, LABEL["size"] * LABEL["line_height"], text.upper(), JETBRAINS, LABEL["size"],
+                      LABEL["tracking"], fill, wght=weight)
+
+    def label_width(text):
+        return p.width(text.upper(), JETBRAINS, LABEL["size"], LABEL["tracking"])
+
+    # header: clear at the top of the page (a transparent 1 px border round it), 44 px tall items
+    nav = hero["nav"]
+    top = nav["top"] + 1 + nav["pad_y"]
+    mid = top + nav["height"] / 2
+    left, end = pad + 1, right - 1
+    label_top = mid - LABEL["size"] * LABEL["line_height"] / 2
+    p.rect(left, top, left + nav["height"], top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    initials = "AA"
+    iw = p.width(initials, JETBRAINS, 14, -0.02)
+    p.text(left + nav["height"] / 2 - iw / 2, mid - 21 / 2, 21, initials, JETBRAINS, 14, -0.02, c["ink"], wght=500)
+    pill = label_width("Contact") + 48
+    p.rect(end - pill, top, end, top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    label(end - pill + 24, label_top, "Contact", c["ink"], 500)
+    links = sum(label_width(t) for t in nav["links"]) + nav["link_gap"] * (len(nav["links"]) - 1)
+    inner = (left + nav["height"] + nav["gap"], end - pill - nav["gap"])
+    x = (inner[0] + inner[1]) / 2 - links / 2
+    for t in nav["links"]:
+        label(x, label_top, t, _mix(c["paper"], c["ink"], 0.7))
+        x += label_width(t) + nav["link_gap"]
+
+    label(pad, hero["location"]["top"], hero["location"]["text"], c["dim"])
+
+    name = hero["name"]
+    line_box = name["size"] * name["line_height"]
+    for i, t in enumerate(name["lines"]):
+        p.text(pad, name["top"] + i * line_box, line_box, t.upper(), BRICOLAGE, name["size"], name["tracking"],
+               c["paper"], wght=800, opsz=name["size"])
+
+    p.rect(pad, hero["rule"]["top"], right, hero["rule"]["top"] + 1, c["rule"])
+
+    line = hero["line"]
+    line_box = line["size"] * line["line_height"]
+    for i, t in enumerate(line["lines"]):
+        p.text(pad, line["top"] + i * line_box, line_box, t, BRICOLAGE, line["size"], line["tracking"], c["paper"],
+               wght=400, opsz=line["size"])
+
+    sc = hero["scroll"]
+    x = right - (label_width("Scroll") + sc["gap"] + sc["rule"])
+    x = label(x, sc["center"] - LABEL["size"] * LABEL["line_height"] / 2, "Scroll", c["paper"])
+    p.rect(right - sc["rule"], sc["center"] - 0.5, right, sc["center"] + 0.5, c["paper"])
     img.save(path)
 
 

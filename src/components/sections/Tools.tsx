@@ -22,7 +22,7 @@ export function ToolList({ marked = null }: { marked?: Tool | null }) {
 
 export function Tools() {
   return (
-    <Section id="stack" title={TOOLS_TITLE}>
+    <Section name="stack" title={TOOLS_TITLE}>
       <dl className="m-0 flex flex-col border-t border-rule">
         {stack.map((group) => (
           <div

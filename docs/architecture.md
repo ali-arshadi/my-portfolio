@@ -263,12 +263,19 @@ Implemented (`components/screen/`).
   (1 px = distanceFactor / 400 world units). It sits at the scene root rather than in a portal under
   the node: a portal keeps its own copy of the scene state, and when it was made before `CameraRig`'s
   camera became the default, the HTML was projected through the old camera.
-- **The swap.** `ScreenContent`'s first view repeats the screen image baked into the model (dots, code
-  bars, name, in the same layout, in the colours the image shows after tone mapping), and the HTML
-  fades in over the last 0.08 of the camera's alignment, so the swap can't be seen. The portfolio
-  follows (`sections/Portfolio.tsx`, the same component the static page shows). A title-bar strip
-  fades the content out under the window dots; it starts in the intro's navy and turns the
-  portfolio's warm black as that reaches it (`TITLE_BAR_SWAP`, faded by `MonitorScreen`).
+- **The swap.** The screen texture baked into the model is the portfolio design's hero and header
+  (`blender/scripts/shared/textures.py`: `screen()`), and `ScreenContent`'s first view is the same hero
+  as HTML (`ScreenHero`, fixed pixel positions on the 1280 × 720 screen, `HERO`). The texture paints
+  that layout at 1.25× with the same fonts (vendored in `blender/fonts/`), placing text as the
+  browser does (line box, ascent and descent, letter-spacing per character); glyph positions agree to
+  about 1 px. The HTML fades in over the last 0.08 of the camera's alignment, so the swap can't be seen.
+  Keep `HERO` and `SCREEN_HERO` in step, and re-bake after changing either (the screen's light is in
+  the bake).
+- **The header** (`ScreenNav`) sits over the screen, outside the scrolling content: clear on the first
+  view, as painted; as the content scrolls it narrows to 860 px and turns to frosted glass
+  (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
+  (`screenNav` in `scrollState.ts`, registered by `ScrollController`): sections are found by
+  `data-section`, not `id`, as the static page's copy of them is in the DOM too.
 - **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
   design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
   display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band
@@ -277,8 +284,7 @@ Implemented (`components/screen/`).
   lime contact block. Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
   content is 1280 px wide whatever the window is, and the same markup fits a phone. The design's
   experience accordion is shown fully open here: opening a row would change the content's height, and
-  with it the length of the page's scroll, under the reader. The design's nav bar is left out: the
-  content does not scroll itself, so in-page anchors cannot move it.
+  with it the length of the page's scroll, under the reader.
 - **Input and accessibility.** The HTML is drawn into `ScreenLayer`, over the canvas but outside its
   `aria-hidden` wrapper. It is `inert` and ignores the pointer until the camera has arrived. `#hero`
   (and GSAP's pin spacer, in `globals.css`) let clicks through to it. "Skip to content" scrolls to

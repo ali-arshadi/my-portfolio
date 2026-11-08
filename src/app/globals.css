@@ -293,3 +293,30 @@ html[data-panel-open] {
     transition: none;
   }
 }
+
+/* The monitor's header (screen/ScreenHero.tsx: ScreenNav). Clear on the first view, as the screen
+   texture shows it; MonitorScreen fades in the glass (--q) as the content scrolls. */
+.screen-nav {
+  padding: 8px calc(8px * var(--q, 0)) 8px calc(12px * var(--q, 0));
+  border-color: rgb(236 234 227 / calc(0.16 * var(--q, 0)));
+  background-color: rgb(24 24 21 / calc(0.42 * var(--q, 0)));
+  backdrop-filter: blur(calc(22px * var(--q, 0)))
+    saturate(calc(1 + 0.7 * var(--q, 0)));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / calc(0.2 * var(--q, 0))),
+    0 10px 40px rgb(0 0 0 / calc(0.38 * var(--q, 0)));
+}
+.screen-nav .lift {
+  transition: transform 0.35s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.screen-nav .lift:hover {
+  transform: translateY(-4px);
+}
+.screen-nav :focus-visible {
+  outline-color: var(--paper);
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-nav .lift {
+    transition: none;
+  }
+}
