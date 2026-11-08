@@ -339,8 +339,10 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`.
 - **Content source.** The data files (`about`, `impact`, `work`, `experience`, `tools`, `contact`)
   follow the owner's resume and their portfolio design canvas, which they confirmed as true. Work
-  cards show a striped placeholder until real screenshots are added. If `data/about.ts` `bio` is
-  `null`, the About panel shows a marked placeholder.
+  cards show the owner's screenshots (`src/assets/work/`, 1600 px WebP, through `next/image`, eager:
+  lazy loading does not follow the monitor's transform), in 2:1 frames anchored to the top; a second
+  screenshot fades in on hover (Achareh Sazeh's pricing page). The shelf panel shows the first one as
+  a thumbnail.
 - Still planned: the **candle** toggling the shelf accent light (optional; dropped if it doesn't earn
   its place).
 - Content is never invented: anything missing is marked as a placeholder in the data file.

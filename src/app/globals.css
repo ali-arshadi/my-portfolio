@@ -253,6 +253,16 @@ html[data-panel-open] {
 .folio .project:hover .shot {
   transform: scale(1.04);
 }
+/* a project's second screenshot fades in over the first while the card is hovered */
+.folio .shot-next {
+  opacity: 0;
+  transition:
+    opacity 0.4s ease,
+    transform 0.6s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .project:hover .shot-next {
+  opacity: 1;
+}
 .folio .stack-row .stack-item {
   transition:
     opacity 0.25s,

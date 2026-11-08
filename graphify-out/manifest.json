@@ -96,9 +96,9 @@
     "semantic_hash": ""
   },
   "src/components/sections/SelectedWork.tsx": {
-    "mtime": 1794167564.821851,
-    "seen": 1794167674.119317,
-    "ast_hash": "82b141258c837d7f80bc93ed7a4492b7",
+    "mtime": 1794168535.212785,
+    "seen": 1794168676.7392514,
+    "ast_hash": "a921e4883e7a3f8bc080cb66f0f44b7f",
     "semantic_hash": ""
   },
   "src/components/sections/Tools.tsx": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "src/data/work.ts": {
-    "mtime": 1794160220.5174804,
-    "seen": 1794162387.3321214,
-    "ast_hash": "df552ca585b9dbd0434788cb87179594",
+    "mtime": 1794168567.2525299,
+    "seen": 1794168676.7392652,
+    "ast_hash": "ea1f3af35576417f123d98887b1ca41c",
     "semantic_hash": ""
   },
   "tsconfig.json": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "src/components/shelf/ShelfPanel.tsx": {
-    "mtime": 1794167580.842165,
-    "seen": 1794167674.1193185,
-    "ast_hash": "ff2a9a96259f3a07c186a61689623130",
+    "mtime": 1794168613.124829,
+    "seen": 1794168676.7392538,
+    "ast_hash": "a60fd002f438a4a29bbce2d32244abc5",
     "semantic_hash": ""
   },
   "src/components/shelf/panelState.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794167660.5719075,
-    "seen": 1794167674.119338,
-    "ast_hash": "ee262872aefea971403ed5f26227cad8",
+    "mtime": 1794168674.212279,
+    "seen": 1794168676.7392745,
+    "ast_hash": "ebf81014c1ceaecedf4d14bd111f5af8",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {
@@ -945,6 +945,30 @@
     "mtime": 1794164586.1691494,
     "seen": 1794165276.1660128,
     "ast_hash": "1b72cb07d888b4d058bffd54dee64c55",
+    "semantic_hash": ""
+  },
+  "src/assets/work/achareh-bazaar.webp": {
+    "mtime": 1794168489.386081,
+    "seen": 1794168676.7393258,
+    "ast_hash": "65eca42428c2a045ca5b816201fc6c9b",
+    "semantic_hash": ""
+  },
+  "src/assets/work/achareh-sazeh-pricing.webp": {
+    "mtime": 1794168489.6600423,
+    "seen": 1794168676.7393267,
+    "ast_hash": "ea419210d03fb4be9a4da935c3f107ab",
+    "semantic_hash": ""
+  },
+  "src/assets/work/achareh-sazeh.webp": {
+    "mtime": 1794168489.5221264,
+    "seen": 1794168676.7393274,
+    "ast_hash": "67c8987811fa704c25e0c764301bf060",
+    "semantic_hash": ""
+  },
+  "src/assets/work/mavida-home.webp": {
+    "mtime": 1794168489.8028967,
+    "seen": 1794168676.739328,
+    "ast_hash": "a6021001c5dfbd2045bc45618a88fbfd",
     "semantic_hash": ""
   },
   "pnpm-lock.yaml": {

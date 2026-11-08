@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { WORK_TITLE } from "@/components/sections/SelectedWork";
 import { TOOLS_TITLE } from "@/components/sections/Tools";
@@ -40,27 +41,43 @@ function Stack({ marked }: { marked: Tool | null }) {
   );
 }
 
-// The projects, as "Live in production" lists them, as compact rows.
+// The projects, as "Live in production" lists them, as compact rows with their first screenshot.
 function Projects() {
   return (
     <ul className="m-0 list-none border-t border-rule p-0">
       {work.map((item) => (
-        <li key={item.title} className="border-b border-rule py-5">
-          <div className="font-mono text-[13px] text-dim">{item.years}</div>
-          <h4 className="mt-1 mb-0 text-[26px] leading-[1.05] font-bold tracking-[-0.03em]">
-            {item.title}
-          </h4>
-          <p className="mt-2 mb-0 text-[15px] leading-normal text-pretty text-dim">
-            {item.description}
-          </p>
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block border-b border-lime pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-lime"
-          >
-            {item.site}
-          </a>
+        <li
+          key={item.title}
+          className="flex flex-wrap gap-x-6 gap-y-4 border-b border-rule py-5"
+        >
+          <div className="relative aspect-[2/1] w-full flex-none self-start overflow-hidden border border-rule bg-tile sm:w-44">
+            <Image
+              src={item.shots[0].src}
+              alt={item.shots[0].alt}
+              fill
+              sizes="(min-width: 640px) 176px, 92vw"
+              loading="eager"
+              placeholder="blur"
+              className="object-cover object-top"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="font-mono text-[13px] text-dim">{item.years}</div>
+            <h4 className="mt-1 mb-0 text-[26px] leading-[1.05] font-bold tracking-[-0.03em]">
+              {item.title}
+            </h4>
+            <p className="mt-2 mb-0 text-[15px] leading-normal text-pretty text-dim">
+              {item.description}
+            </p>
+            <a
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-block border-b border-lime pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-lime"
+            >
+              {item.site}
+            </a>
+          </div>
         </li>
       ))}
     </ul>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { work } from "@/data/work";
 import { Section } from "./Section";
 
@@ -15,10 +16,21 @@ export function SelectedWork() {
               rel="noopener noreferrer"
               className="project block"
             >
-              <div className="aspect-[4/3] overflow-hidden border border-rule">
-                <div className="shot label flex size-full items-center justify-center bg-[repeating-linear-gradient(135deg,#1b1b18_0_14px,#141411_14px_28px)] p-6 text-center text-[12px] text-dim">
-                  {item.screenshot}
-                </div>
+              <div className="relative aspect-[2/1] overflow-hidden border border-rule bg-tile">
+                {item.shots.map((shot, i) => (
+                  <Image
+                    key={shot.alt}
+                    src={shot.src}
+                    alt={shot.alt}
+                    fill
+                    sizes="(min-width: 900px) 420px, 100vw"
+                    placeholder="blur"
+                    // eager: on the monitor the content is moved by a transform, which lazy loading
+                    // does not track
+                    loading="eager"
+                    className={`shot object-cover object-top ${i > 0 ? "shot-next" : ""}`}
+                  />
+                ))}
               </div>
               <div className="mt-6 font-mono text-[13px] text-dim">
                 {item.years}
