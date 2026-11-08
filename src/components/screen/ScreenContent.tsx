@@ -1,8 +1,5 @@
 import type { Ref } from "react";
-import { Contact } from "@/components/sections/Contact";
-import { Experience } from "@/components/sections/Experience";
-import { SelectedWork } from "@/components/sections/SelectedWork";
-import { Tools } from "@/components/sections/Tools";
+import { Portfolio } from "@/components/sections/Portfolio";
 
 // The monitor's screen, in CSS pixels; the 3D screen is 16:9 as well.
 export const SCREEN_PX = { width: 1280, height: 720 };
@@ -76,22 +73,20 @@ function Intro() {
 }
 
 // Everything on the screen, top to bottom. The frame clips it; MonitorScreen moves it up as the page
-// scrolls, so the reader scrolls the page, not a nested scroll box. The sections' page-sized vertical
-// padding is tightened for a 720 px screen.
+// scrolls, so the reader scrolls the page, not a nested scroll box. After the first view comes the
+// portfolio, the same as the static page shows, laid out for the screen's 1280 px.
 export function ScreenContent({ ref }: { ref?: Ref<HTMLDivElement> }) {
   return (
-    <div
-      ref={ref}
-      className="flex flex-col pb-24 text-fg [&>section]:py-12 [&>section_h2]:mb-7"
-    >
+    <div ref={ref} className="flex flex-col text-fg">
       <Intro />
-      <SelectedWork />
-      <Tools />
-      <Experience />
-      <Contact />
+      <Portfolio />
     </div>
   );
 }
+
+// How far the content has scrolled when the portfolio's warm black reaches the title bar, and how
+// much further until the bar has taken that colour over from the intro's navy (MonitorScreen).
+export const TITLE_BAR_SWAP = { from: 0.87 * H, length: 120 };
 
 // The screen's background: navy, darker at the top, with the soft glow behind the name.
 export const SCREEN_BACKGROUND =
@@ -99,7 +94,8 @@ export const SCREEN_BACKGROUND =
 
 // The window's title bar: the three dots over a strip of the screen's top colour that the content
 // fades out under as it scrolls (on the first view it matches the background, so it can't be seen).
-export function WindowDots() {
+// Over the portfolio the strip turns its warm black: `inkRef` is that layer, faded in by MonitorScreen.
+export function WindowDots({ inkRef }: { inkRef?: Ref<HTMLDivElement> }) {
   return (
     <div
       aria-hidden="true"
@@ -109,6 +105,15 @@ export function WindowDots() {
         background: "linear-gradient(180deg, #00061a 60%, rgba(0, 6, 26, 0))",
       }}
     >
+      <div
+        ref={inkRef}
+        className="absolute inset-0"
+        style={{
+          opacity: 0,
+          background:
+            "linear-gradient(180deg, #0d0d0b 60%, rgba(13, 13, 11, 0))",
+        }}
+      />
       <div
         className="absolute flex"
         style={{ left: 0.035 * W - 9 * (W / 1600), top: (46 / 900) * H }}

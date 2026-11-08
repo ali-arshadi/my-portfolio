@@ -6,16 +6,18 @@ type SectionProps = {
   children: ReactNode;
 };
 
+// One section of the portfolio content: a rule, a big uppercase title, then the content. Sizes are in
+// container units of the .folio wrapper (Portfolio), so the monitor's 1280 px screen and a phone both
+// get a layout that fits them.
 export function Section({ id, title, children }: SectionProps) {
   return (
-    <section
-      id={id}
-      className="mx-auto w-full max-w-[1040px] px-6 py-20 md:px-10 md:py-28"
-    >
-      <h2 className="mb-10 text-2xl font-semibold tracking-tight md:text-3xl">
-        {title}
-      </h2>
-      {children}
+    <section id={id} className="px-[clamp(20px,5cqw,72px)] pb-[88px]">
+      <div className="border-t border-rule pt-12">
+        <h2 className="mb-12 text-[clamp(40px,5.5cqw,88px)] leading-[0.92] font-extrabold tracking-[-0.045em] text-balance uppercase">
+          {title}
+        </h2>
+        {children}
+      </div>
     </section>
   );
 }

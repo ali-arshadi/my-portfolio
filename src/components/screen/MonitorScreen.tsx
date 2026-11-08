@@ -11,6 +11,7 @@ import {
   SCREEN_BACKGROUND,
   SCREEN_PX,
   ScreenContent,
+  TITLE_BAR_SWAP,
   WindowDots,
 } from "./ScreenContent";
 import { screenLayer } from "./ScreenLayer";
@@ -28,6 +29,7 @@ export function MonitorScreen() {
   const screen = useMemo(() => scene.getObjectByName("Screen"), [scene]);
   const frame = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
+  const titleInk = useRef<HTMLDivElement>(null);
   const distance = useSyncExternalStore(
     screenScroll.subscribe,
     screenScroll.get,
@@ -103,6 +105,15 @@ export function MonitorScreen() {
     }
     if (y !== prev.y) {
       content.current.style.transform = `translate3d(0, ${-y}px, 0)`;
+      if (titleInk.current) {
+        titleInk.current.style.opacity = String(
+          MathUtils.clamp(
+            (y - TITLE_BAR_SWAP.from) / TITLE_BAR_SWAP.length,
+            0,
+            1,
+          ),
+        );
+      }
     }
     last.current = { opacity, live, y };
   });
@@ -134,7 +145,7 @@ export function MonitorScreen() {
         }}
       >
         <ScreenContent ref={measureContent} />
-        <WindowDots />
+        <WindowDots inkRef={titleInk} />
       </div>
     </Html>
   );

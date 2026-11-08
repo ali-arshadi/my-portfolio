@@ -8,6 +8,14 @@
   --card: #0f1118;
   --line: #1f2330;
   --radius-card: 0.75rem;
+  /* the portfolio content (sections/*): warm black, bone white and a lime accent */
+  --ink: #0d0d0b;
+  --paper: #eceae3;
+  --dim: #a19f96;
+  --faint: #55554e;
+  --rule: #2b2b27;
+  --tile: #151512;
+  --lime: #c8f03c;
 }
 
 @theme inline {
@@ -19,6 +27,24 @@
   --color-line: var(--line);
   --radius-card: var(--radius-card);
   --font-sans: var(--font-familjen), ui-sans-serif, system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-dim: var(--dim);
+  --color-faint: var(--faint);
+  --color-rule: var(--rule);
+  --color-tile: var(--tile);
+  --color-lime: var(--lime);
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* The small uppercase mono labels of the portfolio content. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 html {
@@ -187,5 +213,83 @@ html[data-panel-open] {
   .shelf-panel[open],
   .shelf-panel::backdrop {
     animation: none;
+  }
+}
+
+/* The portfolio content (sections/*, on the monitor and in the static #content). Sizes use container
+   units (cqw) rather than vw: on the monitor the content is 1280 px wide whatever the window is. */
+.folio {
+  container-type: inline-size;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+}
+.folio :focus-visible {
+  outline-color: var(--paper);
+}
+.folio-marquee {
+  display: flex;
+  width: max-content;
+  animation: folio-marquee 40s linear infinite;
+}
+@keyframes folio-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.folio .lift,
+.folio .tile {
+  transition: transform 0.35s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .lift:hover {
+  transform: translateY(-4px);
+}
+.folio .tile:hover {
+  transform: translateY(-6px);
+}
+.folio .shot {
+  transition: transform 0.6s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .project:hover .shot {
+  transform: scale(1.04);
+}
+.folio .stack-row .stack-item {
+  transition:
+    opacity 0.25s,
+    transform 0.35s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .stack-row:hover .stack-item {
+  opacity: 0.25;
+}
+.folio .stack-row .stack-item:hover {
+  opacity: 1;
+  transform: translateX(8px);
+}
+.folio .migration-row {
+  transition: background 0.25s;
+}
+.folio .migration-row:hover {
+  background: var(--tile);
+}
+.folio .mail {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 4px;
+  transition: background-size 0.6s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .mail:hover {
+  background-size: 100% 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .folio-marquee {
+    animation: none;
+  }
+  .folio .lift,
+  .folio .tile,
+  .folio .shot,
+  .folio .stack-item,
+  .folio .mail {
+    transition: none;
   }
 }
