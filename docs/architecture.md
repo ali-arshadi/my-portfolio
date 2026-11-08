@@ -276,6 +276,12 @@ Implemented (`components/screen/`).
   (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
   (`screenNav` in `scrollState.ts`, registered by `ScrollController`): sections are found by
   `data-section`, not `id`, as the static page's copy of them is in the DOM too.
+- **Scroll cues are drawn, not written** (`hero/ScrollCue.tsx`): a mouse outline whose wheel dot
+  slides down and fades, on a loop (held still with reduced motion), with a screen-reader label. The
+  page's hero shows it in the lamp's amber, the one UI accent not in lime (labelled "Scroll to step up to the screen", or "Scroll
+  for my work" in static mode); the monitor's hero shows it bottom right, as a link to the profile.
+  The texture paints that one with the dot at rest, where the animation starts (`SCROLL_CUE` and
+  `SCREEN_HERO["scroll"]` in step).
 - **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
   design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
   display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band
@@ -313,11 +319,11 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   starts off and catches on by itself 0.7 s into the loader's reveal, so the first thing the reader
   sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
-  own mesh, no proxy box needed) opens the **tools panel**: "Daily drivers" with that book's entry of
-  `data/tools.ts` marked, then "Live in production". `config/shelf.ts` maps each spine title (painted from
+  own mesh, no proxy box needed) opens the **stack panel**: "Daily drivers" by group with that book's
+  entry of `data/tools.ts` in lime, then "Live in production". `config/shelf.ts` maps each spine title (painted from
   `blender/scripts/config.py` `BOOKS`) to its tool; Node.js has no entry in `tools.ts`, so that
-  book marks nothing. The **figurine** opens the **About panel**: name and tagline
-  (`data/about.ts`, which the hero now reads too), the bio, "Where I've worked" and "Say hello".
+  book marks nothing. The **figurine**, a GitHub-style cat, opens the owner's **GitHub profile** in a
+  new tab (`GITHUB` in `data/contact.ts`), from the click's own handler so the browser allows it.
   Hovering an object lifts it (books 14 mm, figurine 8 mm; the shelf's front edge hides their bases),
   damped, or instantly when `motionScale` is 0; the object stays lifted while its panel is open.
 - **Panels** (`shelf/ShelfPanel.tsx`, state in `shelf/panelState.ts`). HTML over the canvas, not
@@ -325,16 +331,18 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   focus and makes the page inert. Escape, the close button or a click on the backdrop closes it, and
   focus returns to the element that had it. While one is open `html[data-panel-open]` stops the page
   scrolling (with `scrollbar-gutter: stable`, so the canvas does not resize), so the pinned hero and
-  the camera stay put. The panel fades and rises in, with no animation under reduced motion. The panels
-  reuse the sections' list components (`ToolList`, `WorkList`, `ExperienceList`, `ContactList`) and
-  titles, so their content stays in step with the page.
-- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Daily
-  drivers", the owner's name), hidden until focused, open the same panels. In the static page
+  the camera stay put. The panel fades and rises in, with no animation under reduced motion. It is in the
+  portfolio design (`.folio`: warm black, Bricolage, mono labels, square edges) and reads the same data
+  and titles as the sections (`stack`, `work`), so its content stays in step with the page.
+- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode a button ("Daily
+  drivers") and a link ("GitHub"), hidden until focused, do what the books and the figurine do. In the static page
   (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`.
 - **Content source.** The data files (`about`, `impact`, `work`, `experience`, `tools`, `contact`)
   follow the owner's resume and their portfolio design canvas, which they confirmed as true. Work
-  cards show a striped placeholder until real screenshots are added. If `data/about.ts` `bio` is
-  `null`, the About panel shows a marked placeholder.
+  cards show the owner's screenshots (`src/assets/work/`, 1600 px WebP, through `next/image`, eager:
+  lazy loading does not follow the monitor's transform), in 2:1 frames anchored to the top; a second
+  screenshot fades in on hover (Achareh Sazeh's pricing page). The shelf panel shows the first one as
+  a thumbnail.
 - Still planned: the **candle** toggling the shelf accent light (optional; dropped if it doesn't earn
   its place).
 - Content is never invented: anything missing is marked as a placeholder in the data file.
@@ -344,7 +352,7 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
 Implemented in Phase 7.
 
 - **Loader** (`hero/Loader.tsx`, styles in `globals.css`). In 3D mode a full-screen loader covers the
-  page from the first paint: an amber ring (the desk lamp's colour) filling around the percentage, with
+  page from the first paint: a lime ring (the portfolio's accent) filling around the percentage, with
   "Setting up the desk" under it, the way 3D sites such as Lusion and Bruno Simon's portfolio open on a
   minimal centred loader. `DeskCanvas`'s `LoadStatus` reads drei's progress store each frame and eases
   the shown value toward it, so it never jumps or runs backwards; at 100% the ring glows for half a

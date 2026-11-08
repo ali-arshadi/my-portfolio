@@ -1,12 +1,19 @@
-// From the owner's portfolio design and the resume.
+import type { StaticImageData } from "next/image";
+import acharehBazaar from "@/assets/work/achareh-bazaar.webp";
+import acharehSazehPricing from "@/assets/work/achareh-sazeh-pricing.webp";
+import acharehSazeh from "@/assets/work/achareh-sazeh.webp";
+import mavidaHome from "@/assets/work/mavida-home.webp";
+
+// From the owner's portfolio design and the resume; screenshots from the owner (src/assets/work/,
+// 1600 px wide WebP).
 export type WorkItem = {
   title: string;
   years: string;
   description: string;
   href: string;
   site: string;
-  // PLACEHOLDER: no screenshots yet; the card shows this label in a striped box until one is added.
-  screenshot: string;
+  // The first is the card's picture; a second one shows when the card is hovered.
+  shots: readonly { src: StaticImageData; alt: string }[];
 };
 
 export const work: WorkItem[] = [
@@ -16,7 +23,12 @@ export const work: WorkItem[] = [
     description: "Where I lead front-end development today.",
     href: "https://acharehbazaar.com",
     site: "acharehbazaar.com",
-    screenshot: "[Screenshot: purchasing dashboard]",
+    shots: [
+      {
+        src: acharehBazaar,
+        alt: "Achareh Bazaar's home page: building and organisational supplies",
+      },
+    ],
   },
   {
     title: "Achareh Sazeh",
@@ -24,7 +36,13 @@ export const work: WorkItem[] = [
     description: "Maintenance dashboard for the Achareh Group.",
     href: "https://sazeh.achareh.ir",
     site: "sazeh.achareh.ir  ·  /pricing",
-    screenshot: "[Screenshot: maintenance dashboard]",
+    shots: [
+      {
+        src: acharehSazeh,
+        alt: "Achareh Sazeh's home page: smart maintenance and repairs",
+      },
+      { src: acharehSazehPricing, alt: "Achareh Sazeh's pricing packages" },
+    ],
   },
   {
     title: "Mavida Home",
@@ -32,7 +50,12 @@ export const work: WorkItem[] = [
     description: "Freelance front-end work during my military service.",
     href: "https://mavidahome.com/",
     site: "mavidahome.com",
-    screenshot: "[Screenshot: Mavida Home]",
+    shots: [
+      {
+        src: mavidaHome,
+        alt: "Mavida Home's store front with the SMEG banner",
+      },
+    ],
   },
 ];
 

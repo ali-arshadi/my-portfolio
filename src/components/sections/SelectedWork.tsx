@@ -1,34 +1,8 @@
+import Image from "next/image";
 import { work } from "@/data/work";
 import { Section } from "./Section";
 
 export const WORK_TITLE = "Live in production";
-
-// The projects for the shelf's tools panel: plain cards in the site's own palette.
-export function WorkList({ compact = false }: { compact?: boolean }) {
-  return (
-    <ul className="grid gap-4">
-      {work.map((item) => (
-        <li key={item.title}>
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block rounded-card border border-line bg-card transition-colors hover:bg-line ${compact ? "p-4" : "p-6"}`}
-          >
-            <p className="text-sm text-muted">{item.years}</p>
-            <h3
-              className={`mt-2 font-semibold ${compact ? "text-lg" : "text-xl"}`}
-            >
-              {item.title}
-            </h3>
-            <p className="mt-2 max-w-prose text-muted">{item.description}</p>
-            <p className="mt-3 text-sm text-lamp">{item.site}</p>
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export function SelectedWork() {
   return (
@@ -42,10 +16,21 @@ export function SelectedWork() {
               rel="noopener noreferrer"
               className="project block"
             >
-              <div className="aspect-[4/3] overflow-hidden border border-rule">
-                <div className="shot label flex size-full items-center justify-center bg-[repeating-linear-gradient(135deg,#1b1b18_0_14px,#141411_14px_28px)] p-6 text-center text-[12px] text-dim">
-                  {item.screenshot}
-                </div>
+              <div className="relative aspect-[2/1] overflow-hidden border border-rule bg-tile">
+                {item.shots.map((shot, i) => (
+                  <Image
+                    key={shot.alt}
+                    src={shot.src}
+                    alt={shot.alt}
+                    fill
+                    sizes="(min-width: 900px) 700px, 100vw"
+                    placeholder="blur"
+                    // eager: on the monitor the content is moved by a transform, which lazy loading
+                    // does not track
+                    loading="eager"
+                    className={`shot object-cover object-top ${i > 0 ? "shot-next" : ""}`}
+                  />
+                ))}
               </div>
               <div className="mt-6 font-mono text-[13px] text-dim">
                 {item.years}

@@ -10,25 +10,6 @@ function dateTime(job: ExperienceItem) {
   return job.end ? `${job.start}/${job.end}` : job.start;
 }
 
-// Companies and dates only, for the shelf's About panel.
-export function ExperienceList({ compact = false }: { compact?: boolean }) {
-  return (
-    <ul className={compact ? "space-y-3" : "space-y-6"}>
-      {experience.map((job) => (
-        <li
-          key={job.company}
-          className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between"
-        >
-          <span className="font-semibold">{job.company}</span>
-          <time dateTime={dateTime(job)} className="text-muted">
-            {job.dates}
-          </time>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 // Every job open: on the monitor an accordion would change the content's height, and with it the
 // length of the page's scroll, under the reader.
 export function Experience() {

@@ -1,9 +1,7 @@
 // Which shelf panel is open, if any. The scene (ShelfObjects) and the keyboard buttons open one;
 // ShelfPanel shows it and closes it. A plain store, so the scene can read it every frame.
-//   tools  a book: the tools list with that book's tool marked, and the selected work
-//   about  the figurine
-export type ShelfPanelId =
-  { kind: "tools"; book: number | null } | { kind: "about" };
+// It holds the book it was opened from (null from the keyboard button), whose tool the panel marks.
+export type ShelfPanelId = { book: number | null };
 
 let current: ShelfPanelId | null = null;
 const listeners = new Set<() => void>();

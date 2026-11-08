@@ -1,6 +1,7 @@
 "use client";
 
 import type { MouseEvent, Ref } from "react";
+import { SCROLL_CUE, ScrollCue } from "@/components/hero/ScrollCue";
 import { screenNav } from "@/components/scene/scrollState";
 import { about } from "@/data/about";
 
@@ -17,7 +18,7 @@ export const HERO = {
   name: { top: 156, size: 210, lineHeight: 0.86, tracking: -0.045 },
   rule: { top: 584 },
   line: { top: 612, size: 25, lineHeight: 1.25, tracking: -0.01 },
-  scroll: { center: 652.5, rule: 64 },
+  scroll: { center: 652.5 },
   nav: { top: 16, height: 44, shrinkTo: 860, shrinkOver: 320, glassOver: 140 },
 } as const;
 
@@ -103,15 +104,14 @@ export function ScreenHero() {
       <a
         href="#profile"
         onClick={(event) => go(event, "profile")}
-        className="label absolute flex h-11 items-center gap-4"
-        style={{ right: HERO.padX, top: scroll.center - 22 }}
+        className="absolute flex size-11 items-center justify-center"
+        style={{
+          // the cue's right edge on the content's, centred on scroll.center, in a 44 px target
+          right: HERO.padX - (44 - SCROLL_CUE.width) / 2,
+          top: scroll.center - 22,
+        }}
       >
-        <span>Scroll</span>
-        <span
-          aria-hidden="true"
-          className="block h-px bg-current"
-          style={{ width: scroll.rule }}
-        />
+        <ScrollCue label="Scroll to my profile" />
       </a>
     </div>
   );

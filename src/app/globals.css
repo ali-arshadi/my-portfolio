@@ -57,7 +57,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lamp);
+  outline: 2px solid var(--lime);
   outline-offset: 3px;
 }
 
@@ -87,7 +87,7 @@ body {
 }
 
 /* The full-screen loader (hero/Loader.tsx): only in 3D mode, until the scene is ready. The page does
-   not scroll meanwhile. At 100% the ring lights up like the desk lamp, then the loader fades out. */
+   not scroll meanwhile. At 100% the ring lights up, then the loader fades out. */
 html[data-scene="3d"]:not([data-scene-ready]) {
   overflow: hidden;
 }
@@ -133,13 +133,13 @@ html[data-scene="3d"]:not([data-scene-ready]) {
   animation: loader-breathe 1.8s ease-in-out infinite;
 }
 .loader-fill {
-  stroke: var(--lamp);
+  stroke: var(--lime);
   stroke-linecap: round;
   transition: filter 450ms ease;
 }
 .loader[data-complete] .loader-fill {
-  filter: drop-shadow(0 0 4px var(--lamp))
-    drop-shadow(0 0 14px rgba(255, 180, 84, 0.55));
+  filter: drop-shadow(0 0 4px var(--lime))
+    drop-shadow(0 0 14px rgba(200, 240, 60, 0.55));
 }
 .loader-value {
   position: absolute;
@@ -253,6 +253,16 @@ html[data-panel-open] {
 .folio .project:hover .shot {
   transform: scale(1.04);
 }
+/* a project's second screenshot fades in over the first while the card is hovered */
+.folio .shot-next {
+  opacity: 0;
+  transition:
+    opacity 0.4s ease,
+    transform 0.6s cubic-bezier(0.16, 0.84, 0.24, 1);
+}
+.folio .project:hover .shot-next {
+  opacity: 1;
+}
 .folio .stack-row .stack-item {
   transition:
     opacity 0.25s,
@@ -318,5 +328,31 @@ html[data-panel-open] {
 @media (prefers-reduced-motion: reduce) {
   .screen-nav .lift {
     transition: none;
+  }
+}
+
+/* The scroll cue (hero/ScrollCue.tsx): the wheel dot slides down and fades, then starts again from
+   rest, which is how the monitor's screen texture paints it. */
+.scroll-cue-dot {
+  animation: scroll-cue 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes scroll-cue {
+  0%,
+  15% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-dot {
+    animation: none;
   }
 }

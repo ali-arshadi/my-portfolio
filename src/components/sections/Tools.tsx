@@ -1,24 +1,7 @@
-import { stack, type Tool, tools } from "@/data/tools";
+import { stack } from "@/data/tools";
 import { Section } from "./Section";
 
 export const TOOLS_TITLE = "Daily drivers";
-
-// Every tool in one row of chips, for the shelf's tools panel. `marked` picks out the book's tool.
-export function ToolList({ marked = null }: { marked?: Tool | null }) {
-  return (
-    <ul className="flex flex-wrap gap-2">
-      {tools.map((tool) => (
-        <li
-          key={tool}
-          aria-current={tool === marked ? "true" : undefined}
-          className={`rounded-card border bg-card px-3 py-1.5 text-sm ${tool === marked ? "border-lamp text-lamp" : "border-line"}`}
-        >
-          {tool}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export function Tools() {
   return (
