@@ -312,6 +312,12 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   (`scroll.t <= ACTIVE_UNTIL`, 0.02), once `<html data-scene-ready>` is set, and while no panel is
   open; events over page controls (links, buttons, an open dialog) are left to them. Scrolling away or
   opening a panel ends a hover even if the pointer did not move.
+- **The marks** (`scene/SceneHotspots.tsx`). Nothing else shows a reader that the scene's objects can be
+  clicked, so each one (the lamp's click box, the top of the row of books, the figurine's head) gets a
+  lime dot with a pulse ring: drei `<Html>` pinned to the object, in the canvas's `aria-hidden`
+  wrapper, taking no pointer events. They fade in 1.6 s after the scene is ready (once the lamp is
+  on), only while the objects can be used (opening frame, no panel open), and for good once the reader
+  clicks any object (`ScenePointer` sets `<html data-scene-touched>`). No pulse with reduced motion.
 - **Implemented: the lamp** (`LampSwitch.tsx`, Phase 8). Clicking the desk lamp in the opening frame
   switches it off and on. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
   and diffuser together; switching on, the bulb catches with a brief flicker (instant with reduced
@@ -321,8 +327,8 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
   own mesh, no proxy box needed) opens the **stack panel**: "Daily drivers" by group with that book's
   entry of `data/tools.ts` in lime, then "Live in production". `config/shelf.ts` maps each spine title (painted from
-  `blender/scripts/config.py` `BOOKS`) to its tool; Node.js has no entry in `tools.ts`, so that
-  book marks nothing. The **figurine**, a GitHub-style cat, opens the owner's **GitHub profile** in a
+  `blender/scripts/config.py` `BOOKS`) to its tool; every spine names a tool from the stack (the
+  second reads "Tailwind", short for Tailwind CSS, which would not fit the spine). The **figurine**, a GitHub-style cat, opens the owner's **GitHub profile** in a
   new tab (`GITHUB` in `data/contact.ts`), from the click's own handler so the browser allows it.
   Hovering an object lifts it (books 14 mm, figurine 8 mm; the shelf's front edge hides their bases),
   damped, or instantly when `motionScale` is 0; the object stays lifted while its panel is open.

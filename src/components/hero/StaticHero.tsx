@@ -6,6 +6,7 @@ import { ScrollCue } from "./ScrollCue";
 // link takes them back. The scroll hint depends on the scene mode; globals.css shows the right one.
 // The name and the tagline are on the monitor's screen in the opening frame (the live scene and the
 // still alike), so the page's title is for screen readers only and the tagline is left to the screen.
+// That the scene's objects can be clicked is shown in the scene itself (scene/SceneHotspots.tsx).
 export function StaticHero() {
   return (
     <>
