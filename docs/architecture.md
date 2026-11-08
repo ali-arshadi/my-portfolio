@@ -312,11 +312,12 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   (`scroll.t <= ACTIVE_UNTIL`, 0.02), once `<html data-scene-ready>` is set, and while no panel is
   open; events over page controls (links, buttons, an open dialog) are left to them. Scrolling away or
   opening a panel ends a hover even if the pointer did not move.
-- **The hint.** Nothing else tells a reader the scene's objects can be clicked, so in 3D mode the hero
-  shows "Click the lamp, the books or the cat" next to the scroll cue (`StaticHero`, hidden from
-  screen readers: keyboard users get buttons instead). It fades with the hero text as the camera
-  moves, and for good once the reader clicks any object (`ScenePointer` sets `<html
-  data-scene-touched>`).
+- **The marks** (`scene/SceneHotspots.tsx`). Nothing else shows a reader that the scene's objects can be
+  clicked, so each one (the lamp's click box, the top of the row of books, the figurine's head) gets a
+  lime dot with a pulse ring: drei `<Html>` pinned to the object, in the canvas's `aria-hidden`
+  wrapper, taking no pointer events. They fade in 1.6 s after the scene is ready (once the lamp is
+  on), only while the objects can be used (opening frame, no panel open), and for good once the reader
+  clicks any object (`ScenePointer` sets `<html data-scene-touched>`). No pulse with reduced motion.
 - **Implemented: the lamp** (`LampSwitch.tsx`, Phase 8). Clicking the desk lamp in the opening frame
   switches it off and on. `lampLevel` fades the lamp's baked light, its live highlight and its bulb
   and diffuser together; switching on, the bulb catches with a brief flicker (instant with reduced

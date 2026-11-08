@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/StaticHero.tsx": {
-    "mtime": 1794175786.1545122,
-    "seen": 1794176423.5320215,
-    "ast_hash": "ea3504e225ebcff89ffdca137ed284ef",
+    "mtime": 1794176740.5754383,
+    "seen": 1794176810.297369,
+    "ast_hash": "6a3dcf21627be0d22107af73e15e1d7c",
     "semantic_hash": ""
   },
   "src/components/scene/CameraRig.tsx": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "src/components/scene/Experience.tsx": {
-    "mtime": 1793986049.0456643,
-    "seen": 1794162387.3320723,
-    "ast_hash": "b685963ee3fd5ea6e93979d3873b6b1d",
+    "mtime": 1794176728.6305256,
+    "seen": 1794176810.2973747,
+    "ast_hash": "0555687389422a8e6f71fb098950f44c",
     "semantic_hash": ""
   },
   "src/components/scene/LampSwitch.tsx": {
@@ -372,9 +372,9 @@
     "semantic_hash": ""
   },
   "src/components/scene/ScenePointer.tsx": {
-    "mtime": 1794175786.0343041,
-    "seen": 1794176423.5320377,
-    "ast_hash": "ba5385fc561ee7a33ea8e4a3a3eba259",
+    "mtime": 1794176741.2404199,
+    "seen": 1794176810.2973802,
+    "ast_hash": "b569f89ad32d9b9d3615b3dd5d2c7650",
     "semantic_hash": ""
   },
   "src/components/scene/ShelfObjects.tsx": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794176420.3358934,
-    "seen": 1794176423.5320866,
-    "ast_hash": "7f6cd0ee22058984dc4d1f0f09c88fe5",
+    "mtime": 1794176807.4423442,
+    "seen": 1794176810.2974198,
+    "ast_hash": "c4de682cf5dc599513f0cfcbae064b09",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {
@@ -969,6 +969,12 @@
     "mtime": 1794168489.8028967,
     "seen": 1794168676.739328,
     "ast_hash": "a6021001c5dfbd2045bc45618a88fbfd",
+    "semantic_hash": ""
+  },
+  "src/components/scene/SceneHotspots.tsx": {
+    "mtime": 1794176727.9078822,
+    "seen": 1794176810.2973778,
+    "ast_hash": "2e24acbefe2952f87deb7d0a155a3258",
     "semantic_hash": ""
   },
   "pnpm-lock.yaml": {

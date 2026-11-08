@@ -7,6 +7,7 @@ import { DebugView } from "./DebugView";
 import { Effects } from "./Effects";
 import { LampSwitch } from "./LampSwitch";
 import { Lighting } from "./Lighting";
+import { SceneHotspots } from "./SceneHotspots";
 import { ScenePointer } from "./ScenePointer";
 import { SceneMotion } from "./SceneMotion";
 import { ShelfObjects } from "./ShelfObjects";
@@ -28,6 +29,7 @@ export function Experience() {
       <ScenePointer />
       <LampSwitch />
       <ShelfObjects />
+      <SceneHotspots />
       <Effects />
     </>
   );
