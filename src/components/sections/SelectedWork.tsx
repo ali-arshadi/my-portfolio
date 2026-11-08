@@ -3,33 +3,6 @@ import { Section } from "./Section";
 
 export const WORK_TITLE = "Live in production";
 
-// The projects for the shelf's tools panel: plain cards in the site's own palette.
-export function WorkList({ compact = false }: { compact?: boolean }) {
-  return (
-    <ul className="grid gap-4">
-      {work.map((item) => (
-        <li key={item.title}>
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block rounded-card border border-line bg-card transition-colors hover:bg-line ${compact ? "p-4" : "p-6"}`}
-          >
-            <p className="text-sm text-muted">{item.years}</p>
-            <h3
-              className={`mt-2 font-semibold ${compact ? "text-lg" : "text-xl"}`}
-            >
-              {item.title}
-            </h3>
-            <p className="mt-2 max-w-prose text-muted">{item.description}</p>
-            <p className="mt-3 text-sm text-lime">{item.site}</p>
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export function SelectedWork() {
   return (
     <Section name="work" title={WORK_TITLE}>

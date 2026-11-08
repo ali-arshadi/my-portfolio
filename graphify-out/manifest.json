@@ -78,15 +78,15 @@
     "semantic_hash": ""
   },
   "src/components/sections/Contact.tsx": {
-    "mtime": 1794165482.1685765,
-    "seen": 1794165542.7435467,
-    "ast_hash": "e2faa47bff4549fdf3a0213047ca195e",
+    "mtime": 1794167564.8228571,
+    "seen": 1794167674.11931,
+    "ast_hash": "0602421546e1159201e376d4dc4f466c",
     "semantic_hash": ""
   },
   "src/components/sections/Experience.tsx": {
-    "mtime": 1794162624.6203394,
-    "seen": 1794163623.4624214,
-    "ast_hash": "0391107d4512b9f2a6c64c25b232e7da",
+    "mtime": 1794167564.8228571,
+    "seen": 1794167674.1193106,
+    "ast_hash": "b147aa95ead6274f00df6ffe724aa2ad",
     "semantic_hash": ""
   },
   "src/components/sections/Section.tsx": {
@@ -96,21 +96,21 @@
     "semantic_hash": ""
   },
   "src/components/sections/SelectedWork.tsx": {
-    "mtime": 1794165482.180616,
-    "seen": 1794165542.743561,
-    "ast_hash": "1807542e037588a10b50680955f068ce",
+    "mtime": 1794167564.821851,
+    "seen": 1794167674.119317,
+    "ast_hash": "82b141258c837d7f80bc93ed7a4492b7",
     "semantic_hash": ""
   },
   "src/components/sections/Tools.tsx": {
-    "mtime": 1794165482.1927378,
-    "seen": 1794165542.7435622,
-    "ast_hash": "0be658b13638661e7ac9c6358fc2f245",
+    "mtime": 1794167580.027795,
+    "seen": 1794167674.119318,
+    "ast_hash": "bcb2ac8d408701fcd5cff26d38d5af84",
     "semantic_hash": ""
   },
   "src/data/contact.ts": {
-    "mtime": 1794160506.702509,
-    "seen": 1794162387.3321152,
-    "ast_hash": "558324aa417e693bfc7599534d88f9c7",
+    "mtime": 1794167580.8707993,
+    "seen": 1794167674.1193259,
+    "ast_hash": "0b80148fc35a1b506132a9b149def888",
     "semantic_hash": ""
   },
   "src/data/experience.ts": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "src/components/scene/ShelfObjects.tsx": {
-    "mtime": 1793986049.131946,
-    "seen": 1794162387.3320782,
-    "ast_hash": "ebf395d7b44796a84df4742dfeff9d3a",
+    "mtime": 1794167533.6125276,
+    "seen": 1794167674.1192985,
+    "ast_hash": "899529d72a4d2ed56a3e5526eaa79f3e",
     "semantic_hash": ""
   },
   "src/components/scene/Workspace.tsx": {
@@ -468,15 +468,15 @@
     "semantic_hash": ""
   },
   "src/components/shelf/ShelfPanel.tsx": {
-    "mtime": 1794165482.2092755,
-    "seen": 1794165542.7435641,
-    "ast_hash": "6ad36402029d5da8b6ecd5c9e3b4710e",
+    "mtime": 1794167580.842165,
+    "seen": 1794167674.1193185,
+    "ast_hash": "ff2a9a96259f3a07c186a61689623130",
     "semantic_hash": ""
   },
   "src/components/shelf/panelState.ts": {
-    "mtime": 1793986049.220493,
-    "seen": 1794162387.3321054,
-    "ast_hash": "4a8fc77024798a221178836c76ab5b24",
+    "mtime": 1794167534.1915267,
+    "seen": 1794167674.1193194,
+    "ast_hash": "60c815ced7539680f077c6cc141d7a84",
     "semantic_hash": ""
   },
   "src/config/camera.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794167243.977371,
-    "seen": 1794167289.8537173,
-    "ast_hash": "9fde58e273345d7df733677a24985501",
+    "mtime": 1794167660.5719075,
+    "seen": 1794167674.119338,
+    "ast_hash": "ee262872aefea971403ed5f26227cad8",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {

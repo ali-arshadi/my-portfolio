@@ -4,6 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { Matrix3, MathUtils, type Object3D, Vector3 } from "three";
 import { shelfPanel } from "@/components/shelf/panelState";
+import { GITHUB } from "@/data/contact";
 import { motionScale } from "./motionState";
 import { type SceneTarget, useSceneTarget } from "./ScenePointer";
 
@@ -29,8 +30,9 @@ function localUp(object: Object3D) {
   return up;
 }
 
-// The books and the figurine on the shelf. Each book opens the tools panel with its tool marked; the
-// figurine opens the About panel (ShelfPanel shows them). Hovering one lifts it a little.
+// The books and the figurine on the shelf. Each book opens the stack panel with its tool marked
+// (ShelfPanel); the figurine, a GitHub-style cat, opens the owner's GitHub profile in a new tab.
+// Hovering one lifts it a little.
 export function ShelfObjects() {
   const lifted = useRef(new Map<Object3D, Lifted>());
   const hovered = useRef<{ object: Object3D; lift: number } | null>(null);
@@ -51,10 +53,7 @@ export function ShelfObjects() {
       },
       onActivate: (part) => {
         opened.current = { object: part, lift: LIFT.book };
-        shelfPanel.open({
-          kind: "tools",
-          book: Number(BOOK.exec(part.name)?.[1]),
-        });
+        shelfPanel.open({ book: Number(BOOK.exec(part.name)?.[1]) });
       },
     }),
     [],
@@ -65,9 +64,9 @@ export function ShelfObjects() {
       onHover: (part) => {
         hovered.current = part && { object: part, lift: LIFT.figurine };
       },
-      onActivate: (part) => {
-        opened.current = { object: part, lift: LIFT.figurine };
-        shelfPanel.open({ kind: "about" });
+      // in the click's own handler, so the browser lets the new tab open
+      onActivate: () => {
+        window.open(GITHUB.href, "_blank", "noopener,noreferrer");
       },
     }),
     [],

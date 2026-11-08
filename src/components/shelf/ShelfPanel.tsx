@@ -1,78 +1,81 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { CONTACT_TITLE, ContactList } from "@/components/sections/Contact";
-import {
-  EXPERIENCE_TITLE,
-  ExperienceList,
-} from "@/components/sections/Experience";
-import { WORK_TITLE, WorkList } from "@/components/sections/SelectedWork";
-import { TOOLS_TITLE, ToolList } from "@/components/sections/Tools";
+import { WORK_TITLE } from "@/components/sections/SelectedWork";
+import { TOOLS_TITLE } from "@/components/sections/Tools";
 import { SHELF_BOOKS } from "@/config/shelf";
-import { about } from "@/data/about";
-import { type ShelfPanelId, shelfPanel } from "./panelState";
+import { GITHUB } from "@/data/contact";
+import { stack, type Tool } from "@/data/tools";
+import { work } from "@/data/work";
+import { shelfPanel } from "./panelState";
 
 const TITLE_ID = "shelf-panel-title";
 
-function Subheading({ children }: { children: string }) {
+// The stack by group, as the "Daily drivers" section shows it, with the book's tool in lime.
+function Stack({ marked }: { marked: Tool | null }) {
   return (
-    <h3 className="mb-4 mt-10 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
-      {children}
-    </h3>
+    <dl className="m-0 border-t border-rule">
+      {stack.map((group) => (
+        <div
+          key={group.label}
+          className="flex flex-wrap gap-x-8 gap-y-2 border-b border-rule py-4"
+        >
+          <dt className="label flex-[0_0_150px] pt-1 text-dim">
+            {group.label}
+          </dt>
+          <dd className="m-0 flex min-w-0 flex-[1_1_240px] flex-wrap gap-x-4 gap-y-1 text-[22px] leading-[1.2] font-semibold tracking-[-0.02em]">
+            {group.items.map((item) => (
+              <span
+                key={item}
+                aria-current={item === marked ? "true" : undefined}
+                className={item === marked ? "text-lime" : undefined}
+              >
+                {item}
+              </span>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
-function ToolsPanel({ book }: { book: number | null }) {
+// The projects, as "Live in production" lists them, as compact rows.
+function Projects() {
   return (
-    <>
-      <h2 id={TITLE_ID} className="mb-6 text-2xl font-semibold tracking-tight">
-        {TOOLS_TITLE}
-      </h2>
-      <ToolList marked={book === null ? null : SHELF_BOOKS[book]?.tool} />
-      <Subheading>{WORK_TITLE}</Subheading>
-      <WorkList compact />
-    </>
+    <ul className="m-0 list-none border-t border-rule p-0">
+      {work.map((item) => (
+        <li key={item.title} className="border-b border-rule py-5">
+          <div className="font-mono text-[13px] text-dim">{item.years}</div>
+          <h4 className="mt-1 mb-0 text-[26px] leading-[1.05] font-bold tracking-[-0.03em]">
+            {item.title}
+          </h4>
+          <p className="mt-2 mb-0 text-[15px] leading-normal text-pretty text-dim">
+            {item.description}
+          </p>
+          <a
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block border-b border-lime pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-lime"
+          >
+            {item.site}
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-function AboutPanel() {
-  return (
-    <>
-      <h2 id={TITLE_ID} className="text-2xl font-semibold tracking-tight">
-        {about.name}
-      </h2>
-      <p className="mt-2 text-muted">{about.tagline}</p>
-      {about.bio ? (
-        <p className="mt-6 max-w-prose">{about.bio}</p>
-      ) : (
-        <p className="mt-6 rounded-card border border-dashed border-lime/60 px-4 py-3 text-sm text-lime">
-          [Placeholder: bio not written yet. Add it to src/data/about.ts.]
-        </p>
-      )}
-      <Subheading>{EXPERIENCE_TITLE}</Subheading>
-      <ExperienceList compact />
-      <Subheading>{CONTACT_TITLE}</Subheading>
-      <ContactList inline />
-    </>
-  );
-}
-
-function PanelBody({ panel }: { panel: ShelfPanelId }) {
-  return panel.kind === "tools" ? (
-    <ToolsPanel book={panel.book} />
-  ) : (
-    <AboutPanel />
-  );
-}
-
-// The panels the shelf's objects open (ShelfObjects): an HTML dialog over the canvas, not part of the
-// scene. A modal <dialog> sits in the top layer, keeps focus inside it and makes the page behind it
-// inert; Escape, the close button or a click outside it closes it, and focus goes back to where it
-// was. The page does not scroll meanwhile (globals.css, html[data-panel-open]), so the camera and the
-// pinned hero stay where they are.
+// The panel a shelf book opens (ShelfObjects): an HTML dialog over the canvas, not part of the
+// scene, in the portfolio's design. A modal <dialog> sits in the top layer, keeps focus inside it and
+// makes the page behind it inert; Escape, the close button or a click outside it closes it, and focus
+// goes back to where it was. The page does not scroll meanwhile (globals.css, html[data-panel-open]),
+// so the camera and the pinned hero stay where they are.
 //
-// The objects only take the mouse, so keyboard users get a button for each panel; they stay hidden
-// until focused, and exist only in 3D mode: in the static page the same content is in #content.
+// The objects only take the mouse, so keyboard users get a button for the panel and a link to the
+// GitHub profile (what the figurine opens); they stay hidden until focused, and exist only in 3D
+// mode: in the static page the same content is in #content.
 export function ShelfPanel() {
   const panel = useSyncExternalStore(
     shelfPanel.subscribe,
@@ -111,23 +114,28 @@ export function ShelfPanel() {
     }
   };
 
+  const book = panel?.book == null ? null : SHELF_BOOKS[panel.book];
+  const launch =
+    "sr-only rounded-full bg-lime px-4 py-2 font-mono text-[13px] text-ink uppercase focus-visible:not-sr-only";
+
   return (
     <>
       <div className="shelf-launch fixed left-4 top-16 z-20 flex-col gap-2">
         <button
           type="button"
-          className="sr-only rounded-card bg-card px-3 py-2 text-sm text-fg focus-visible:not-sr-only"
-          onClick={() => shelfPanel.open({ kind: "tools", book: null })}
+          className={launch}
+          onClick={() => shelfPanel.open({ book: null })}
         >
           {TOOLS_TITLE}
         </button>
-        <button
-          type="button"
-          className="sr-only rounded-card bg-card px-3 py-2 text-sm text-fg focus-visible:not-sr-only"
-          onClick={() => shelfPanel.open({ kind: "about" })}
+        <a
+          href={GITHUB.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={launch}
         >
-          {about.name}
-        </button>
+          {GITHUB.label}
+        </a>
       </div>
       <dialog
         ref={dialog}
@@ -141,23 +149,38 @@ export function ShelfPanel() {
             release();
           }
         }}
-        className="shelf-panel m-auto max-h-[min(85dvh,46rem)] w-[min(92vw,36rem)] overflow-y-auto overscroll-contain rounded-card border border-line bg-bg p-0 text-fg shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+        className="shelf-panel folio m-auto max-h-[min(85dvh,46rem)] w-[min(92vw,40rem)] overflow-y-auto overscroll-contain border border-rule p-0 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
       >
-        <div className="relative px-6 pb-8 pt-12 md:px-8">
-          <form
-            method="dialog"
-            onSubmit={release}
-            className="absolute right-3 top-3"
-          >
-            <button
-              type="submit"
-              aria-label="Close"
-              className="flex size-9 items-center justify-center rounded-full text-xl leading-none text-muted transition-colors hover:bg-line hover:text-fg"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </form>
-          {panel && <PanelBody panel={panel} />}
+        <div className="relative px-6 pt-8 pb-10 md:px-9">
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              {book && (
+                <p className="label m-0 text-dim">{book.tool ?? book.spine}</p>
+              )}
+              <h2
+                id={TITLE_ID}
+                className="mt-2 mb-0 text-[44px] leading-[0.92] font-extrabold tracking-[-0.045em] uppercase"
+              >
+                {TOOLS_TITLE}
+              </h2>
+            </div>
+            <form method="dialog" onSubmit={release}>
+              <button
+                type="submit"
+                aria-label="Close"
+                className="flex size-11 items-center justify-center rounded-full border border-faint text-xl leading-none transition-colors hover:border-lime hover:text-lime"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </form>
+          </div>
+          <div className="mt-8">
+            <Stack marked={book?.tool ?? null} />
+          </div>
+          <h3 className="mt-12 mb-5 text-[28px] leading-none font-extrabold tracking-[-0.04em] uppercase">
+            {WORK_TITLE}
+          </h3>
+          <Projects />
         </div>
       </dialog>
     </>

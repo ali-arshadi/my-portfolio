@@ -17,3 +17,6 @@ export const contact: ContactLink[] = [
     href: "https://linkedin.com/in/ali-arshadi",
   },
 ];
+
+// The GitHub profile, which the shelf's figurine (a GitHub-style cat) opens.
+export const GITHUB = contact.find((link) => link.label === "GitHub")!;

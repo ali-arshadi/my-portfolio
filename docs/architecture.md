@@ -319,11 +319,11 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   starts off and catches on by itself 0.7 s into the loader's reveal, so the first thing the reader
   sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
-  own mesh, no proxy box needed) opens the **tools panel**: "Daily drivers" with that book's entry of
-  `data/tools.ts` marked, then "Live in production". `config/shelf.ts` maps each spine title (painted from
+  own mesh, no proxy box needed) opens the **stack panel**: "Daily drivers" by group with that book's
+  entry of `data/tools.ts` in lime, then "Live in production". `config/shelf.ts` maps each spine title (painted from
   `blender/scripts/config.py` `BOOKS`) to its tool; Node.js has no entry in `tools.ts`, so that
-  book marks nothing. The **figurine** opens the **About panel**: name and tagline
-  (`data/about.ts`, which the hero now reads too), the bio, "Where I've worked" and "Say hello".
+  book marks nothing. The **figurine**, a GitHub-style cat, opens the owner's **GitHub profile** in a
+  new tab (`GITHUB` in `data/contact.ts`), from the click's own handler so the browser allows it.
   Hovering an object lifts it (books 14 mm, figurine 8 mm; the shelf's front edge hides their bases),
   damped, or instantly when `motionScale` is 0; the object stays lifted while its panel is open.
 - **Panels** (`shelf/ShelfPanel.tsx`, state in `shelf/panelState.ts`). HTML over the canvas, not
@@ -331,11 +331,11 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   focus and makes the page inert. Escape, the close button or a click on the backdrop closes it, and
   focus returns to the element that had it. While one is open `html[data-panel-open]` stops the page
   scrolling (with `scrollbar-gutter: stable`, so the canvas does not resize), so the pinned hero and
-  the camera stay put. The panel fades and rises in, with no animation under reduced motion. The panels
-  reuse the sections' list components (`ToolList`, `WorkList`, `ExperienceList`, `ContactList`) and
-  titles, so their content stays in step with the page.
-- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Daily
-  drivers", the owner's name), hidden until focused, open the same panels. In the static page
+  the camera stay put. The panel fades and rises in, with no animation under reduced motion. It is in the
+  portfolio design (`.folio`: warm black, Bricolage, mono labels, square edges) and reads the same data
+  and titles as the sections (`stack`, `work`), so its content stays in step with the page.
+- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode a button ("Daily
+  drivers") and a link ("GitHub"), hidden until focused, do what the books and the figurine do. In the static page
   (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`.
 - **Content source.** The data files (`about`, `impact`, `work`, `experience`, `tools`, `contact`)
   follow the owner's resume and their portfolio design canvas, which they confirmed as true. Work
