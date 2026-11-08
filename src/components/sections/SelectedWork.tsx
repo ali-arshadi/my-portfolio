@@ -23,7 +23,7 @@ export function SelectedWork() {
                     src={shot.src}
                     alt={shot.alt}
                     fill
-                    sizes="(min-width: 900px) 420px, 100vw"
+                    sizes="(min-width: 900px) 700px, 100vw"
                     placeholder="blur"
                     // eager: on the monitor the content is moved by a transform, which lazy loading
                     // does not track
