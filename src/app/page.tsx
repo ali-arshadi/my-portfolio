@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero/Hero";
+import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
 import { Experience } from "@/components/sections/Experience";
 import { SelectedWork } from "@/components/sections/SelectedWork";
@@ -14,6 +15,7 @@ export default function Home() {
         id="content"
         className="relative z-[2] bg-bg shadow-[0_-60px_80px_20px_#090a0e]"
       >
+        <About />
         <SelectedWork />
         <Tools />
         <Experience />

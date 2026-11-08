@@ -1,26 +1,27 @@
 export type WorkItem = {
   title: string;
-  tag: "Internal product";
+  tag: "Internal product" | "Product feature";
   description: string;
 };
 
+// From the resume: one entry per product, worded from its bullet points.
 export const work: WorkItem[] = [
-  {
-    title: "Payment confirmation",
-    tag: "Internal product",
-    description:
-      "Pay a pre-invoice in full cash, full credit, or a mix, with a plain summary of what is charged before the final click.",
-  },
   {
     title: "B2B purchasing dashboard",
     tag: "Internal product",
     description:
-      "Front-end for the whole flow from purchase request to vendor quotes, proformas, invoices and payments.",
+      "Front-end for the whole flow from purchase requests to vendor quotations, proformas, invoices and payments, built with Vue 2, Nuxt 2, Vuex, Tailwind CSS and REST APIs. Build time cut from about 15-18 minutes to 7-8.",
   },
   {
-    title: "Design system",
+    title: "Maintenance dashboard",
     tag: "Internal product",
     description:
-      "Tailwind-based library of 40+ reusable components, built from design tokens and Figma specs.",
+      "Sass-based maintenance dashboard built with Vue 2 and Nuxt 2, with reusable components, while migrating legacy components toward Vue 3, Nuxt 3 and the Composition API.",
+  },
+  {
+    title: "Video conferencing",
+    tag: "Product feature",
+    description:
+      "The video conferencing feature of a collaboration platform that combines project management and team communication, built with Vue.js and TypeScript.",
   },
 ];

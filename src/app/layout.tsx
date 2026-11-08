@@ -13,10 +13,10 @@ const familjen = Familjen_Grotesk({
 
 export const metadata: Metadata = {
   title: "Ali Arshadi",
-  description: "Front-end developer in Tehran.",
+  description: "Senior front-end developer in Tehran.",
   openGraph: {
     title: "Ali Arshadi",
-    description: "Front-end developer in Tehran.",
+    description: "Senior front-end developer in Tehran.",
     type: "website",
     locale: "en",
   },

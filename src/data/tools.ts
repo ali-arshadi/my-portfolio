@@ -1,18 +1,22 @@
+// From the resume's Technical Skills, in its order: front-end, state management, API, tools, then
+// additional experience.
 export const tools = [
   "Vue.js",
   "Nuxt.js",
-  "React",
-  "Next.js",
-  "TypeScript",
   "JavaScript",
-  "Tailwind CSS",
+  "TypeScript",
+  "HTML",
+  "CSS",
   "Sass",
-  "Pinia",
+  "Tailwind CSS",
   "Vuex",
+  "Pinia",
   "REST APIs",
   "Git",
   "Docker",
-  "Figma",
+  "React",
+  "Next.js",
+  "CI/CD",
 ] as const;
 
 export type Tool = (typeof tools)[number];
