@@ -1,4 +1,5 @@
 import { about } from "@/data/about";
+import { ScrollCue } from "./ScrollCue";
 
 // The hero text over the opening frame. ScrollController fades it out (#hero-overlay) as the camera
 // starts to move. #hero lets clicks through to the monitor, so the skip link takes them back.
@@ -22,10 +23,14 @@ export function StaticHero() {
         <p className="mt-4 text-[clamp(1rem,2vw,1.35rem)] text-muted">
           {about.tagline}
         </p>
-        <p className="mt-8 text-[0.95rem] text-lamp">
-          <span className="hint-3d">Scroll to step up to the screen</span>
-          <span className="hint-static">Scroll for my work</span>
-        </p>
+        <div className="mt-8 text-lamp">
+          <span className="hint-3d">
+            <ScrollCue label="Scroll to step up to the screen" />
+          </span>
+          <span className="hint-static">
+            <ScrollCue label="Scroll for my work" />
+          </span>
+        </div>
       </div>
     </>
   );

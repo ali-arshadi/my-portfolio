@@ -276,6 +276,12 @@ Implemented (`components/screen/`).
   (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
   (`screenNav` in `scrollState.ts`, registered by `ScrollController`): sections are found by
   `data-section`, not `id`, as the static page's copy of them is in the DOM too.
+- **Scroll cues are drawn, not written** (`hero/ScrollCue.tsx`): a mouse outline whose wheel dot
+  slides down and fades, on a loop (held still with reduced motion), with a screen-reader label. The
+  page's hero shows it in the lamp's amber (labelled "Scroll to step up to the screen", or "Scroll
+  for my work" in static mode); the monitor's hero shows it bottom right, as a link to the profile.
+  The texture paints that one with the dot at rest, where the animation starts (`SCROLL_CUE` and
+  `SCREEN_HERO["scroll"]` in step).
 - **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
   design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
   display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band

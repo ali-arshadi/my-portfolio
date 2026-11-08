@@ -80,7 +80,8 @@ SCREEN_HERO = dict(
     rule=dict(top=584),
     line=dict(top=612, size=25, line_height=1.25, tracking=-0.01,
               lines=("Senior Front-end Developer for large", "Vue and Nuxt applications.")),
-    scroll=dict(center=652.5, rule=64, gap=16),
+    # the scroll cue (src/components/hero/ScrollCue.tsx): a mouse outline, its wheel dot at rest
+    scroll=dict(center=652.5, width=26, height=40, border=2, dot=dict(width=4, height=8, top=8)),
     nav=dict(top=16, height=44, pad_y=8, gap=24, link_gap=25.6,
              links=("Profile", "Impact", "Work", "Featured", "Experience", "Stack")),
 )
@@ -123,6 +124,10 @@ class _Painter:
                         anchor="ls")
             x += f.getlength(c) / s + tracking * size
         return x
+
+    def outline(self, x0, y0, x1, y1, color, width, radius):
+        box = (round(x0 * self.s), round(y0 * self.s), round(x1 * self.s) - 1, round(y1 * self.s) - 1)
+        self.d.rounded_rectangle(box, radius=radius * self.s, outline=_rgb(color), width=round(width * self.s))
 
     def rect(self, x0, y0, x1, y1, fill, radius=0):
         box = (round(x0 * self.s), round(y0 * self.s), round(x1 * self.s) - 1, round(y1 * self.s) - 1)
@@ -191,9 +196,12 @@ def screen(path):
                wght=400, opsz=line["size"])
 
     sc = hero["scroll"]
-    x = right - (label_width("Scroll") + sc["gap"] + sc["rule"])
-    x = label(x, sc["center"] - LABEL["size"] * LABEL["line_height"] / 2, "Scroll", c["paper"])
-    p.rect(right - sc["rule"], sc["center"] - 0.5, right, sc["center"] + 0.5, c["paper"])
+    top = sc["center"] - sc["height"] / 2
+    p.outline(right - sc["width"], top, right, top + sc["height"], c["paper"], sc["border"], sc["width"] / 2)
+    dot = sc["dot"]
+    cx = right - sc["width"] / 2
+    p.rect(cx - dot["width"] / 2, top + dot["top"], cx + dot["width"] / 2, top + dot["top"] + dot["height"], c["paper"],
+           radius=dot["width"] / 2)
     img.save(path)
 
 

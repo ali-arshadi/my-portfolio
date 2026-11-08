@@ -320,3 +320,29 @@ html[data-panel-open] {
     transition: none;
   }
 }
+
+/* The scroll cue (hero/ScrollCue.tsx): the wheel dot slides down and fades, then starts again from
+   rest, which is how the monitor's screen texture paints it. */
+.scroll-cue-dot {
+  animation: scroll-cue 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes scroll-cue {
+  0%,
+  15% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-dot {
+    animation: none;
+  }
+}
