@@ -263,11 +263,28 @@ Implemented (`components/screen/`).
   (1 px = distanceFactor / 400 world units). It sits at the scene root rather than in a portal under
   the node: a portal keeps its own copy of the scene state, and when it was made before `CameraRig`'s
   camera became the default, the HTML was projected through the old camera.
-- **The swap.** `ScreenContent`'s first view repeats the screen image baked into the model (dots, code
-  bars, name, in the same layout, in the colours the image shows after tone mapping), and the HTML
-  fades in over the last 0.08 of the camera's alignment, so the swap can't be seen. The sections
-  follow, with tighter vertical padding than on the page. A title-bar strip fades the content out
-  under the window dots.
+- **The swap.** The screen texture baked into the model is the portfolio design's hero and header
+  (`blender/scripts/shared/textures.py`: `screen()`), and `ScreenContent`'s first view is the same hero
+  as HTML (`ScreenHero`, fixed pixel positions on the 1280 × 720 screen, `HERO`). The texture paints
+  that layout at 1.25× with the same fonts (vendored in `blender/fonts/`), placing text as the
+  browser does (line box, ascent and descent, letter-spacing per character); glyph positions agree to
+  about 1 px. The HTML fades in over the last 0.08 of the camera's alignment, so the swap can't be seen.
+  Keep `HERO` and `SCREEN_HERO` in step, and re-bake after changing either (the screen's light is in
+  the bake).
+- **The header** (`ScreenNav`) sits over the screen, outside the scrolling content: clear on the first
+  view, as painted; as the content scrolls it narrows to 860 px and turns to frosted glass
+  (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
+  (`screenNav` in `scrollState.ts`, registered by `ScrollController`): sections are found by
+  `data-section`, not `id`, as the static page's copy of them is in the DOM too.
+- **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
+  design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
+  display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band
+  (marquee; still with reduced motion), Profile, Impact tiles, Live in production, Achareh Bazaar
+  (request-to-payment flow and the Vue 2 → Vue 3 migration), Where I've shipped, Daily drivers, the
+  lime contact block. Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
+  content is 1280 px wide whatever the window is, and the same markup fits a phone. The design's
+  experience accordion is shown fully open here: opening a row would change the content's height, and
+  with it the length of the page's scroll, under the reader.
 - **Input and accessibility.** The HTML is drawn into `ScreenLayer`, over the canvas but outside its
   `aria-hidden` wrapper. It is `inert` and ignores the pointer until the camera has arrived. `#hero`
   (and GSAP's pin spacer, in `globals.css`) let clicks through to it. "Skip to content" scrolls to
@@ -296,8 +313,8 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   starts off and catches on by itself 0.7 s into the loader's reveal, so the first thing the reader
   sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
-  own mesh, no proxy box needed) opens the **tools panel**: "Tools I use" with that book's entry of
-  `data/tools.ts` marked, then "Selected work". `config/shelf.ts` maps each spine title (painted from
+  own mesh, no proxy box needed) opens the **tools panel**: "Daily drivers" with that book's entry of
+  `data/tools.ts` marked, then "Live in production". `config/shelf.ts` maps each spine title (painted from
   `blender/scripts/config.py` `BOOKS`) to its tool; Node.js has no entry in `tools.ts`, so that
   book marks nothing. The **figurine** opens the **About panel**: name and tagline
   (`data/about.ts`, which the hero now reads too), the bio, "Where I've worked" and "Say hello".
@@ -311,17 +328,16 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   the camera stay put. The panel fades and rises in, with no animation under reduced motion. The panels
   reuse the sections' list components (`ToolList`, `WorkList`, `ExperienceList`, `ContactList`) and
   titles, so their content stays in step with the page.
-- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Tools
-  I use", the owner's name), hidden until focused, open the same panels. In the static page
-  (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`, the bio
-  as an About section that only the static page shows.
-- **Content source.** The data files follow the owner's resume (title, summary, skills, projects,
-  experience). If `data/about.ts` `bio` is `null`, the About panel shows a marked placeholder.
+- **Keyboard and static mode.** The 3D objects take only the mouse, so in 3D mode two buttons ("Daily
+  drivers", the owner's name), hidden until focused, open the same panels. In the static page
+  (`data-scene="static"`) the buttons are hidden and the same content is already in `#content`.
+- **Content source.** The data files (`about`, `impact`, `work`, `experience`, `tools`, `contact`)
+  follow the owner's resume and their portfolio design canvas, which they confirmed as true. Work
+  cards show a striped placeholder until real screenshots are added. If `data/about.ts` `bio` is
+  `null`, the About panel shows a marked placeholder.
 - Still planned: the **candle** toggling the shelf accent light (optional; dropped if it doesn't earn
   its place).
-- Content: the existing `src/data/work.ts`, `tools.ts`, `experience.ts` and `contact.ts` are the owner's
-  own data and are reused as-is. Anything missing is marked as a placeholder in the data file, never
-  invented.
+- Content is never invented: anything missing is marked as a placeholder in the data file.
 
 ## 9. Loading and fallback
 

@@ -7,12 +7,8 @@ import { MathUtils, Mesh, Quaternion, Vector3 } from "three";
 import { PHASES } from "@/config/camera";
 import { ASSETS } from "@/config/scene.generated";
 import { scroll, screenScroll } from "@/components/scene/scrollState";
-import {
-  SCREEN_BACKGROUND,
-  SCREEN_PX,
-  ScreenContent,
-  WindowDots,
-} from "./ScreenContent";
+import { SCREEN_BACKGROUND, SCREEN_PX, ScreenContent } from "./ScreenContent";
+import { HERO, ScreenNav } from "./ScreenHero";
 import { screenLayer } from "./ScreenLayer";
 
 const MONITOR = ASSETS.find((a) => a.name === "monitor")!.model;
@@ -28,6 +24,7 @@ export function MonitorScreen() {
   const screen = useMemo(() => scene.getObjectByName("Screen"), [scene]);
   const frame = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
+  const nav = useRef<HTMLElement>(null);
   const distance = useSyncExternalStore(
     screenScroll.subscribe,
     screenScroll.get,
@@ -103,6 +100,16 @@ export function MonitorScreen() {
     }
     if (y !== prev.y) {
       content.current.style.transform = `translate3d(0, ${-y}px, 0)`;
+      // the header narrows and turns to glass over the first stretch of the content's scroll
+      const style = nav.current?.style;
+      style?.setProperty(
+        "--p",
+        String(MathUtils.clamp(y / HERO.nav.shrinkOver, 0, 1)),
+      );
+      style?.setProperty(
+        "--q",
+        String(MathUtils.clamp(y / HERO.nav.glassOver, 0, 1)),
+      );
     }
     last.current = { opacity, live, y };
   });
@@ -122,6 +129,7 @@ export function MonitorScreen() {
     >
       <div
         ref={frame}
+        data-screen
         inert
         className="relative overflow-hidden"
         style={{
@@ -134,7 +142,7 @@ export function MonitorScreen() {
         }}
       >
         <ScreenContent ref={measureContent} />
-        <WindowDots />
+        <ScreenNav ref={nav} />
       </div>
     </Html>
   );

@@ -4,7 +4,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useSyncExternalStore } from "react";
 import { useSceneMode } from "@/components/scene/sceneMode";
-import { scroll, screenScroll } from "@/components/scene/scrollState";
+import {
+  scroll,
+  screenNav,
+  screenScroll,
+} from "@/components/scene/scrollState";
 import { PHASES } from "@/config/phases";
 
 // Scroll spent on the camera move, in viewport heights.
@@ -136,7 +140,20 @@ export function ScrollController() {
     };
     skip?.addEventListener("click", onSkip);
 
+    // The monitor's header links: a point in its content is that far past the camera's arrival.
+    const unregister = screenNav.register((y) => {
+      const hero = ScrollTrigger.getAll().find((st) => st.pin);
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      window.scrollTo({
+        top: (hero?.start ?? 0) + camera + Math.min(Math.max(y, 0), distance),
+        behavior: reduce ? "auto" : "smooth",
+      });
+    });
+
     return () => {
+      unregister();
       skip?.removeEventListener("click", onSkip);
       mm.revert();
     };

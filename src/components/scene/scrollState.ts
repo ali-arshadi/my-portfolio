@@ -23,3 +23,20 @@ export const screenScroll = {
     return () => listeners.delete(listener);
   },
 };
+
+// Scrolls the page to a point in the monitor's content (in its CSS pixels from the top), for the
+// monitor's header links. ScrollController registers how: the content does not scroll itself, the
+// page does, after the camera move.
+let toScreen: ((y: number) => void) | null = null;
+
+export const screenNav = {
+  go: (y: number) => toScreen?.(y),
+  register(fn: (y: number) => void) {
+    toScreen = fn;
+    return () => {
+      if (toScreen === fn) {
+        toScreen = null;
+      }
+    };
+  },
+};
