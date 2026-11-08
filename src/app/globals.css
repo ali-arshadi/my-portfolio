@@ -82,6 +82,15 @@ body {
 [data-scene="static"] .hint-3d {
   display: none;
 }
+/* The hint that the scene's objects can be clicked (StaticHero): 3D mode only (.hint-3d above), gone
+   once the reader has clicked one. */
+.scene-hint {
+  display: inline-flex;
+  transition: opacity 0.6s ease;
+}
+[data-scene-touched] .scene-hint {
+  opacity: 0;
+}
 [data-scene="static"] .hint-static {
   display: inline;
 }

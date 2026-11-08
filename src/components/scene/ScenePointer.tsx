@@ -112,6 +112,8 @@ export function ScenePointer() {
     const onClick = (event: MouseEvent) => {
       const hit = pick(event);
       if (hit) {
+        // the reader has found the scene's objects: the hero's hint about them can go (globals.css)
+        document.documentElement.dataset.sceneTouched = "";
         hit.target.onActivate(hit.part);
       }
     };

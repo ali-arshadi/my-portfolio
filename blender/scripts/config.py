@@ -105,7 +105,7 @@ SHELF_PROPS = dict(
 # come from calibration.py; titles are programming topics, and the reference's third spine is light.
 BOOKS = [
     dict(x=0.347, thickness=0.052, height=0.236, title="Vue.js", cover="#16171a"),
-    dict(x=0.292, thickness=0.057, height=0.235, title="Node.js", cover="#1b1b1f"),
+    dict(x=0.292, thickness=0.057, height=0.235, title="Tailwind", cover="#1b1b1f"),
     dict(x=0.244, thickness=0.040, height=0.226, title="CSS", cover="#c9c5bd"),
     dict(x=0.199, thickness=0.049, height=0.221, title="Next.js", cover="#121214"),
     dict(x=0.151, thickness=0.048, height=0.213, title="Nuxt", cover="#1e1d21"),
