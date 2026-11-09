@@ -15,3 +15,8 @@ export const BLOOM = {
   intensity: 0.3,
   radius: 0.4,
 };
+
+// The monitor's screen material. The browser draws it as a display: its texture colours exactly, unlit
+// and outside tone mapping (Workspace.tsx, Effects.tsx), so the opening shot's screen matches the live
+// HTML that takes over at the monitor.
+export const SCREEN_MATERIAL = "monitor_screen";

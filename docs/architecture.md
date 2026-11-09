@@ -152,6 +152,7 @@ positions). Metals use it at full strength, since they have no diffuse colour fo
 Everything else uses a trace of it, so it does not double the baked diffuse light.
 
 Tone mapping is AgX in both Blender and three.js, with the same exposure (`EXPOSURE`, in stops).
+The one exception is the monitor's screen (see The swap).
 
 ### Live lamp highlight
 
@@ -179,7 +180,14 @@ and plant pot (measured patch by patch at 1672 × 941).
 - **Bloom** on light sources only. The scene renders in linear HDR, and the threshold (1.5) sits above
   every baked surface, so only the emissive bulb, diffuser, LED and flame glow. A small radius keeps the
   glow close to them; the first, wider setting hazed the dark walls next to the LED by up to 9×.
-- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview.
+- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview,
+  except on the monitor's screen: `Workspace` draws the `monitor_screen` material as a display
+  (`MeshBasicMaterial` with its texture, unlit) and writes alpha 0 there, every other surface being
+  opaque (alpha 1). The pass (`SceneToneMapping`) reads that mark from the scene render and passes
+  those pixels through, so the screen shows its texture's sRGB colours exactly. Tone mapped, its
+  bone text and accent washed out (through AgX at this exposure, bone becomes about `#cbcac8` and the
+  lime about `#c0c981`) and its reflections lifted the black, so the swap to the live HTML showed.
+  The screen's values stay under the bloom threshold, so it does not glow.
 - No vignette: the reference's dark corners come from its lighting, which the bake already reproduces.
 - No real-time AO or soft shadows: both are already in the bake.
 
@@ -270,7 +278,9 @@ Implemented (`components/screen/`).
   browser does (line box, ascent and descent, letter-spacing per character); glyph positions agree to
   about 1 px. The HTML fades in over the last 0.08 of the camera's alignment, so the swap can't be seen.
   Keep `HERO` and `SCREEN_HERO` in step, and re-bake after changing either (the screen's light is in
-  the bake).
+  the bake). The browser shows the texture's colours untouched (see Effects), so the screen matches the
+  HTML in colour as well as layout; `emit_strength` (0.75) only sets how much light the screen casts
+  in the bake.
 - **The header** (`ScreenNav`) sits over the screen, outside the scrolling content: clear on the first
   view, as painted; as the content scrolls it narrows to 860 px and turns to frosted glass
   (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
@@ -283,11 +293,12 @@ Implemented (`components/screen/`).
   The texture paints that one with the dot at rest, where the animation starts (`SCROLL_CUE` and
   `SCREEN_HERO["scroll"]` in step).
 - **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
-  design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
+  design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c` as the accent (`--accent`; the poster's "Repeat." and its
+  underline are lime too, painted greener, `POSTER_ACCENT`, as the warm lamp light turns the accent mustard); Bricolage Grotesque for
   display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band
   (marquee; still with reduced motion), Profile, Impact tiles, Live in production, Achareh Bazaar
   (request-to-payment flow and the Vue 2 → Vue 3 migration), Where I've shipped, Daily drivers, the
-  lime contact block. Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
+  lime contact block (its focus ring is ink, as bone barely shows on lime). Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
   content is 1280 px wide whatever the window is, and the same markup fits a phone. The design's
   experience accordion is shown fully open here: opening a row would change the content's height, and
   with it the length of the page's scroll, under the reader.

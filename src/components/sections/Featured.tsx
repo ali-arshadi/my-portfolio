@@ -28,7 +28,7 @@ export function Featured() {
             return (
               <li
                 key={step}
-                className={`tile flex min-h-[240px] min-w-0 flex-[1_1_190px] flex-col justify-between gap-8 border border-rule p-6 ${end ? "bg-lime text-ink" : "bg-tile"}`}
+                className={`tile flex min-h-[240px] min-w-0 flex-[1_1_190px] flex-col justify-between gap-8 border border-rule p-6 ${end ? "bg-accent text-ink" : "bg-tile"}`}
               >
                 <div
                   className={`font-mono text-[13px] ${end ? "" : "text-dim"}`}
@@ -41,7 +41,7 @@ export function Featured() {
                   </div>
                   <div className={`mt-6 h-1 ${end ? "bg-ink/20" : "bg-rule"}`}>
                     <div
-                      className={`h-1 ${end ? "bg-ink" : "bg-lime"}`}
+                      className={`h-1 ${end ? "bg-ink" : "bg-accent"}`}
                       style={{
                         width: `${((i + 1) * 100) / featured.flow.length}%`,
                       }}
@@ -57,7 +57,7 @@ export function Featured() {
         <div className="border border-rule bg-[#10100e]">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-rule px-8 py-5">
             <span className="label text-dim">{featured.migrationFrom}</span>
-            <span className="label flex min-h-8 items-center rounded-full bg-lime px-4 text-[12px] font-medium text-ink">
+            <span className="label flex min-h-8 items-center rounded-full bg-accent px-4 text-[12px] font-medium text-ink">
               {featured.migrationVia}
             </span>
             <span className="label">{featured.migrationTo}</span>
@@ -77,7 +77,7 @@ export function Featured() {
                 >
                   <span className="size-2 rounded-full bg-faint" />
                   <span className="h-px flex-1 bg-faint" />
-                  <span className="size-2 rounded-full bg-lime" />
+                  <span className="size-2 rounded-full bg-accent" />
                 </span>
                 <span className="min-w-0 flex-[1_1_260px] text-[clamp(22px,2.4cqw,34px)] font-semibold tracking-[-0.02em]">
                   <span className="sr-only">becomes </span>

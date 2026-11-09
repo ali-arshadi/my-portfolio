@@ -27,7 +27,7 @@ export function Practices() {
   return (
     <section
       aria-label="Practices"
-      className="overflow-hidden bg-lime py-[22px] text-ink"
+      className="overflow-hidden bg-accent py-[22px] text-ink"
     >
       <div className="folio-marquee">
         <Band />

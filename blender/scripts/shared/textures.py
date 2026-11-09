@@ -17,7 +17,11 @@ SANS = os.path.join(FONTS, "NotoSans-Regular.ttf")
 
 # Print aspect matches the poster's print area (see create_wall_poster.py).
 POSTER_SIZE = (720, 1120)
-POSTER_LINES = [("Build", "#e6d8c8"), ("Ship", "#e6d8c8"), ("Improve", "#e6d8c8"), ("Repeat.", "#f4a352")]
+ACCENT = "#c8f03c"  # the portfolio's lime (--accent in src/app/globals.css)
+# The poster's lime: a print lit by the warm lamp, so painted in the accent it reads mustard (about
+# 150,119,49 on screen). Painted greener, it reads lime-green under that light (about 118,137,45).
+POSTER_ACCENT = "#8cff20"
+POSTER_LINES = [("Build", "#e6d8c8"), ("Ship", "#e6d8c8"), ("Improve", "#e6d8c8"), ("Repeat.", POSTER_ACCENT)]
 
 
 def _font(path, size):
@@ -58,7 +62,7 @@ def poster(path):
         y += int(h * 0.136)
     d = ImageDraw.Draw(img)
     uy = int(h * 0.87)
-    d.line((int(w * 0.3), uy, int(w * 0.52), uy), fill=_rgb("#c8844e"), width=4)
+    d.line((int(w * 0.3), uy, int(w * 0.52), uy), fill=_rgb(POSTER_ACCENT), width=4)
     img.save(path)
 
 
@@ -86,7 +90,7 @@ SCREEN_HERO = dict(
              links=("Profile", "Impact", "Work", "Featured", "Experience", "Stack")),
 )
 SCREEN_COLORS = dict(ink="#0d0d0b", paper="#eceae3", dim="#a19f96", rule="#2b2b27", grid="#1b1b18",
-                     lime="#c8f03c")
+                     accent=ACCENT)
 LABEL = dict(size=13, line_height=1.5, tracking=0.04)  # the design's mono labels
 
 
@@ -165,12 +169,12 @@ def screen(path):
     mid = top + nav["height"] / 2
     left, end = pad + 1, right - 1
     label_top = mid - LABEL["size"] * LABEL["line_height"] / 2
-    p.rect(left, top, left + nav["height"], top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    p.rect(left, top, left + nav["height"], top + nav["height"], c["accent"], radius=nav["height"] / 2)
     initials = "AA"
     iw = p.width(initials, JETBRAINS, 14, -0.02)
     p.text(left + nav["height"] / 2 - iw / 2, mid - 21 / 2, 21, initials, JETBRAINS, 14, -0.02, c["ink"], wght=500)
     pill = label_width("Contact") + 48
-    p.rect(end - pill, top, end, top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    p.rect(end - pill, top, end, top + nav["height"], c["accent"], radius=nav["height"] / 2)
     label(end - pill + 24, label_top, "Contact", c["ink"], 500)
     links = sum(label_width(t) for t in nav["links"]) + nav["link_gap"] * (len(nav["links"]) - 1)
     inner = (left + nav["height"] + nav["gap"], end - pill - nav["gap"])

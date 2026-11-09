@@ -42,7 +42,7 @@ export function SelectedWork() {
                 {item.description}
               </p>
               <div className="mt-5">
-                <span className="inline-block border-b border-lime pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-lime">
+                <span className="inline-block border-b border-accent pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-accent">
                   {item.site}
                 </span>
               </div>
