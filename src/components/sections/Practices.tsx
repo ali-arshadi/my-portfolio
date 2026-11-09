@@ -22,7 +22,7 @@ function Band({ hidden = false }: { hidden?: boolean }) {
   );
 }
 
-// The amber band of what the work is about, running sideways (still with reduced motion).
+// The lime band of what the work is about, running sideways (still with reduced motion).
 export function Practices() {
   return (
     <section

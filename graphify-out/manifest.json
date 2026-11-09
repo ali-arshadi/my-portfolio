@@ -306,9 +306,9 @@
     "semantic_hash": ""
   },
   "blender/scripts/shared/textures.py": {
-    "mtime": 1794236961.9877815,
-    "seen": 1794237418.5407522,
-    "ast_hash": "a51caab1594603444b009a2c499a93fa",
+    "mtime": 1794238502.515011,
+    "seen": 1794239174.1149104,
+    "ast_hash": "7f826396d5cb76b95931e1d03aeada40",
     "semantic_hash": ""
   },
   "blender/scripts/shared/validation.py": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "src/components/hero/Loader.tsx": {
-    "mtime": 1794236955.3839927,
-    "seen": 1794237418.540762,
-    "ast_hash": "e58922f9ad672484281158adb92b7363",
+    "mtime": 1794238033.1430209,
+    "seen": 1794239174.114925,
+    "ast_hash": "d96200a05a13b6e0c92b9a10c066cd25",
     "semantic_hash": ""
   },
   "src/components/hero/ScrollController.tsx": {
@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "src/components/scene/Workspace.tsx": {
-    "mtime": 1794237050.8107624,
-    "seen": 1794237418.540775,
-    "ast_hash": "eb0415bbacb1742ee8df0e88f4dfef16",
+    "mtime": 1794238033.2569814,
+    "seen": 1794239174.114947,
+    "ast_hash": "35d6b9d420b61d65ef10348f7b1d01f4",
     "semantic_hash": ""
   },
   "src/components/scene/lampState.ts": {
@@ -456,9 +456,9 @@
     "semantic_hash": ""
   },
   "src/components/sections/Practices.tsx": {
-    "mtime": 1794236955.4305124,
-    "seen": 1794237418.5407872,
-    "ast_hash": "225bc4cbe6b5e9fd6b358c0da4c44b06",
+    "mtime": 1794238033.218279,
+    "seen": 1794239174.1149654,
+    "ast_hash": "67d7bf152e53e7847857e529aaaa52c2",
     "semantic_hash": ""
   },
   "src/components/sections/Profile.tsx": {
@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "src/components/shelf/ShelfPanel.tsx": {
-    "mtime": 1794236955.4551685,
-    "seen": 1794237418.5407913,
-    "ast_hash": "e2e555bbc6caef2161659810d4184329",
+    "mtime": 1794238066.9368217,
+    "seen": 1794239174.114971,
+    "ast_hash": "0cf1c505ed99b95057ee29c819022a6f",
     "semantic_hash": ""
   },
   "src/components/shelf/panelState.ts": {
@@ -492,8 +492,8 @@
     "semantic_hash": ""
   },
   "src/config/scene.generated.ts": {
-    "mtime": 1794237218.9435532,
-    "seen": 1794237418.5407946,
+    "mtime": 1794238699.6122508,
+    "seen": 1794239174.114975,
     "ast_hash": "c8707831305ac16f7ba4d2987644b00c",
     "semantic_hash": ""
   },
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794237139.421722,
-    "seen": 1794237418.540808,
-    "ast_hash": "3169c283c2ddd85f5be6630ec0b09522",
+    "mtime": 1794238502.515011,
+    "seen": 1794239174.1150458,
+    "ast_hash": "e08ee222314b92bdf7cde5ce97bcbac7",
     "semantic_hash": ""
   },
   "docs/asset-inventory.md": {
@@ -792,9 +792,9 @@
     "semantic_hash": ""
   },
   "public/lightmaps/desk-lamp.lamp.webp": {
-    "mtime": 1794237220.345,
-    "seen": 1794237418.5408373,
-    "ast_hash": "cf70d9f333527c0c95f1625d30ab5621",
+    "mtime": 1794238358.43,
+    "seen": 1794239174.1151114,
+    "ast_hash": "aff22cc33716d7787710538b58442673",
     "semantic_hash": ""
   },
   "public/lightmaps/desk.base.webp": {
@@ -810,9 +810,9 @@
     "semantic_hash": ""
   },
   "public/lightmaps/figurine.base.webp": {
-    "mtime": 1794237221.582,
-    "seen": 1794237418.5408397,
-    "ast_hash": "4b464c386cb1c212608b08990106f78c",
+    "mtime": 1794238358.545,
+    "seen": 1794239174.1151161,
+    "ast_hash": "f19271a43c72780c5b2e2e1f45edb805",
     "semantic_hash": ""
   },
   "public/lightmaps/figurine.lamp.webp": {
@@ -858,15 +858,15 @@
     "semantic_hash": ""
   },
   "public/lightmaps/mouse.base.webp": {
-    "mtime": 1794237223.109,
-    "seen": 1794237418.5408454,
-    "ast_hash": "14edbb5492c3a916555d87fad9fb06d8",
+    "mtime": 1794238358.598,
+    "seen": 1794239174.1151264,
+    "ast_hash": "b7e2236f0a706da299f1aa6cc899ebc8",
     "semantic_hash": ""
   },
   "public/lightmaps/mouse.lamp.webp": {
-    "mtime": 1794237223.138,
-    "seen": 1794237418.540846,
-    "ast_hash": "b269c143f2f147371043c8a280524436",
+    "mtime": 1794238358.641,
+    "seen": 1794239174.1151273,
+    "ast_hash": "2e53187600f1acc3e767073e565c9305",
     "semantic_hash": ""
   },
   "public/lightmaps/room.base.webp": {
@@ -918,9 +918,9 @@
     "semantic_hash": ""
   },
   "src/assets/opening-frame.webp": {
-    "mtime": 1794237411.7744558,
-    "seen": 1794237418.5408525,
-    "ast_hash": "3090dde4c3a36056c2795ea5ef9b0240",
+    "mtime": 1794238952.328878,
+    "seen": 1794239174.1151361,
+    "ast_hash": "a10c85408571ce16b583ed205288dc99",
     "semantic_hash": ""
   },
   "src/components/screen/ScreenHero.tsx": {
@@ -972,9 +972,9 @@
     "semantic_hash": ""
   },
   "src/components/scene/SceneHotspots.tsx": {
-    "mtime": 1794236955.4069974,
-    "seen": 1794237418.5407724,
-    "ast_hash": "fb74c3c5a72ac6bb187588627edba4c7",
+    "mtime": 1794238033.178693,
+    "seen": 1794239174.1149418,
+    "ast_hash": "2e24acbefe2952f87deb7d0a155a3258",
     "semantic_hash": ""
   },
   "pnpm-lock.yaml": {

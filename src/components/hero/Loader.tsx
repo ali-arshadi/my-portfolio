@@ -1,4 +1,4 @@
-// Full-screen loader for the 3D scene: an amber ring, the portfolio's accent, filling around the
+// Full-screen loader for the 3D scene: a lime ring, the portfolio's accent, filling around the
 // percentage, with a caption. It is server-rendered and shown only in 3D mode until the scene is ready
 // (globals.css, on <html data-scene>); DeskCanvas's LoadStatus moves the ring and the number, lights the
 // ring up at 100% and then reveals the scene.

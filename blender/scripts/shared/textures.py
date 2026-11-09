@@ -17,7 +17,11 @@ SANS = os.path.join(FONTS, "NotoSans-Regular.ttf")
 
 # Print aspect matches the poster's print area (see create_wall_poster.py).
 POSTER_SIZE = (720, 1120)
-POSTER_LINES = [("Build", "#e6d8c8"), ("Ship", "#e6d8c8"), ("Improve", "#e6d8c8"), ("Repeat.", "#f4a352")]
+ACCENT = "#c8f03c"  # the portfolio's lime (--accent in src/app/globals.css)
+# The poster's lime: a print lit by the warm lamp, so painted in the accent it reads mustard (about
+# 150,119,49 on screen). Painted greener, it reads lime-green under that light (about 118,137,45).
+POSTER_ACCENT = "#8cff20"
+POSTER_LINES = [("Build", "#e6d8c8"), ("Ship", "#e6d8c8"), ("Improve", "#e6d8c8"), ("Repeat.", POSTER_ACCENT)]
 
 
 def _font(path, size):
@@ -58,7 +62,7 @@ def poster(path):
         y += int(h * 0.136)
     d = ImageDraw.Draw(img)
     uy = int(h * 0.87)
-    d.line((int(w * 0.3), uy, int(w * 0.52), uy), fill=_rgb("#c8844e"), width=4)
+    d.line((int(w * 0.3), uy, int(w * 0.52), uy), fill=_rgb(POSTER_ACCENT), width=4)
     img.save(path)
 
 
@@ -86,7 +90,7 @@ SCREEN_HERO = dict(
              links=("Profile", "Impact", "Work", "Featured", "Experience", "Stack")),
 )
 SCREEN_COLORS = dict(ink="#0d0d0b", paper="#eceae3", dim="#a19f96", rule="#2b2b27", grid="#1b1b18",
-                     accent="#ffb454")  # the desk lamp's amber (--accent in globals.css)
+                     accent=ACCENT)
 LABEL = dict(size=13, line_height=1.5, tracking=0.04)  # the design's mono labels
 
 

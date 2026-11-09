@@ -12,7 +12,7 @@ import { shelfPanel } from "./panelState";
 
 const TITLE_ID = "shelf-panel-title";
 
-// The stack by group, as the "Daily drivers" section shows it, with the book's tool in the accent.
+// The stack by group, as the "Daily drivers" section shows it, with the book's tool in lime.
 function Stack({ marked }: { marked: Tool | null }) {
   return (
     <dl className="m-0 border-t border-rule">

@@ -8,16 +8,14 @@
   --card: #0f1118;
   --line: #1f2330;
   --radius-card: 0.75rem;
-  /* the portfolio content (sections/*): warm black, bone white and the lamp's amber accent */
+  /* the portfolio content (sections/*): warm black, bone white and a lime accent */
   --ink: #0d0d0b;
   --paper: #eceae3;
   --dim: #a19f96;
   --faint: #55554e;
   --rule: #2b2b27;
   --tile: #151512;
-  --accent: var(
-    --lamp
-  ); /* the desk lamp's amber, so the content matches the scene */
+  --accent: #c8f03c; /* lime, as on the poster's "Repeat." */
 }
 
 @theme inline {
@@ -141,7 +139,7 @@ html[data-scene="3d"]:not([data-scene-ready]) {
 }
 .loader[data-complete] .loader-fill {
   filter: drop-shadow(0 0 4px var(--accent))
-    drop-shadow(0 0 14px rgb(255 180 84 / 0.55));
+    drop-shadow(0 0 14px rgb(200 240 60 / 0.55));
 }
 .loader-value {
   position: absolute;
@@ -229,7 +227,7 @@ html[data-panel-open] {
 .folio :focus-visible {
   outline-color: var(--paper);
 }
-/* on the amber contact block a bone ring would barely show */
+/* on the lime contact block a bone ring would barely show */
 .folio [data-section="contact"] :focus-visible {
   outline-color: var(--ink);
 }
@@ -363,7 +361,7 @@ html[data-panel-open] {
   }
 }
 
-/* The marks on the scene's clickable objects (scene/SceneHotspots.tsx): an amber dot with a pulse ring,
+/* The marks on the scene's clickable objects (scene/SceneHotspots.tsx): a lime dot with a pulse ring,
    faded in while the objects can be used. */
 .hotspot {
   position: relative;
@@ -374,7 +372,7 @@ html[data-panel-open] {
   background: var(--accent);
   box-shadow:
     0 0 0 2px rgb(13 13 11 / 0.55),
-    0 0 14px rgb(255 180 84 / 0.55);
+    0 0 14px rgb(200 240 60 / 0.55);
   opacity: 0;
   transform: scale(0.6);
   transition:
