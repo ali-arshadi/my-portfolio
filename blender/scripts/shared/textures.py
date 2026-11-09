@@ -86,7 +86,7 @@ SCREEN_HERO = dict(
              links=("Profile", "Impact", "Work", "Featured", "Experience", "Stack")),
 )
 SCREEN_COLORS = dict(ink="#0d0d0b", paper="#eceae3", dim="#a19f96", rule="#2b2b27", grid="#1b1b18",
-                     lime="#c8f03c")
+                     accent="#ffb454")  # the desk lamp's amber (--accent in globals.css)
 LABEL = dict(size=13, line_height=1.5, tracking=0.04)  # the design's mono labels
 
 
@@ -165,12 +165,12 @@ def screen(path):
     mid = top + nav["height"] / 2
     left, end = pad + 1, right - 1
     label_top = mid - LABEL["size"] * LABEL["line_height"] / 2
-    p.rect(left, top, left + nav["height"], top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    p.rect(left, top, left + nav["height"], top + nav["height"], c["accent"], radius=nav["height"] / 2)
     initials = "AA"
     iw = p.width(initials, JETBRAINS, 14, -0.02)
     p.text(left + nav["height"] / 2 - iw / 2, mid - 21 / 2, 21, initials, JETBRAINS, 14, -0.02, c["ink"], wght=500)
     pill = label_width("Contact") + 48
-    p.rect(end - pill, top, end, top + nav["height"], c["lime"], radius=nav["height"] / 2)
+    p.rect(end - pill, top, end, top + nav["height"], c["accent"], radius=nav["height"] / 2)
     label(end - pill + 24, label_top, "Contact", c["ink"], 500)
     links = sum(label_width(t) for t in nav["links"]) + nav["link_gap"] * (len(nav["links"]) - 1)
     inner = (left + nav["height"] + nav["gap"], end - pill - nav["gap"])

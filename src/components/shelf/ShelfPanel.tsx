@@ -12,7 +12,7 @@ import { shelfPanel } from "./panelState";
 
 const TITLE_ID = "shelf-panel-title";
 
-// The stack by group, as the "Daily drivers" section shows it, with the book's tool in lime.
+// The stack by group, as the "Daily drivers" section shows it, with the book's tool in the accent.
 function Stack({ marked }: { marked: Tool | null }) {
   return (
     <dl className="m-0 border-t border-rule">
@@ -29,7 +29,7 @@ function Stack({ marked }: { marked: Tool | null }) {
               <span
                 key={item}
                 aria-current={item === marked ? "true" : undefined}
-                className={item === marked ? "text-lime" : undefined}
+                className={item === marked ? "text-accent" : undefined}
               >
                 {item}
               </span>
@@ -73,7 +73,7 @@ function Projects() {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-block border-b border-lime pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-lime"
+              className="mt-3 inline-block border-b border-accent pb-0.5 font-mono text-[13px] tracking-[0.02em] whitespace-pre text-accent"
             >
               {item.site}
             </a>
@@ -133,7 +133,7 @@ export function ShelfPanel() {
 
   const book = panel?.book == null ? null : SHELF_BOOKS[panel.book];
   const launch =
-    "sr-only rounded-full bg-lime px-4 py-2 font-mono text-[13px] text-ink uppercase focus-visible:not-sr-only";
+    "sr-only rounded-full bg-accent px-4 py-2 font-mono text-[13px] text-ink uppercase focus-visible:not-sr-only";
 
   return (
     <>
@@ -185,7 +185,7 @@ export function ShelfPanel() {
               <button
                 type="submit"
                 aria-label="Close"
-                className="flex size-11 items-center justify-center rounded-full border border-faint text-xl leading-none transition-colors hover:border-lime hover:text-lime"
+                className="flex size-11 items-center justify-center rounded-full border border-faint text-xl leading-none transition-colors hover:border-accent hover:text-accent"
               >
                 <span aria-hidden="true">×</span>
               </button>

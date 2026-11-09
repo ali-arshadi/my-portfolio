@@ -152,6 +152,7 @@ positions). Metals use it at full strength, since they have no diffuse colour fo
 Everything else uses a trace of it, so it does not double the baked diffuse light.
 
 Tone mapping is AgX in both Blender and three.js, with the same exposure (`EXPOSURE`, in stops).
+The one exception is the monitor's screen (see The swap).
 
 ### Live lamp highlight
 
@@ -179,7 +180,14 @@ and plant pot (measured patch by patch at 1672 × 941).
 - **Bloom** on light sources only. The scene renders in linear HDR, and the threshold (1.5) sits above
   every baked surface, so only the emissive bulb, diffuser, LED and flame glow. A small radius keeps the
   glow close to them; the first, wider setting hazed the dark walls next to the LED by up to 9×.
-- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview.
+- **AgX tone mapping** runs as the last pass, with the renderer's exposure, as in the Blender preview,
+  except on the monitor's screen: `Workspace` draws the `monitor_screen` material as a display
+  (`MeshBasicMaterial` with its texture, unlit) and writes alpha 0 there, every other surface being
+  opaque (alpha 1). The pass (`SceneToneMapping`) reads that mark from the scene render and passes
+  those pixels through, so the screen shows its texture's sRGB colours exactly. Tone mapped, its
+  bone text and accent washed out (through AgX at this exposure, bone becomes about `#cbcac8` and the
+  amber about `#d5b284`) and its reflections lifted the black, so the swap to the live HTML showed.
+  The screen's values stay under the bloom threshold, so it does not glow.
 - No vignette: the reference's dark corners come from its lighting, which the bake already reproduces.
 - No real-time AO or soft shadows: both are already in the bake.
 
@@ -270,7 +278,9 @@ Implemented (`components/screen/`).
   browser does (line box, ascent and descent, letter-spacing per character); glyph positions agree to
   about 1 px. The HTML fades in over the last 0.08 of the camera's alignment, so the swap can't be seen.
   Keep `HERO` and `SCREEN_HERO` in step, and re-bake after changing either (the screen's light is in
-  the bake).
+  the bake). The browser shows the texture's colours untouched (see Effects), so the screen matches the
+  HTML in colour as well as layout; `emit_strength` (0.75) only sets how much light the screen casts
+  in the bake.
 - **The header** (`ScreenNav`) sits over the screen, outside the scrolling content: clear on the first
   view, as painted; as the content scrolls it narrows to 860 px and turns to frosted glass
   (`MonitorScreen` sets `--p` and `--q`). Its links scroll the page, not the content, to a section
@@ -278,16 +288,18 @@ Implemented (`components/screen/`).
   `data-section`, not `id`, as the static page's copy of them is in the DOM too.
 - **Scroll cues are drawn, not written** (`hero/ScrollCue.tsx`): a mouse outline whose wheel dot
   slides down and fades, on a loop (held still with reduced motion), with a screen-reader label. The
-  page's hero shows it in the lamp's amber, the one UI accent not in lime (labelled "Scroll to step up to the screen", or "Scroll
+  page's hero shows it in the lamp's amber, the same accent as the portfolio content (labelled "Scroll to step up to the screen", or "Scroll
   for my work" in static mode); the monitor's hero shows it bottom right, as a link to the profile.
   The texture paints that one with the dot at rest, where the animation starts (`SCROLL_CUE` and
   `SCREEN_HERO["scroll"]` in step).
 - **The portfolio design** (`sections/*`, styles under `.folio` in `globals.css`), from the owner's
-  design canvas: warm black `#0d0d0b`, bone `#eceae3`, lime `#c8f03c`; Bricolage Grotesque for
+  design canvas: warm black `#0d0d0b`, bone `#eceae3`, and the desk lamp's amber `#ffb454` as the accent (`--accent`,
+  which points at `--lamp`; the canvas's lime `#c8f03c` did not match the scene). Ink on amber is about
+  11:1, amber on ink the same, so both pass AA; Bricolage Grotesque for
   display and text, JetBrains Mono for labels (`next/font`, in the root layout). Order: practices band
   (marquee; still with reduced motion), Profile, Impact tiles, Live in production, Achareh Bazaar
   (request-to-payment flow and the Vue 2 → Vue 3 migration), Where I've shipped, Daily drivers, the
-  lime contact block. Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
+  amber contact block (its focus ring is ink, as bone barely shows on amber). Sizes use container units (`cqw`) of `.folio`, never `vw`: on the monitor the
   content is 1280 px wide whatever the window is, and the same markup fits a phone. The design's
   experience accordion is shown fully open here: opening a row would change the content's height, and
   with it the length of the page's scroll, under the reader.
@@ -314,7 +326,7 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   opening a panel ends a hover even if the pointer did not move.
 - **The marks** (`scene/SceneHotspots.tsx`). Nothing else shows a reader that the scene's objects can be
   clicked, so each one (the lamp's click box, the top of the row of books, the figurine's head) gets a
-  lime dot with a pulse ring: drei `<Html>` pinned to the object, in the canvas's `aria-hidden`
+  amber dot with a pulse ring: drei `<Html>` pinned to the object, in the canvas's `aria-hidden`
   wrapper, taking no pointer events. They fade in 1.6 s after the scene is ready (once the lamp is
   on), only while the objects can be used (opening frame, no panel open), and for good once the reader
   clicks any object (`ScenePointer` sets `<html data-scene-touched>`). No pulse with reduced motion.
@@ -326,7 +338,7 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
   sees is the desk light coming on (skipped if they click it first, or with `?lamp=`).
 - **Implemented: the shelf** (`scene/ShelfObjects.tsx`). Each book (`book_0` … `book_7`, hit on its
   own mesh, no proxy box needed) opens the **stack panel**: "Daily drivers" by group with that book's
-  entry of `data/tools.ts` in lime, then "Live in production". `config/shelf.ts` maps each spine title (painted from
+  entry of `data/tools.ts` in the accent, then "Live in production". `config/shelf.ts` maps each spine title (painted from
   `blender/scripts/config.py` `BOOKS`) to its tool; every spine names a tool from the stack (the
   second reads "Tailwind", short for Tailwind CSS, which would not fit the spine). The **figurine**, a GitHub-style cat, opens the owner's **GitHub profile** in a
   new tab (`GITHUB` in `data/contact.ts`), from the click's own handler so the browser allows it.
@@ -358,7 +370,7 @@ onActivate })`: `root` is a scene node name (all its descendants are tested, hid
 Implemented in Phase 7.
 
 - **Loader** (`hero/Loader.tsx`, styles in `globals.css`). In 3D mode a full-screen loader covers the
-  page from the first paint: a lime ring (the portfolio's accent) filling around the percentage, with
+  page from the first paint: an amber ring (the portfolio's accent) filling around the percentage, with
   "Setting up the desk" under it, the way 3D sites such as Lusion and Bruno Simon's portfolio open on a
   minimal centred loader. `DeskCanvas`'s `LoadStatus` reads drei's progress store each frame and eases
   the shown value toward it, so it never jumps or runs backwards; at 100% the ring glows for half a

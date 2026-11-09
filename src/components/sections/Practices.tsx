@@ -22,12 +22,12 @@ function Band({ hidden = false }: { hidden?: boolean }) {
   );
 }
 
-// The lime band of what the work is about, running sideways (still with reduced motion).
+// The amber band of what the work is about, running sideways (still with reduced motion).
 export function Practices() {
   return (
     <section
       aria-label="Practices"
-      className="overflow-hidden bg-lime py-[22px] text-ink"
+      className="overflow-hidden bg-accent py-[22px] text-ink"
     >
       <div className="folio-marquee">
         <Band />

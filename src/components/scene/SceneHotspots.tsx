@@ -27,7 +27,7 @@ const SPOTS = [
   },
 ] as const;
 
-// Lime marks with a pulse on the scene's clickable objects (the lamp, the books, the figurine), so a
+// Amber marks with a pulse on the scene's clickable objects (the lamp, the books, the figurine), so a
 // reader sees there is something to click without being told: nothing else shows it until they hover
 // one. They are HTML pinned to the objects (drei <Html>, in the canvas's aria-hidden wrapper, taking
 // no pointer events: ScenePointer still does the clicking). They show when the objects can be used:

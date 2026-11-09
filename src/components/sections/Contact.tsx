@@ -10,7 +10,7 @@ export function Contact() {
   return (
     <section
       data-section="contact"
-      className="bg-lime px-[clamp(20px,5cqw,72px)] pt-28 text-ink"
+      className="bg-accent px-[clamp(20px,5cqw,72px)] pt-28 text-ink"
     >
       <h2 className="m-0 text-[clamp(56px,11cqw,190px)] leading-[0.88] font-extrabold tracking-[-0.045em] text-balance uppercase">
         {CONTACT_TITLE}

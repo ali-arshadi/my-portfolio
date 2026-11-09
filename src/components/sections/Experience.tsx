@@ -55,7 +55,7 @@ export function Experience() {
                   >
                     <span
                       aria-hidden="true"
-                      className="mt-2 size-2 flex-none bg-lime"
+                      className="mt-2 size-2 flex-none bg-accent"
                     />
                     <span>{bullet}</span>
                   </li>

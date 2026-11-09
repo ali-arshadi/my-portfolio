@@ -4,6 +4,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 import { useLayoutEffect, useMemo } from "react";
 import {
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   SRGBColorSpace,
   type Texture,
@@ -12,6 +13,7 @@ import {
   HIT_TARGET_SUFFIX,
   METAL_ENV_INTENSITY,
   PLAIN_ENV_INTENSITY,
+  SCREEN_MATERIAL,
 } from "@/config/scene";
 import {
   ASSETS,
@@ -156,6 +158,25 @@ uniform float swayAmount;`,
   });
 }
 
+// The monitor's screen, drawn as a display rather than a lit surface: its texture's own colours, with
+// no lighting, reflections or tone mapping, so the opening shot shows exactly the colours of the live
+// HTML that replaces it at the monitor (MonitorScreen). Tone mapped like the rest, its near-black
+// lifted and its bone text and amber washed out. The pixels are marked with alpha 0 (everything else
+// is opaque, alpha 1), and Effects' tone mapping passes marked pixels through unchanged.
+function asDisplay(mesh: Mesh, material: MeshStandardMaterial) {
+  const display = new MeshBasicMaterial({
+    name: material.name,
+    map: material.emissiveMap ?? material.map,
+  });
+  display.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      "#include <opaque_fragment>\n  gl_FragColor.a = 0.0;",
+    );
+  };
+  mesh.material = display;
+}
+
 function isLightmapped(material: MeshStandardMaterial) {
   const emissive =
     material.emissiveIntensity > 0 &&
@@ -185,6 +206,13 @@ function AssetModel({ asset }: { asset: Asset }) {
         return;
       }
       const material = object.material as MeshStandardMaterial;
+      if (
+        material.name === SCREEN_MATERIAL &&
+        material.isMeshStandardMaterial
+      ) {
+        asDisplay(object, material);
+        return;
+      }
       if ((LAMP_EMITTERS as readonly string[]).includes(material.name)) {
         fadeWithLamp(material);
       }

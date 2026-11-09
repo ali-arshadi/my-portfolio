@@ -137,7 +137,7 @@ export function ScreenNav({ ref }: { ref?: Ref<HTMLElement> }) {
         href="#top"
         aria-label="Back to top"
         onClick={(event) => go(event, null)}
-        className="flex size-11 flex-none items-center justify-center rounded-full bg-lime text-[14px] font-medium tracking-[-0.02em] text-ink"
+        className="flex size-11 flex-none items-center justify-center rounded-full bg-accent text-[14px] font-medium tracking-[-0.02em] text-ink"
       >
         AA
       </a>
@@ -156,7 +156,7 @@ export function ScreenNav({ ref }: { ref?: Ref<HTMLElement> }) {
       <a
         href="#contact"
         onClick={(event) => go(event, "contact")}
-        className="lift label flex min-h-11 flex-none items-center rounded-full bg-lime px-6 font-medium text-ink"
+        className="lift label flex min-h-11 flex-none items-center rounded-full bg-accent px-6 font-medium text-ink"
       >
         Contact
       </a>

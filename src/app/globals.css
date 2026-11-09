@@ -8,14 +8,16 @@
   --card: #0f1118;
   --line: #1f2330;
   --radius-card: 0.75rem;
-  /* the portfolio content (sections/*): warm black, bone white and a lime accent */
+  /* the portfolio content (sections/*): warm black, bone white and the lamp's amber accent */
   --ink: #0d0d0b;
   --paper: #eceae3;
   --dim: #a19f96;
   --faint: #55554e;
   --rule: #2b2b27;
   --tile: #151512;
-  --lime: #c8f03c;
+  --accent: var(
+    --lamp
+  ); /* the desk lamp's amber, so the content matches the scene */
 }
 
 @theme inline {
@@ -33,7 +35,7 @@
   --color-faint: var(--faint);
   --color-rule: var(--rule);
   --color-tile: var(--tile);
-  --color-lime: var(--lime);
+  --color-accent: var(--accent);
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
@@ -57,7 +59,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lime);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -133,13 +135,13 @@ html[data-scene="3d"]:not([data-scene-ready]) {
   animation: loader-breathe 1.8s ease-in-out infinite;
 }
 .loader-fill {
-  stroke: var(--lime);
+  stroke: var(--accent);
   stroke-linecap: round;
   transition: filter 450ms ease;
 }
 .loader[data-complete] .loader-fill {
-  filter: drop-shadow(0 0 4px var(--lime))
-    drop-shadow(0 0 14px rgba(200, 240, 60, 0.55));
+  filter: drop-shadow(0 0 4px var(--accent))
+    drop-shadow(0 0 14px rgb(255 180 84 / 0.55));
 }
 .loader-value {
   position: absolute;
@@ -226,6 +228,10 @@ html[data-panel-open] {
 }
 .folio :focus-visible {
   outline-color: var(--paper);
+}
+/* on the amber contact block a bone ring would barely show */
+.folio [data-section="contact"] :focus-visible {
+  outline-color: var(--ink);
 }
 .folio-marquee {
   display: flex;
@@ -357,7 +363,7 @@ html[data-panel-open] {
   }
 }
 
-/* The marks on the scene's clickable objects (scene/SceneHotspots.tsx): a lime dot with a pulse ring,
+/* The marks on the scene's clickable objects (scene/SceneHotspots.tsx): an amber dot with a pulse ring,
    faded in while the objects can be used. */
 .hotspot {
   position: relative;
@@ -365,10 +371,10 @@ html[data-panel-open] {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--lime);
+  background: var(--accent);
   box-shadow:
     0 0 0 2px rgb(13 13 11 / 0.55),
-    0 0 14px rgb(200 240 60 / 0.55);
+    0 0 14px rgb(255 180 84 / 0.55);
   opacity: 0;
   transform: scale(0.6);
   transition:
@@ -383,7 +389,7 @@ html[data-panel-open] {
   content: "";
   position: absolute;
   inset: -2px;
-  border: 2px solid var(--lime);
+  border: 2px solid var(--accent);
   border-radius: 50%;
   animation: hotspot-pulse 2.2s ease-out infinite;
 }
