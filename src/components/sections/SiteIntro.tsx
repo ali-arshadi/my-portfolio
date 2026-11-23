@@ -4,6 +4,7 @@ import type { MouseEvent } from "react";
 import { SCROLL_CUE, ScrollCue } from "@/components/hero/ScrollCue";
 import { NAV_LINKS } from "@/components/screen/nav";
 import { about } from "@/data/about";
+import { CvLink } from "./CvLink";
 
 const CLEARANCE = 72;
 
@@ -97,6 +98,9 @@ export function SiteIntro() {
             >
               <ScrollCue label="Scroll to my profile" />
             </a>
+          </div>
+          <div className="mt-8">
+            <CvLink tone="ink" />
           </div>
         </div>
       </section>

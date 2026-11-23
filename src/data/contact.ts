@@ -18,5 +18,12 @@ export const contact: ContactLink[] = [
   },
 ];
 
+// Served from public/. The download name is what the file is saved as.
+export const CV = {
+  label: "Download CV",
+  href: "/Ali-Arshadi-CV.pdf",
+  download: "Ali-Arshadi-CV.pdf",
+} as const;
+
 // The GitHub profile, which the shelf's figurine (a GitHub-style cat) opens.
 export const GITHUB = contact.find((link) => link.label === "GitHub")!;

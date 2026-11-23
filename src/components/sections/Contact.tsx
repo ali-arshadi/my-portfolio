@@ -1,5 +1,6 @@
 import { about } from "@/data/about";
 import { contact } from "@/data/contact";
+import { CvLink } from "./CvLink";
 
 export const CONTACT_TITLE = "Let’s talk front-end.";
 
@@ -26,6 +27,9 @@ export function Contact() {
         </div>
       )}
       <ul className="m-0 mt-10 flex list-none flex-wrap gap-3 p-0">
+        <li>
+          <CvLink tone="accent" />
+        </li>
         {profiles.map((link) => (
           <li key={link.label}>
             <a
