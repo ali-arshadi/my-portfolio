@@ -6,11 +6,9 @@ import { SCENE_MEDIA } from "./sceneMedia";
 export { SCENE_MEDIA };
 
 // How the hero is shown:
-//   3d       the live scene, the scroll-driven camera and the portfolio on the monitor
-//   static   the rendered opening frame and the sections below it: narrow screens (the monitor's text
-//            would be too small to read, and a phone should not download the scene) and browsers
-//            without WebGL 2
-//   pending  on the server and before hydration: the still frame shows, nothing else is decided yet
+//   3d       the live scene, the scroll-driven camera and the portfolio on the monitor (desktop)
+//   static   the site only, no scene: phones, tablets, and browsers without WebGL 2
+//   pending  on the server and before hydration: nothing else is decided yet
 export type SceneMode = "3d" | "static" | "pending";
 
 let webgl2: boolean | undefined;

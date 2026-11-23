@@ -68,13 +68,24 @@ body {
 }
 
 /* Scene mode (DeskCanvasLoader sets <html data-scene>: 3d, static or pending; DeskCanvas adds
-   data-scene-ready). In 3D mode the sections live on the monitor; otherwise the page shows them below
-   the hero. In 3D mode the still is hidden: the loader reveals the live scene itself. */
+   data-scene-ready). The scene and its hero overlay exist only in 3D (desktop). Phones and tablets
+   get the site in #content. Default (no data-scene, and static) hides the scene so a phone never
+   flashes it before the mode script runs. */
+#scene,
+#hero {
+  display: none;
+}
+[data-scene="3d"] #scene {
+  display: block;
+}
+[data-scene="3d"] #hero {
+  display: flex;
+}
 [data-scene="3d"] #content {
   display: none;
 }
-[data-scene="3d"] .scene-still {
-  display: none;
+#content [data-section] {
+  scroll-margin-top: 5rem;
 }
 .hint-static {
   display: none;
@@ -306,6 +317,12 @@ html[data-panel-open] {
   .folio .mail {
     transition: none;
   }
+}
+
+/* The site header on phones and tablets (sections/SiteIntro.tsx). Always glass: there is no
+   baked screen texture to match, and the pill sits over the scrolling page. */
+.site-nav {
+  --q: 1;
 }
 
 /* The monitor's header (screen/ScreenHero.tsx: ScreenNav). Clear on the first view, as the screen

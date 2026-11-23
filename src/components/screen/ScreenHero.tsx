@@ -4,6 +4,7 @@ import type { MouseEvent, Ref } from "react";
 import { SCROLL_CUE, ScrollCue } from "@/components/hero/ScrollCue";
 import { screenNav } from "@/components/scene/scrollState";
 import { about } from "@/data/about";
+import { NAV_LINKS } from "./nav";
 
 // The monitor's first view: the portfolio design's hero and header, laid out in CSS pixels on the
 // 1280 x 720 screen. The same layout is painted into the screen texture baked into the model
@@ -23,16 +24,6 @@ export const HERO = {
 } as const;
 
 const INK = "#0d0d0b";
-
-// The content's sections, in the header's order (their data-section names).
-const LINKS = [
-  ["Profile", "profile"],
-  ["Impact", "impact"],
-  ["Work", "work"],
-  ["Featured", "featured"],
-  ["Experience", "experience"],
-  ["Stack", "stack"],
-] as const;
 
 // Scrolls the page to a section of the screen's content (or its top): the content is moved by the
 // page's scroll, so a plain in-page link cannot reach it. A section stops this far short of the top,
@@ -142,7 +133,7 @@ export function ScreenNav({ ref }: { ref?: Ref<HTMLElement> }) {
         AA
       </a>
       <div className="flex flex-1 items-center justify-center gap-x-[25.6px]">
-        {LINKS.map(([label, section]) => (
+        {NAV_LINKS.map(([label, section]) => (
           <a
             key={section}
             href={`#${section}`}

@@ -41,7 +41,8 @@ export const metadata: Metadata = {
 };
 
 // The scene-mode script sets <html data-scene> before the first paint, so the 3D loader only ever shows
-// where the scene will load (hence suppressHydrationWarning on <html>).
+// where the scene will load (hence suppressHydrationWarning on <html>). Body has it too: extensions
+// such as Grammarly stamp attributes onto <body> before hydration.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -49,7 +50,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${familjen.variable} ${bricolage.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-bg font-sans text-fg antialiased">
+      <body
+        className="bg-bg font-sans text-fg antialiased"
+        suppressHydrationWarning
+      >
         <Script id="scene-mode" strategy="beforeInteractive">
           {SCENE_MODE_SCRIPT}
         </Script>
